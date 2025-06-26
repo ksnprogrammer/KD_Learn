@@ -10,6 +10,7 @@ import {
   HeartHandshake,
   LayoutDashboard,
   Leaf,
+  Library,
   MessageSquare,
   Settings,
   Sigma,
@@ -99,6 +100,14 @@ export function AppSidebar() {
               <Link href="/dashboard/story-weaver">
                 <Feather />
                 Story Weaver
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard/hall-of-legends">
+                <Library />
+                Hall of Legends
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

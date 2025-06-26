@@ -119,3 +119,53 @@ export async function updateSubmissionStatus(id: number, status: 'Approved' | 'R
     return { success: false, error: `Failed to update submission status: ${errorMessage}` };
   }
 }
+
+export async function saveStory(storyData: CreateStoryOutput): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    const { error } = await supabase
+      .from('stories')
+      .insert([
+        { 
+          title: storyData.title, 
+          story: storyData.story,
+          image_data_uri: storyData.imageDataUri,
+        }
+      ]);
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    };
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to save story: ${errorMessage}` };
+  }
+}
+
+export async function getStories(): Promise<{
+  success: boolean;
+  data?: any[];
+  error?: string;
+}> {
+  try {
+    const { data, error } = await supabase
+      .from('stories')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    }
+    return { success: true, data: data || [] };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to fetch stories: ${errorMessage}` };
+  }
+}

@@ -3,7 +3,7 @@
 import { AppHeader } from "@/components/app-header";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -11,10 +11,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
-import { generateStory } from "@/app/actions";
+import { generateStory, saveStory } from "@/app/actions";
 import type { CreateStoryOutput } from "@/ai/flows/create-story-flow";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Feather, Sparkles } from "lucide-react";
+import { Loader2, Feather, Sparkles, Save } from "lucide-react";
 import Image from "next/image";
 
 const formSchema = z.object({
@@ -25,6 +25,8 @@ type FormValues = z.infer<typeof formSchema>;
 
 function StoryWeaverPanel() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [result, setResult] = useState<CreateStoryOutput | null>(null);
   const { toast } = useToast();
 
@@ -38,6 +40,7 @@ function StoryWeaverPanel() {
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
     setResult(null);
+    setIsSaved(false);
 
     const { success, data, error } = await generateStory(values.prompt);
     setIsLoading(false);
@@ -49,6 +52,27 @@ function StoryWeaverPanel() {
         variant: 'destructive',
         title: 'Error Weaving Story',
         description: error || 'The Royal Storyteller is busy. Please try again later.',
+      });
+    }
+  }
+
+  async function handleSaveStory() {
+    if (!result) return;
+    setIsSaving(true);
+    const { success, error } = await saveStory(result);
+    setIsSaving(false);
+
+    if (success) {
+      setIsSaved(true);
+      toast({
+        title: 'Story Saved!',
+        description: 'Your legend has been inscribed in the Hall of Legends.',
+      });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error Saving Story',
+        description: error || 'Could not save your story. Please try again.',
       });
     }
   }
@@ -119,6 +143,12 @@ function StoryWeaverPanel() {
             </div>
             <pre className="whitespace-pre-wrap font-body text-base text-muted-foreground leading-relaxed">{result.story}</pre>
           </CardContent>
+          <CardFooter>
+            <Button onClick={handleSaveStory} disabled={isSaving || isSaved}>
+              {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" />}
+              {isSaved ? 'Saved to Hall' : 'Save to Hall of Legends'}
+            </Button>
+          </CardFooter>
         </Card>
       )}
     </div>
