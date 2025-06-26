@@ -1,17 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Bar, BarChart as RechartsBarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import {
   BarChart as BarChartIcon,
   CheckCheck,
   CheckCircle,
-  DollarSign,
   Eye,
   Loader2,
   Sparkles,
   Upload,
-  Users,
   XCircle,
   Video,
   FileText,
@@ -25,6 +22,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
+import type { KingdomReportOutput } from '@/ai/flows/generate-kingdom-report';
 import {
   generateModule,
   getSubmissions,
@@ -32,19 +30,12 @@ import {
   updateSubmissionStatus,
   getPayments,
   updatePaymentStatus,
+  generateKingdomAnalytics,
 } from '@/app/actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from '@/components/ui/chart';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -562,82 +553,84 @@ function PaymentApprovals() {
 
 
 function AnalyticsReports() {
-  const newKnightsData = [
-    { month: 'Jan', knights: 18 },
-    { month: 'Feb', knights: 30 },
-    { month: 'Mar', knights: 45 },
-    { month: 'Apr', knights: 60 },
-    { month: 'May', knights: 55 },
-    { month: 'Jun', knights: 78 },
-  ];
+  const [report, setReport] = useState<KingdomReportOutput | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const knightsChartConfig = {
-    knights: {
-      label: 'New Knights',
-      color: 'hsl(var(--primary))',
-    },
-  } satisfies ChartConfig;
+  const handleGenerateReport = async () => {
+    setIsLoading(true);
+    setReport(null);
+    const { success, data, error } = await generateKingdomAnalytics();
+    setIsLoading(false);
 
-  const revenueData = [
-    { month: 'Jan', revenue: 8000 },
-    { month: 'Feb', revenue: 12000 },
-    { month: 'Mar', revenue: 19000 },
-    { month: 'Apr', revenue: 25000 },
-    { month: 'May', revenue: 22000 },
-    { month: 'Jun', revenue: 31000 },
-  ];
-
-  const revenueChartConfig = {
-    revenue: {
-      label: 'Revenue (LKR)',
-      color: 'hsl(var(--biology))',
-    },
-  } satisfies ChartConfig;
+    if (success && data) {
+      setReport(data);
+      toast({
+        title: 'Report Generated',
+        description: 'The Royal Scribe has delivered their findings.',
+      });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Failed to Generate Report',
+        description: error || 'An unexpected error occurred.',
+      });
+    }
+  };
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users />
-            New Knight Enlistment
+            <BarChartIcon />
+            Kingdom Intelligence
           </CardTitle>
-          <CardDescription>Monthly new knights joining the kingdom.</CardDescription>
+          <CardDescription>
+            Request a new report from the Royal Scribe to understand the state of the kingdom's content pipeline.
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <ChartContainer config={knightsChartConfig} className="h-[300px] w-full">
-            <RechartsBarChart accessibilityLayer data={newKnightsData}>
-              <CartesianGrid vertical={false} />
-              <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
-              <YAxis />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <ChartLegend content={<ChartLegendContent />} />
-              <Bar dataKey="knights" fill="var(--color-knights)" radius={4} />
-            </RechartsBarChart>
-          </ChartContainer>
-        </CardContent>
+        <CardFooter>
+          <Button onClick={handleGenerateReport} disabled={isLoading}>
+            {isLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="mr-2" />}
+            Generate Intelligence Report
+          </Button>
+        </CardFooter>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign />
-            Kingdom Treasury
-          </CardTitle>
-          <CardDescription>Monthly revenue from memberships and donations.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={revenueChartConfig} className="h-[300px] w-full">
-            <LineChart accessibilityLayer data={revenueData}>
-              <CartesianGrid vertical={false} />
-              <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
-              <YAxis tickFormatter={(value) => `LKR ${Number(value) / 1000}k`} />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <ChartLegend content={<ChartLegendContent />} />
-              <Line type="monotone" dataKey="revenue" stroke="var(--color-revenue)" strokeWidth={2} dot={true} />
-            </LineChart>
-          </ChartContainer>
-        </CardContent>
-      </Card>
+      
+      {isLoading && (
+        <div className="flex flex-col items-center justify-center text-center gap-4 mt-12">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
+          <p className="font-headline text-lg">The Scribe is gathering intelligence...</p>
+        </div>
+      )}
+
+      {report && (
+        <div className="space-y-6 animate-fade-in-up">
+          <Card>
+            <CardHeader>
+              <CardTitle>Scribe's Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="prose max-w-none text-muted-foreground">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{report.narrativeSummary}</ReactMarkdown>
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {report.keyMetrics.map((metric, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle>{metric.metric}</CardTitle>
+                  <CardDescription className="text-3xl font-bold text-card-foreground">{metric.value}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">{metric.insight}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

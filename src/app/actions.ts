@@ -4,6 +4,8 @@ import { createModuleFromDescription } from '@/ai/flows/create-module-from-descr
 import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
 import { createStory } from '@/ai/flows/create-story-flow';
 import type { CreateStoryOutput } from '@/ai/flows/create-story-flow';
+import { generateKingdomReport } from '@/ai/flows/generate-kingdom-report';
+import type { KingdomReportOutput } from '@/ai/flows/generate-kingdom-report';
 import { supabase } from '@/lib/supabase';
 import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
@@ -427,5 +429,20 @@ export async function updatePaymentStatus(id: number, status: 'Approved' | 'Reje
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     return { success: false, error: `Failed to update payment status: ${errorMessage}` };
+  }
+}
+
+export async function generateKingdomAnalytics(): Promise<{
+  success: boolean;
+  data?: KingdomReportOutput;
+  error?: string;
+}> {
+  try {
+    const output = await generateKingdomReport();
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate report: ${errorMessage}` };
   }
 }
