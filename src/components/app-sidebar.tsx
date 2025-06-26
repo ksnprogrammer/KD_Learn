@@ -4,6 +4,7 @@ import {
   BookOpen,
   Castle,
   Briefcase,
+  Feather,
   FlaskConical,
   Gem,
   HeartHandshake,
@@ -90,6 +91,14 @@ export function AppSidebar() {
               <Link href="/dashboard/profile">
                 <UserCircle />
                 My Profile
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard/story-weaver">
+                <Feather />
+                Story Weaver
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

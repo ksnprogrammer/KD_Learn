@@ -2,6 +2,8 @@
 
 import { createModuleFromDescription } from '@/ai/flows/create-module-from-description';
 import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
+import { createStory } from '@/ai/flows/create-story-flow';
+import type { CreateStoryOutput } from '@/ai/flows/create-story-flow';
 import { supabase } from '@/lib/supabase';
 
 export async function generateModule(topicDescription: string): Promise<{
@@ -20,6 +22,25 @@ export async function generateModule(topicDescription: string): Promise<{
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     return { success: false, error: `Failed to generate module: ${errorMessage}` };
+  }
+}
+
+export async function generateStory(prompt: string): Promise<{
+  success: boolean;
+  data?: CreateStoryOutput;
+  error?: string;
+}> {
+  if (!prompt) {
+    return { success: false, error: 'Prompt cannot be empty.' };
+  }
+
+  try {
+    const output = await createStory({ prompt });
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate story: ${errorMessage}` };
   }
 }
 
