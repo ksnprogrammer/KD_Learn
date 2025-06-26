@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -24,6 +24,9 @@ const formSchema = z.object({
   password: z.string().min(8, { message: 'Password must be at least 8 characters.' }),
   gender: z.enum(['male', 'female'], {
     required_error: 'You need to select your avatar.',
+  }),
+  terms: z.boolean().refine((val) => val === true, {
+    message: 'You must accept the terms and conditions to proceed.',
   }),
 });
 
@@ -40,6 +43,7 @@ export function KnightRegistration() {
       name: '',
       email: '',
       password: '',
+      terms: false,
     },
   });
 
@@ -48,10 +52,10 @@ export function KnightRegistration() {
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsLoading(false);
 
-    const gang = values.gender === 'male' ? "the Azure Dragons" : "the Verdant Dragons";
+    const gang = values.gender === 'male' ? 'the Azure Dragons' : 'the Verdant Dragons';
 
     toast({
       title: 'Welcome, Knight!',
@@ -174,6 +178,32 @@ export function KnightRegistration() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="terms"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 pt-2">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>I accept the Kingdom's rules.</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        By signing up, you agree to our{' '}
+                        <Link href="/terms" className="underline hover:text-primary" target="_blank">
+                          Terms of Service
+                        </Link>{' '}
+                        and{' '}
+                        <Link href="/privacy" className="underline hover:text-primary" target="_blank">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </p>
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Enlisting...' : <> <Sword className="mr-2" /> Become a Knight </>}
               </Button>
@@ -181,9 +211,9 @@ export function KnightRegistration() {
           </Form>
           <div className="mt-4">
             <Button variant="outline" className="w-full" asChild>
-                <Link href={process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || '#'}>
-                    <MessageSquare className="mr-2" /> Join the WhatsApp Channel
-                </Link>
+              <Link href={process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || '#'}>
+                <MessageSquare className="mr-2" /> Join the WhatsApp Channel
+              </Link>
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">

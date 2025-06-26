@@ -148,9 +148,12 @@ export function LandingPage() {
 
       </main>
       <footer className="border-t py-6">
-        <div className="container flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} KingDragons. All rights reserved.</p>
-          <Logo />
+        <div className="container flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground text-center sm:text-left">&copy; {new Date().getFullYear()} KingDragons. All rights reserved.</p>
+          <div className="flex gap-4">
+              <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">Terms of Service</Link>
+              <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">Privacy Policy</Link>
+          </div>
         </div>
       </footer>
     </div>
