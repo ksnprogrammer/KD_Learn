@@ -5,6 +5,67 @@ import type { CreateModuleOutput } from '@/ai/flows/create-module-from-descripti
 import { createStory } from '@/ai/flows/create-story-flow';
 import type { CreateStoryOutput } from '@/ai/flows/create-story-flow';
 import { supabase } from '@/lib/supabase';
+import { createServerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+
+
+export async function login(formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const cookieStore = cookies();
+  const supabase = createServerClient({ cookies: () => cookieStore });
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    return redirect('/login?message=Could not authenticate user');
+  }
+
+  return redirect('/dashboard');
+}
+
+export async function signup(formData: FormData) {
+  const origin = headers().get('origin');
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+  const name = formData.get('name') as string;
+  const examLevel = formData.get('examLevel') as string;
+  
+  const cookieStore = cookies();
+  const supabase = createServerClient({ cookies: () => cookieStore });
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: `${origin}/auth/callback`,
+      data: {
+        name: name,
+        exam_level: examLevel,
+      },
+    },
+  });
+
+  if (error) {
+    console.error('Signup Error:', error);
+    return redirect('/register?message=Could not authenticate user. Please try again.');
+  }
+
+  return redirect('/register?message=Check your email to continue the sign-up process.');
+}
+
+export async function logout() {
+  const cookieStore = cookies();
+  const supabase = createServerClient({ cookies: () => cookieStore });
+  await supabase.auth.signOut();
+  return redirect('/');
+}
+
 
 export async function generateModule(topicDescription: string, examLevel: 'Grade 5 Scholarship' | 'O/L' | 'A/L'): Promise<{
   success: boolean;
