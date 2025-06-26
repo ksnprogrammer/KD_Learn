@@ -172,6 +172,64 @@ export async function getStories(): Promise<{
   }
 }
 
+export async function getPosts(): Promise<{
+  success: boolean;
+  data?: any[];
+  error?: string;
+}> {
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    }
+    return { success: true, data: data || [] };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to fetch posts: ${errorMessage}` };
+  }
+}
+
+export async function createPost(content: string, author_name: string, author_avatar: string): Promise<{
+  success: boolean;
+  data?: any;
+  error?: string;
+}> {
+   if (!content.trim()) {
+    return { success: false, error: 'Post content cannot be empty.' };
+  }
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .insert([
+        { 
+          content,
+          author_name,
+          author_avatar,
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    };
+    return { success: true, data };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to save post: ${errorMessage}` };
+  }
+}
+
+
 export async function getApprovedModules(): Promise<{
   success: boolean;
   data?: any[];

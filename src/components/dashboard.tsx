@@ -1,6 +1,6 @@
 
 'use client';
-import { FlaskConical, Leaf, Zap, BrainCircuit, Shield, Swords, Trophy, Target, MessageSquare, Users, BookOpen, Sigma, Send, ChevronRight } from 'lucide-react';
+import { FlaskConical, Leaf, Zap, Shield, Swords, Trophy, Target, MessageSquare, Users, BookOpen, Sigma, Send, ChevronRight, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AppSidebar } from '@/components/app-sidebar';
@@ -13,9 +13,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Input } from './ui/input';
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { getPosts, createPost } from '@/app/actions';
+import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
+
 
 const quests = [
     {
@@ -69,39 +73,32 @@ const dailyChallenge = {
     reward: '150 XP',
 };
 
-const initialDiscussionPosts = [
-    {
-        id: 1,
-        author: 'Scribe Elara',
-        avatar: 'https://placehold.co/100x100.png',
-        hint: 'female scholar',
-        time: '2 hours ago',
-        content: "I'm finding the concept of redox reactions in The Azure Dragon quest quite challenging. Any tips from fellow knights who have conquered it?"
-    },
-    {
-        id: 2,
-        author: 'Bard Finn',
-        avatar: 'https://placehold.co/100x100.png',
-        hint: 'male bard',
-        time: '1 hour ago',
-        content: "Think of it as a dance of electrons, Elara! LEO the lion says GER: Lose Electrons Oxidation, Gain Electrons Reduction. That's how I remembered it."
-    },
-    {
-        id: 3,
-        author: 'Sir Galahad',
-        avatar: 'https://placehold.co/100x100.png',
-        hint: 'knight portrait',
-        time: '30 minutes ago',
-        content: "A fine mnemonic, Bard Finn! Practice with the drills in the Mental Training area. Repetition forges the strongest neural pathways."
-    },
-];
-
 const featuredQuest = quests[0];
 
 function KnightDashboard() {
     const { toast } = useToast();
-    const [posts, setPosts] = useState(initialDiscussionPosts);
+    const [posts, setPosts] = useState<any[]>([]);
     const [newPost, setNewPost] = useState('');
+    const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+
+    const fetchPosts = useCallback(async () => {
+        setIsLoadingPosts(true);
+        const { success, data, error } = await getPosts();
+        if (success && data) {
+            setPosts(data);
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Failed to load discussions',
+                description: error || 'Could not fetch posts from the Round Table.',
+            });
+        }
+        setIsLoadingPosts(false);
+    }, [toast]);
+
+    useEffect(() => {
+        fetchPosts();
+    }, [fetchPosts]);
 
     const handleBeginQuest = (questTitle: string) => {
         toast({
@@ -117,21 +114,39 @@ function KnightDashboard() {
         });
     };
 
-    const handlePostSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handlePostSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!newPost.trim()) return;
 
-        const newPostData = {
-            id: posts.length + 1,
-            author: 'King Dragon',
-            avatar: 'https://placehold.co/100x100.png',
-            hint: 'dragon avatar',
-            time: 'Just now',
+        const originalPosts = posts;
+        const tempPost = {
+            id: 'temp-' + Date.now(),
+            author_name: 'King Dragon',
+            author_avatar: 'https://placehold.co/100x100.png',
+            created_at: new Date().toISOString(),
             content: newPost.trim(),
+            isOptimistic: true,
         };
-
-        setPosts([newPostData, ...posts]);
+        
+        setPosts([tempPost, ...posts]);
         setNewPost('');
+
+        const { success, error } = await createPost(
+            newPost.trim(),
+            'King Dragon',
+            'https://placehold.co/100x100.png'
+        );
+
+        if (success) {
+            await fetchPosts();
+        } else {
+            setPosts(originalPosts);
+            toast({
+                variant: 'destructive',
+                title: 'Failed to post message',
+                description: error || 'Your message could not be sent. Please try again.',
+            });
+        }
     };
 
     return (
@@ -306,23 +321,30 @@ function KnightDashboard() {
                                     </form>
                                 </CardContent>
                             </Card>
-                            {posts.map(post => (
-                                <Card key={post.id}>
-                                    <CardContent className="p-4 flex gap-4">
-                                        <Avatar>
-                                            <AvatarImage src={post.avatar} data-ai-hint={post.hint} />
-                                            <AvatarFallback>{post.author.substring(0, 2)}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-center">
-                                                <p className="font-semibold">{post.author}</p>
-                                                <p className="text-xs text-muted-foreground">{post.time}</p>
+                            {isLoadingPosts ? (
+                                <div className="flex flex-col items-center justify-center text-center gap-4 mt-12">
+                                   <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                                   <p className="font-headline text-lg">Listening for whispers from the Round Table...</p>
+                               </div>
+                            ) : (
+                                posts.map(post => (
+                                    <Card key={post.id} className={cn(post.isOptimistic && "opacity-50")}>
+                                        <CardContent className="p-4 flex gap-4">
+                                            <Avatar>
+                                                <AvatarImage src={post.author_avatar} data-ai-hint="knight avatar" />
+                                                <AvatarFallback>{post.author_name.substring(0, 2)}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-center">
+                                                    <p className="font-semibold">{post.author_name}</p>
+                                                    <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</p>
+                                                </div>
+                                                <p className="text-muted-foreground mt-1">{post.content}</p>
                                             </div>
-                                            <p className="text-muted-foreground mt-1">{post.content}</p>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
+                                        </CardContent>
+                                    </Card>
+                                ))
+                            )}
                         </div>
                         <div className="lg:col-span-1">
                             <Card className="bg-gradient-to-br from-card to-secondary/30">
