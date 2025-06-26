@@ -1,9 +1,9 @@
-
 'use client'
 
 import {
   BookOpen,
   Castle,
+  Briefcase,
   FlaskConical,
   Gem,
   HeartHandshake,
@@ -120,6 +120,14 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarSeparator />
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href="/careers">
+                <Briefcase />
+                Join the Wizards
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/dashboard/settings">

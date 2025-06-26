@@ -26,6 +26,7 @@ function LegalFooter() {
             <div className="container flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p className="text-sm text-muted-foreground text-center sm:text-left">&copy; {new Date().getFullYear()} KingDragons. All rights reserved.</p>
                 <div className="flex gap-4">
+                    <Link href="/careers" className="text-sm text-muted-foreground hover:text-foreground">Careers</Link>
                     <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">Terms of Service</Link>
                     <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">Privacy Policy</Link>
                 </div>
