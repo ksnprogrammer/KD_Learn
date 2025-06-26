@@ -36,7 +36,7 @@ const getSubmissionStats = ai.defineTool({
   }
 });
 
-export const KingdomReportOutputSchema = z.object({
+const KingdomReportOutputSchema = z.object({
     narrativeSummary: z.string().describe("A 2-3 paragraph narrative summary of the kingdom's content pipeline health, written in the persona of a Royal Scribe. Mention key metrics and offer strategic advice for the King."),
     keyMetrics: z.array(z.object({
         metric: z.string().describe("The name of the metric, e.g., 'Approved Quests' or 'Pending Submissions'."),

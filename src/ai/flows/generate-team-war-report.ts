@@ -23,7 +23,7 @@ const BattleHistoryItemSchema = z.object({
   date: z.string().describe("A relative date for when the battle concluded, e.g., 'Yesterday', '2 days ago'.")
 });
 
-export const TeamWarReportOutputSchema = z.object({
+const TeamWarReportOutputSchema = z.object({
   liveBattle: z.object({
     teamA: TeamSchema,
     teamB: TeamSchema,

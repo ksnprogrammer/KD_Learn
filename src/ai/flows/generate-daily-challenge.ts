@@ -6,7 +6,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
-export const DailyChallengeOutputSchema = z.object({
+const DailyChallengeOutputSchema = z.object({
   category: z.enum(['Riddle', 'Quick Quiz', 'Logic Puzzle', 'Lore Question']).describe("The category of the challenge."),
   title: z.string().describe("The thematic title of the challenge, e.g., 'The Sphinx's Riddle' or 'Alchemist's Quickfire Test'."),
   description: z.string().describe("A short, engaging description of the challenge for the user to solve."),
