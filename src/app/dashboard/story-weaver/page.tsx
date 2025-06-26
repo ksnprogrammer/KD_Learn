@@ -16,6 +16,8 @@ import type { CreateStoryOutput } from "@/ai/flows/create-story-flow";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Feather, Sparkles, Save } from "lucide-react";
 import Image from "next/image";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const formSchema = z.object({
   prompt: z.string().min(5, 'Please enter a prompt of at least 5 characters.'),
@@ -141,7 +143,9 @@ function StoryWeaverPanel() {
                     data-ai-hint="fantasy story illustration"
                 />
             </div>
-            <pre className="whitespace-pre-wrap font-body text-base text-muted-foreground leading-relaxed">{result.story}</pre>
+            <div className="prose max-w-none text-muted-foreground leading-relaxed">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.story}</ReactMarkdown>
+            </div>
           </CardContent>
           <CardFooter>
             <Button onClick={handleSaveStory} disabled={isSaving || isSaved}>

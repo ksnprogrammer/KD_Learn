@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { CheckCircle, Swords, Target, ThumbsUp, XCircle } from 'lucide-react';
 import { Progress } from './ui/progress';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface TrainingSessionProps {
   module: CreateModuleOutput;
@@ -88,9 +90,9 @@ export function TrainingSession({ module }: TrainingSessionProps) {
                     <p>
                         <span className="font-semibold">Correct Answer:</span> {quiz.correctAnswer}
                     </p>
-                    <p className="text-muted-foreground mt-1">
-                        <span className="font-semibold">Explanation:</span> {quiz.explanation}
-                    </p>
+                    <div className="text-muted-foreground mt-1 prose prose-sm max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{quiz.explanation}</ReactMarkdown>
+                    </div>
                     </div>
                 </div>
                 ))}
@@ -115,7 +117,9 @@ export function TrainingSession({ module }: TrainingSessionProps) {
               <AccordionItem value={`item-${index}`} key={index}>
                 <AccordionTrigger className="text-lg">{section.title}</AccordionTrigger>
                 <AccordionContent>
-                  <div className="prose prose-invert max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: section.content.replace(/\n/g, '<br />') }} />
+                  <div className="prose max-w-none text-muted-foreground">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             ))}

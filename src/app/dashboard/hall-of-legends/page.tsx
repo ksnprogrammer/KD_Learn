@@ -4,11 +4,22 @@ import { AppHeader } from "@/components/app-header";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getStories } from "@/app/actions";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Library, Loader2 } from "lucide-react";
+import { Library, Loader2, BookOpen } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Button } from "@/components/ui/button";
 
 // Assuming stories have this shape from Supabase
 interface Story {
@@ -79,22 +90,50 @@ export default function HallOfLegendsPage() {
                             {!isLoading && stories.length > 0 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up">
                                     {stories.map((story) => (
-                                        <Card key={story.id} className="overflow-hidden group hover:border-primary/50 transition-all">
-                                            <CardHeader className="p-0">
-                                                <div className="aspect-video relative w-full overflow-hidden">
-                                                    <Image
-                                                        src={story.image_data_uri}
-                                                        alt={story.title}
-                                                        fill
-                                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                                                    />
+                                        <Dialog key={story.id}>
+                                            <DialogTrigger asChild>
+                                                <Card className="overflow-hidden group hover:border-primary/50 transition-all cursor-pointer flex flex-col">
+                                                    <CardHeader className="p-0">
+                                                        <div className="aspect-video relative w-full overflow-hidden">
+                                                            <Image
+                                                                src={story.image_data_uri}
+                                                                alt={story.title}
+                                                                fill
+                                                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                                            />
+                                                        </div>
+                                                    </CardHeader>
+                                                    <CardContent className="p-4 flex-grow">
+                                                        <CardTitle className="font-headline text-xl mb-2">{story.title}</CardTitle>
+                                                        <CardDescription className="text-muted-foreground">
+                                                            {`${story.story.substring(0, 100)}...`}
+                                                        </CardDescription>
+                                                    </CardContent>
+                                                    <CardFooter>
+                                                        <Button variant="secondary" size="sm" className="w-full">
+                                                            <BookOpen className="mr-2"/>
+                                                            Read Full Story
+                                                        </Button>
+                                                    </CardFooter>
+                                                </Card>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-3xl">
+                                                <DialogHeader>
+                                                    <DialogTitle className="font-headline text-3xl">{story.title}</DialogTitle>
+                                                     <div className="aspect-video relative w-full rounded-lg overflow-hidden border mt-4">
+                                                        <Image
+                                                            src={story.image_data_uri}
+                                                            alt={story.title}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    </div>
+                                                </DialogHeader>
+                                                <div className="prose max-w-none max-h-[50vh] overflow-y-auto pr-4">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{story.story}</ReactMarkdown>
                                                 </div>
-                                            </CardHeader>
-                                            <CardContent className="p-4">
-                                                <CardTitle className="font-headline text-xl mb-2">{story.title}</CardTitle>
-                                                <CardDescription className="line-clamp-3 text-muted-foreground">{story.story}</CardDescription>
-                                            </CardContent>
-                                        </Card>
+                                            </DialogContent>
+                                        </Dialog>
                                     ))}
                                 </div>
                             )}

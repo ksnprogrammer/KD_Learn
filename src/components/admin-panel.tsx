@@ -21,6 +21,8 @@ import {
 import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
 import {
@@ -207,7 +209,9 @@ function AiDragonCreator() {
                   <AccordionItem value={`item-${index}`} key={index}>
                     <AccordionTrigger className="text-lg">{section.title}</AccordionTrigger>
                     <AccordionContent>
-                      <pre className="whitespace-pre-wrap font-body text-sm text-muted-foreground">{section.content}</pre>
+                      <div className="prose max-w-none text-muted-foreground">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 ))}
@@ -243,9 +247,9 @@ function AiDragonCreator() {
                     <p>
                       <span className="font-semibold">Correct Answer:</span> {quiz.correctAnswer}
                     </p>
-                    <p className="text-muted-foreground mt-1">
-                      <span className="font-semibold">Explanation:</span> {quiz.explanation}
-                    </p>
+                    <div className="text-muted-foreground mt-1 prose prose-sm max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{quiz.explanation}</ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               ))}
