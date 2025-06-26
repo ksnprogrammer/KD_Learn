@@ -41,19 +41,19 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton>
               <Leaf className="text-biology" />
-              Biology
+              The Verdant Dragons
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton>
               <FlaskConical className="text-chemistry" />
-              Chemistry
+              The Azure Dragons
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton>
               <Zap className="text-physics" />
-              Physics
+              The Crimson Dragons
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
