@@ -1,3 +1,4 @@
+
 'use client';
 import { FlaskConical, Leaf, Zap, BrainCircuit, Shield, Swords, Trophy, Target, MessageSquare, Users, BookOpen, Sigma, Send } from 'lucide-react';
 import Image from 'next/image';
@@ -260,6 +261,20 @@ function DiscussionsTab() {
 
     return (
         <div className="animate-fade-in-up space-y-6">
+             <Card className="bg-gradient-to-br from-card to-secondary/30">
+                <CardHeader>
+                    <CardTitle className="font-headline">Join the Royal Conversation!</CardTitle>
+                    <CardDescription>Connect with fellow knights, share strategies, and get help on our official WhatsApp channel.</CardDescription>
+                </CardHeader>
+                <CardFooter>
+                    <Button asChild className="w-full sm:w-auto">
+                        <Link href={process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || '#'}>
+                            <MessageSquare className="mr-2" />
+                            Join WhatsApp Channel
+                        </Link>
+                    </Button>
+                </CardFooter>
+            </Card>
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Round Table Discussions</CardTitle>

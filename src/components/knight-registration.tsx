@@ -1,7 +1,8 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Sword } from 'lucide-react';
+import { MessageSquare, Sword } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -50,9 +51,11 @@ export function KnightRegistration() {
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsLoading(false);
 
+    const gang = values.gender === 'male' ? "the Azure Dragons" : "the Verdant Dragons";
+
     toast({
       title: 'Welcome, Knight!',
-      description: `Sir ${values.name}, your registration is complete. Prepare for adventure!`,
+      description: `Sir ${values.name}, you have been initiated into ${gang}. Prepare for adventure!`,
     });
     router.push('/dashboard');
   }
@@ -176,6 +179,13 @@ export function KnightRegistration() {
               </Button>
             </form>
           </Form>
+          <div className="mt-4">
+            <Button variant="outline" className="w-full" asChild>
+                <Link href={process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || '#'}>
+                    <MessageSquare className="mr-2" /> Join the WhatsApp Channel
+                </Link>
+            </Button>
+          </div>
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
             <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">

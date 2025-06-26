@@ -9,6 +9,7 @@ import {
   HeartHandshake,
   LayoutDashboard,
   Leaf,
+  MessageSquare,
   Settings,
   Sigma,
   Trophy,
@@ -94,6 +95,14 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarContent className="!flex-initial">
         <SidebarMenu>
+           <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href={process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || '#'}>
+                <MessageSquare />
+                WhatsApp
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
            <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/membership">
