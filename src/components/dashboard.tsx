@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Input } from './ui/input';
+import { useState } from 'react';
 
 const quests = [
     {
@@ -72,12 +73,12 @@ const weeklyChallenge = {
 };
 
 const trainingAreas = [
-    { title: 'Weapon Training', description: 'Sharpen your skills with practice quizzes.', icon: Swords, href: '#' },
-    { title: 'Mental Training', description: 'Strengthen your knowledge with core concepts.', icon: BrainCircuit, href: '#' },
+    { title: 'Weapon Training', description: 'Sharpen your skills with practice quizzes.', icon: Swords, href: '/dashboard/weapon-training' },
+    { title: 'Mental Training', description: 'Strengthen your knowledge with core concepts.', icon: BrainCircuit, href: '/dashboard/mental-training' },
     { title: 'Team Wars', description: 'Join forces with your gang and battle for glory.', icon: Users, href: '/dashboard/team-wars' },
 ];
 
-const discussionPosts = [
+const initialDiscussionPosts = [
     {
         id: 1,
         author: 'Scribe Elara',
@@ -236,6 +237,26 @@ function TrainingTab() {
 }
 
 function DiscussionsTab() {
+    const [posts, setPosts] = useState(initialDiscussionPosts);
+    const [newPost, setNewPost] = useState('');
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!newPost.trim()) return;
+
+        const newPostData = {
+            id: posts.length + 1,
+            author: 'King Dragon',
+            avatar: 'https://placehold.co/100x100.png',
+            hint: 'dragon avatar',
+            time: 'Just now',
+            content: newPost.trim(),
+        };
+
+        setPosts([newPostData, ...posts]);
+        setNewPost('');
+    };
+
     return (
         <div className="animate-fade-in-up space-y-6">
             <Card>
@@ -244,15 +265,19 @@ function DiscussionsTab() {
                     <CardDescription>Share wisdom and seek guidance from your fellow knights.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex gap-4">
-                        <Input placeholder="Share your thoughts, knight..." />
-                        <Button><Send /> Post</Button>
-                    </div>
+                    <form onSubmit={handleSubmit} className="flex gap-4">
+                        <Input 
+                            placeholder="Share your thoughts, knight..." 
+                            value={newPost}
+                            onChange={(e) => setNewPost(e.target.value)}
+                        />
+                        <Button type="submit"><Send /> Post</Button>
+                    </form>
                 </CardContent>
             </Card>
 
             <div className="space-y-4">
-                {discussionPosts.map(post => (
+                {posts.map(post => (
                     <Card key={post.id}>
                         <CardContent className="p-4 flex gap-4">
                              <Avatar>
