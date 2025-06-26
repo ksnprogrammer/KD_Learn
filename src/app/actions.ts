@@ -122,6 +122,7 @@ export async function submitModuleForReview(moduleData: CreateModuleOutput, topi
           status: 'Pending',
           content: moduleData,
           exam_level: examLevel,
+          image_data_uri: moduleData.imageDataUri,
         }
       ])
       .select();
@@ -299,7 +300,7 @@ export async function getApprovedModules(): Promise<{
   try {
     const { data, error } = await supabase
       .from('submissions')
-      .select('id, topic, content, exam_level')
+      .select('id, topic, content, exam_level, image_data_uri')
       .eq('status', 'Approved')
       .order('created_at', { ascending: false });
 
@@ -321,13 +322,14 @@ export async function getSubmissionById(id: number): Promise<{
     topic: string;
     content: CreateModuleOutput;
     exam_level: string;
+    image_data_uri?: string;
   };
   error?: string;
 }> {
   try {
     const { data, error } = await supabase
       .from('submissions')
-      .select('topic, content, exam_level')
+      .select('topic, content, exam_level, image_data_uri')
       .eq('id', id)
       .eq('status', 'Approved')
       .single();

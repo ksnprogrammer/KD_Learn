@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 
 async function getModule(id: number) {
     const { success, data, error } = await getSubmissionById(id);
@@ -28,7 +29,7 @@ export default async function TrainingPage({ params }: { params: { id: string } 
   return (
       <div className="container mx-auto py-8">
         {module ? (
-            <>
+            <div className="space-y-8">
                 <Card className="w-full max-w-4xl mx-auto mb-8 bg-transparent border-0 shadow-none">
                     <CardHeader className="text-center">
                         <div className="mx-auto bg-primary/10 text-primary rounded-full p-4 w-fit mb-4">
@@ -41,8 +42,20 @@ export default async function TrainingPage({ params }: { params: { id: string } 
                         </CardDescription>
                     </CardHeader>
                 </Card>
+
+                 {module.image_data_uri && (
+                    <div className="relative aspect-video w-full max-w-4xl mx-auto rounded-lg overflow-hidden border">
+                        <Image
+                            src={module.image_data_uri}
+                            alt={module.topic}
+                            fill
+                            className="object-cover"
+                        />
+                    </div>
+                )}
+
                 <TrainingSession module={module.content} />
-            </>
+            </div>
         ) : (
             <Card className="w-full max-w-lg mx-auto text-center">
                 <CardHeader>

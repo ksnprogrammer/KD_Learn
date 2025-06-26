@@ -9,12 +9,14 @@ import { getApprovedModules } from "@/app/actions";
 import Link from "next/link";
 import type { CreateModuleOutput } from "@/ai/flows/create-module-from-description";
 import { Badge } from "@/components/ui/badge";
+import Image from 'next/image';
 
 interface ApprovedModule {
     id: number;
     topic: string;
     content: CreateModuleOutput;
     exam_level: string;
+    image_data_uri: string;
 }
 
 const getSubjectInfo = (topic: string) => {
@@ -81,26 +83,32 @@ function WeaponTrainingContent() {
             )}
 
             {!isLoading && modules.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto animate-fade-in-up">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto animate-fade-in-up">
                     {modules.map((module) => {
                         const subject = getSubjectInfo(module.topic);
                         const quiz = module.content.quizQuestions;
-                        const Icon = subject.icon;
                         
                         return (
-                            <Card key={module.id} className="hover:border-primary/50 transition-all flex flex-col">
-                                <CardHeader className="flex flex-row items-start justify-between pb-2">
-                                    <CardTitle className="text-lg font-medium">{module.topic}</CardTitle>
-                                    <Icon className={`w-6 h-6 ${subject.color}`} />
+                            <Card key={module.id} className="hover:border-primary/50 transition-all flex flex-col group overflow-hidden">
+                                <CardHeader className="p-0">
+                                    <div className="aspect-video relative w-full overflow-hidden">
+                                        <Image
+                                            src={module.image_data_uri}
+                                            alt={module.topic}
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    </div>
                                 </CardHeader>
-                                <CardContent className="flex-grow">
+                                <CardContent className="p-4 flex-grow">
+                                    <CardTitle className="text-lg font-medium mb-2">{module.topic}</CardTitle>
                                     <div className="flex items-center gap-2">
                                         <Badge variant="outline">{subject.name}</Badge>
                                         <Badge variant="secondary">{module.exam_level}</Badge>
                                     </div>
                                     <p className="text-sm text-muted-foreground mt-2">{quiz.length} questions</p>
                                 </CardContent>
-                                <CardFooter>
+                                <CardFooter className="p-4 pt-0">
                                     <Button className="w-full" asChild>
                                         <Link href={`/dashboard/training/${module.id}`}>Start Training</Link>
                                     </Button>
