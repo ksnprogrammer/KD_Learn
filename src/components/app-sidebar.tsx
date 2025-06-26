@@ -1,3 +1,4 @@
+
 'use client'
 
 import {
@@ -74,15 +75,19 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <UserCircle />
-              My Profile
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard/profile">
+                <UserCircle />
+                My Profile
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Trophy />
-              Leaderboards
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard">
+                <Trophy />
+                Leaderboards
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -107,9 +112,11 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarSeparator />
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Settings />
-              Settings
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard/settings">
+                <Settings />
+                Settings
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
