@@ -6,6 +6,8 @@ import { createStory } from '@/ai/flows/create-story-flow';
 import type { CreateStoryOutput } from '@/ai/flows/create-story-flow';
 import { generateKingdomReport } from '@/ai/flows/generate-kingdom-report';
 import type { KingdomReportOutput } from '@/ai/flows/generate-kingdom-report';
+import { generateAudioFromText } from '@/ai/flows/generate-audio-flow';
+import type { GenerateAudioOutput } from '@/ai/flows/generate-audio-flow';
 import { supabase } from '@/lib/supabase';
 import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
@@ -444,5 +446,24 @@ export async function generateKingdomAnalytics(): Promise<{
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     return { success: false, error: `Failed to generate report: ${errorMessage}` };
+  }
+}
+
+export async function generateAudio(text: string): Promise<{
+  success: boolean;
+  data?: GenerateAudioOutput;
+  error?: string;
+}> {
+  if (!text) {
+    return { success: false, error: 'Text cannot be empty.' };
+  }
+
+  try {
+    const output = await generateAudioFromText(text);
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate audio: ${errorMessage}` };
   }
 }

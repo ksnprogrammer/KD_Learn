@@ -2,16 +2,18 @@
 
 import { useState } from 'react';
 import type { CreateModuleOutput, QuizQuestion } from '@/ai/flows/create-module-from-description';
+import { generateAudio } from '@/app/actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { CheckCircle, Swords, Target, ThumbsUp, XCircle } from 'lucide-react';
+import { CheckCircle, Swords, Target, ThumbsUp, XCircle, Volume2, Loader2 } from 'lucide-react';
 import { Progress } from './ui/progress';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useToast } from '@/hooks/use-toast';
 
 interface TrainingSessionProps {
   module: CreateModuleOutput;
@@ -21,10 +23,17 @@ type UserAnswers = {
   [questionIndex: number]: string;
 };
 
+type AudioState = {
+  isLoading: boolean;
+  audioData: string | null;
+};
+
 export function TrainingSession({ module }: TrainingSessionProps) {
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  const [audioStates, setAudioStates] = useState<{ [index: number]: AudioState }>({});
+  const { toast } = useToast();
 
   const handleAnswerChange = (questionIndex: number, answer: string) => {
     setUserAnswers((prev) => ({
@@ -50,6 +59,29 @@ export function TrainingSession({ module }: TrainingSessionProps) {
     setIsSubmitted(false);
     setScore(0);
   };
+  
+  const handleListen = async (index: number, text: string) => {
+    // If audio is already loaded or loading, do nothing
+    if (audioStates[index]?.isLoading || audioStates[index]?.audioData) {
+      return;
+    }
+
+    setAudioStates(prev => ({ ...prev, [index]: { isLoading: true, audioData: null } }));
+
+    const { success, data, error } = await generateAudio(text);
+
+    if (success && data) {
+      setAudioStates(prev => ({ ...prev, [index]: { isLoading: false, audioData: data.media } }));
+    } else {
+      setAudioStates(prev => ({ ...prev, [index]: { isLoading: false, audioData: null } }));
+      toast({
+        variant: 'destructive',
+        title: 'Could not generate audio',
+        description: error || 'The Dragon could not speak at this time.',
+      });
+    }
+  };
+
 
   const getResultIcon = (question: QuizQuestion, index: number) => {
     if (!isSubmitted) return null;
@@ -117,8 +149,25 @@ export function TrainingSession({ module }: TrainingSessionProps) {
               <AccordionItem value={`item-${index}`} key={index}>
                 <AccordionTrigger className="text-lg">{section.title}</AccordionTrigger>
                 <AccordionContent>
-                  <div className="prose max-w-none text-muted-foreground">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
+                  <div className="space-y-4">
+                    <div className="prose max-w-none text-muted-foreground">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
+                    </div>
+                    <div className="flex flex-col items-start gap-2">
+                      {audioStates[index]?.isLoading ? (
+                        <Button variant="outline" disabled>
+                          <Loader2 className="mr-2 animate-spin" />
+                          Summoning Voice...
+                        </Button>
+                      ) : audioStates[index]?.audioData ? (
+                        <audio controls src={audioStates[index]?.audioData} className="w-full max-w-sm"></audio>
+                      ) : (
+                        <Button variant="outline" onClick={() => handleListen(index, section.content)}>
+                          <Volume2 className="mr-2" />
+                          Listen to this section
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
