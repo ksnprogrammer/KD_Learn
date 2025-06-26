@@ -12,12 +12,14 @@ import { Input } from '@/components/ui/input';
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { getPosts, createPost, getApprovedModules } from '@/app/actions';
+import { getPosts, createPost, getApprovedModules, getDailyChallenge } from '@/app/actions';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/use-user';
 import type { CreateModuleOutput } from "@/ai/flows/create-module-from-description";
+import type { DailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
 import Image from 'next/image';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ApprovedModule {
     id: number;
@@ -43,12 +45,6 @@ const staticLeaderboardData = [
     { rank: 5, name: 'Elara of the Forest', xp: 9800, avatar: 'https://placehold.co/100x100.png', hint: 'elf knight' },
 ];
 
-const dailyChallenge = {
-    title: 'Daily Alchemical Riddle',
-    description: 'Solve a complex chemical equation within 5 minutes to earn bonus XP.',
-    reward: '150 XP',
-};
-
 export function Dashboard() {
     const user = useUser();
     const { toast } = useToast();
@@ -57,7 +53,9 @@ export function Dashboard() {
     const [isLoadingPosts, setIsLoadingPosts] = useState(true);
     const [modules, setModules] = useState<ApprovedModule[]>([]);
     const [isLoadingModules, setIsLoadingModules] = useState(true);
-    
+    const [dailyChallenge, setDailyChallenge] = useState<DailyChallengeOutput | null>(null);
+    const [isLoadingChallenge, setIsLoadingChallenge] = useState(true);
+
     const userName = user?.user_metadata?.name || 'Knight';
     const userAvatar = 'https://placehold.co/100x100.png'; // Placeholder for now
 
@@ -96,10 +94,33 @@ export function Dashboard() {
         setIsLoadingModules(false);
     }, [toast]);
 
+    const fetchChallenge = useCallback(async () => {
+        setIsLoadingChallenge(true);
+        const { success, data, error } = await getDailyChallenge();
+        if (success && data) {
+            setDailyChallenge(data);
+        } else {
+            // Set a default fallback challenge on error to avoid an empty card
+            setDailyChallenge({
+                category: 'Rest Day',
+                title: "The Challenge Master's Day Off",
+                description: "The realm is quiet today. A perfect time to review your past quests! The Challenge Master will return tomorrow with a new trial.",
+                reward: 'Priceless Wisdom'
+            });
+            toast({
+                variant: 'default',
+                title: 'Daily Challenge Unavailable',
+                description: error || 'Could not fetch the daily challenge.',
+            });
+        }
+        setIsLoadingChallenge(false);
+    }, [toast]);
+
     useEffect(() => {
         fetchPosts();
         fetchModules();
-    }, [fetchPosts, fetchModules]);
+        fetchChallenge();
+    }, [fetchPosts, fetchModules, fetchChallenge]);
     
     const handleAcceptChallenge = (title: string) => {
         toast({
@@ -236,19 +257,34 @@ export function Dashboard() {
                     )}
                 </Card>
                 <Card className="flex flex-col">
-                     <CardHeader>
+                    <CardHeader>
                         <div className="flex items-center gap-3">
                             <Target className="text-primary" />
                             <CardTitle>Daily Challenge</CardTitle>
                         </div>
-                        <CardDescription>{dailyChallenge.title}</CardDescription>
+                        {isLoadingChallenge ? (
+                            <Skeleton className="h-5 w-3/4 mt-1" />
+                        ) : (
+                            <CardDescription>{dailyChallenge?.title}</CardDescription>
+                        )}
                     </CardHeader>
                     <CardContent className="flex-grow">
-                        <p className="text-muted-foreground">{dailyChallenge.description}</p>
+                        {isLoadingChallenge ? (
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-5/6" />
+                            </div>
+                        ) : (
+                            <p className="text-muted-foreground">{dailyChallenge?.description}</p>
+                        )}
                     </CardContent>
                     <CardFooter className="flex justify-between items-center">
-                        <Badge variant="outline">Reward: {dailyChallenge.reward}</Badge>
-                        <Button size="sm" onClick={() => handleAcceptChallenge(dailyChallenge.title)}>Accept</Button>
+                        {isLoadingChallenge ? (
+                             <Skeleton className="h-6 w-24" />
+                        ) : (
+                            <Badge variant="outline">Reward: {dailyChallenge?.reward}</Badge>
+                        )}
+                        <Button size="sm" onClick={() => handleAcceptChallenge(dailyChallenge?.title || '')} disabled={isLoadingChallenge}>Accept</Button>
                     </CardFooter>
                 </Card>
             </div>

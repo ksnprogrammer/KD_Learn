@@ -8,6 +8,8 @@ import { generateKingdomReport } from '@/ai/flows/generate-kingdom-report';
 import type { KingdomReportOutput } from '@/ai/flows/generate-kingdom-report';
 import { generateAudioFromText } from '@/ai/flows/generate-audio-flow';
 import type { GenerateAudioOutput } from '@/ai/flows/generate-audio-flow';
+import { generateDailyChallenge } from '@/ai/flows/generate-daily-challenge';
+import type { DailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
 import { supabase } from '@/lib/supabase';
 import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
@@ -465,5 +467,20 @@ export async function generateAudio(text: string): Promise<{
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     return { success: false, error: `Failed to generate audio: ${errorMessage}` };
+  }
+}
+
+export async function getDailyChallenge(): Promise<{
+  success: boolean;
+  data?: DailyChallengeOutput;
+  error?: string;
+}> {
+  try {
+    const output = await generateDailyChallenge();
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate daily challenge: ${errorMessage}` };
   }
 }
