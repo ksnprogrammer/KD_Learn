@@ -74,12 +74,6 @@ const weeklyChallenge = {
     reward: 'Titan\'s Shield Badge',
 };
 
-const trainingAreas = [
-    { title: 'Weapon Training', description: 'Sharpen your skills with practice quizzes.', icon: Swords, href: '/dashboard/weapon-training' },
-    { title: 'Mental Training', description: 'Strengthen your knowledge with core concepts.', icon: BrainCircuit, href: '/dashboard/mental-training' },
-    { title: 'Team Wars', description: 'Join forces with your gang and battle for glory.', icon: Users, href: '/dashboard/team-wars' },
-];
-
 const initialDiscussionPosts = [
     {
         id: 1,
@@ -238,31 +232,6 @@ function ChallengesTab() {
     )
 }
 
-function TrainingTab() {
-    return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up">
-            {trainingAreas.map((area) => (
-                <Card key={area.title} className="hover:border-primary/50 hover:bg-secondary/20 transition-colors flex flex-col">
-                    <CardHeader>
-                        <div className="flex items-center gap-3">
-                            <area.icon className="w-6 h-6 text-primary" />
-                            <CardTitle className="font-headline">{area.title}</CardTitle>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="flex-grow">
-                        <p className="text-muted-foreground">{area.description}</p>
-                    </CardContent>
-                     <CardFooter>
-                        <Button variant="outline" className="w-full" asChild>
-                            <Link href={area.href}>Enter</Link>
-                        </Button>
-                    </CardFooter>
-                </Card>
-            ))}
-        </div>
-    )
-}
-
 function DiscussionsTab() {
     const [posts, setPosts] = useState(initialDiscussionPosts);
     const [newPost, setNewPost] = useState('');
@@ -349,17 +318,15 @@ function KnightDashboard() {
                 <p className="text-muted-foreground">Your quests and dragons await your command.</p>
             </div>
             <Tabs defaultValue="quests" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5 mb-6">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6">
                     <TabsTrigger value="quests"><Swords className="mr-2" />Quests</TabsTrigger>
                     <TabsTrigger value="leaderboard"><Trophy className="mr-2" />Leaderboard</TabsTrigger>
                     <TabsTrigger value="challenges"><Target className="mr-2" />Challenges</TabsTrigger>
-                    <TabsTrigger value="training"><BrainCircuit className="mr-2" />Training</TabsTrigger>
                     <TabsTrigger value="discussions"><MessageSquare className="mr-2" />Discussions</TabsTrigger>
                 </TabsList>
                 <TabsContent value="quests"><QuestsTab /></TabsContent>
                 <TabsContent value="leaderboard"><LeaderboardTab /></TabsContent>
                 <TabsContent value="challenges"><ChallengesTab /></TabsContent>
-                <TabsContent value="training"><TrainingTab /></TabsContent>
                 <TabsContent value="discussions"><DiscussionsTab /></TabsContent>
             </Tabs>
         </div>
