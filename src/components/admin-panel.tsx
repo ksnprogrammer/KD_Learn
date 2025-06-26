@@ -149,11 +149,23 @@ function AssetManager() {
 }
 
 function ContentSubmissions() {
-  const submissions = [
+  const { toast } = useToast();
+  const [submissions, setSubmissions] = useState([
     { id: 1, topic: 'Mitochondria: The Powerhouse', writer: 'Scribe Elara', status: 'Pending' },
     { id: 2, topic: 'The Carbon Cycle', writer: 'Chronicler Leo', status: 'Approved' },
     { id: 3, topic: 'Basics of Electromagnetism', writer: 'Bard Finn', status: 'Rejected' },
-  ];
+    { id: 4, topic: 'Trigonometric Identities', writer: 'Calculator Cassian', status: 'Pending' },
+  ]);
+
+  const handleStatusChange = (id: number, newStatus: 'Approved' | 'Rejected') => {
+    setSubmissions(
+      submissions.map((sub) => (sub.id === id ? { ...sub, status: newStatus } : sub))
+    );
+    toast({
+      title: `Submission ${newStatus}`,
+      description: `The topic has been ${newStatus.toLowerCase()}.`,
+    });
+  };
 
   const getBadgeVariant = (status: string) => {
     switch (status) {
@@ -194,11 +206,11 @@ function ContentSubmissions() {
                   <TableCell className="text-right">
                     {sub.status === 'Pending' && (
                       <div className="flex gap-1 justify-end">
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" onClick={() => handleStatusChange(sub.id, 'Approved')}>
                           <CheckCircle className="text-biology" />
                           <span className="sr-only">Approve</span>
                         </Button>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" onClick={() => handleStatusChange(sub.id, 'Rejected')}>
                           <XCircle className="text-physics" />
                           <span className="sr-only">Reject</span>
                         </Button>

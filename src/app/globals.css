@@ -29,6 +29,8 @@
     --biology: 145 63% 49%;
     --chemistry: 217 91% 60%;
     --physics: 0 72.2% 50.6%;
+    --maths: 39 89% 55%;
+    --general-science: 240 5% 65%;
 
     --sidebar-background: 224 71% 4%;
     --sidebar-foreground: 210 40% 98%;
@@ -61,6 +63,13 @@
     --input: 215 28% 17%;
     --ring: 350 90% 55%;
 
+    /* Custom colors */
+    --biology: 145 63% 49%;
+    --chemistry: 217 91% 60%;
+    --physics: 0 72.2% 50.6%;
+    --maths: 39 89% 55%;
+    --general-science: 240 5% 65%;
+    
     --sidebar-background: 224 71% 4%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 350 90% 55%;

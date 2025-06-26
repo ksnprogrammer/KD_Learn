@@ -1,6 +1,7 @@
 'use client';
-import { FlaskConical, Leaf, Zap, BrainCircuit, Shield, Swords, Trophy, Target, MessageSquare, Users } from 'lucide-react';
+import { FlaskConical, Leaf, Zap, BrainCircuit, Shield, Swords, Trophy, Target, MessageSquare, Users, BookOpen, Sigma, Send } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppHeader } from '@/components/app-header';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -10,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Input } from './ui/input';
 
 const quests = [
     {
@@ -32,6 +34,20 @@ const quests = [
         description: 'Command the fundamental forces of the universe, from motion to energy.',
         icon: Zap,
         color: 'text-physics',
+    },
+    {
+        title: 'The Golden Dragon',
+        subject: 'Maths',
+        description: 'Conquer the language of the universe, from algebra to calculus.',
+        icon: Sigma,
+        color: 'text-maths',
+    },
+    {
+        title: 'The Argent Dragon',
+        subject: 'General Science',
+        description: 'Explore the core principles that unite all scientific disciplines.',
+        icon: BookOpen,
+        color: 'text-generalScience',
     },
 ]
 
@@ -56,14 +72,41 @@ const weeklyChallenge = {
 };
 
 const trainingAreas = [
-    { title: 'Weapon Training', description: 'Sharpen your skills with practice quizzes.', icon: Swords },
-    { title: 'Mental Training', description: 'Strengthen your knowledge with core concepts.', icon: BrainCircuit },
-    { title: 'Team Wars', description: 'Join forces with your gang and battle for glory.', icon: Users },
+    { title: 'Weapon Training', description: 'Sharpen your skills with practice quizzes.', icon: Swords, href: '#' },
+    { title: 'Mental Training', description: 'Strengthen your knowledge with core concepts.', icon: BrainCircuit, href: '#' },
+    { title: 'Team Wars', description: 'Join forces with your gang and battle for glory.', icon: Users, href: '/dashboard/team-wars' },
+];
+
+const discussionPosts = [
+    {
+        id: 1,
+        author: 'Scribe Elara',
+        avatar: 'https://placehold.co/100x100.png',
+        hint: 'female scholar',
+        time: '2 hours ago',
+        content: "I'm finding the concept of redox reactions in The Azure Dragon quest quite challenging. Any tips from fellow knights who have conquered it?"
+    },
+    {
+        id: 2,
+        author: 'Bard Finn',
+        avatar: 'https://placehold.co/100x100.png',
+        hint: 'male bard',
+        time: '1 hour ago',
+        content: "Think of it as a dance of electrons, Elara! LEO the lion says GER: Lose Electrons Oxidation, Gain Electrons Reduction. That's how I remembered it."
+    },
+    {
+        id: 3,
+        author: 'Sir Galahad',
+        avatar: 'https://placehold.co/100x100.png',
+        hint: 'knight portrait',
+        time: '30 minutes ago',
+        content: "A fine mnemonic, Bard Finn! Practice with the drills in the Mental Training area. Repetition forges the strongest neural pathways."
+    },
 ];
 
 function QuestsTab() {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {quests.map((quest) => (
                 <Card key={quest.title} className="flex flex-col animate-fade-in-up">
                     <CardHeader>
@@ -171,18 +214,20 @@ function TrainingTab() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up">
             {trainingAreas.map((area) => (
-                <Card key={area.title} className="hover:border-primary/50 hover:bg-secondary/20 transition-colors">
+                <Card key={area.title} className="hover:border-primary/50 hover:bg-secondary/20 transition-colors flex flex-col">
                     <CardHeader>
                         <div className="flex items-center gap-3">
                             <area.icon className="w-6 h-6 text-primary" />
                             <CardTitle className="font-headline">{area.title}</CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-grow">
                         <p className="text-muted-foreground">{area.description}</p>
                     </CardContent>
                      <CardFooter>
-                        <Button variant="outline" className="w-full">Enter</Button>
+                        <Button variant="outline" className="w-full" asChild>
+                            <Link href={area.href}>Enter</Link>
+                        </Button>
                     </CardFooter>
                 </Card>
             ))}
@@ -192,15 +237,40 @@ function TrainingTab() {
 
 function DiscussionsTab() {
     return (
-        <Card className="animate-fade-in-up text-center h-64 flex flex-col justify-center items-center">
-            <CardHeader>
-                <CardTitle className="font-headline">Round Table Discussions</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <p className="text-muted-foreground">This feature is being forged by the kingdom's wizards. Check back soon!</p>
-                <MessageSquare className="w-12 h-12 mx-auto mt-4 text-muted-foreground/50" />
-            </CardContent>
-        </Card>
+        <div className="animate-fade-in-up space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Round Table Discussions</CardTitle>
+                    <CardDescription>Share wisdom and seek guidance from your fellow knights.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex gap-4">
+                        <Input placeholder="Share your thoughts, knight..." />
+                        <Button><Send /> Post</Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <div className="space-y-4">
+                {discussionPosts.map(post => (
+                    <Card key={post.id}>
+                        <CardContent className="p-4 flex gap-4">
+                             <Avatar>
+                                <AvatarImage src={post.avatar} data-ai-hint={post.hint} />
+                                <AvatarFallback>{post.author.substring(0, 2)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                                <div className="flex justify-between items-center">
+                                    <p className="font-semibold">{post.author}</p>
+                                    <p className="text-xs text-muted-foreground">{post.time}</p>
+                                </div>
+                                <p className="text-muted-foreground mt-1">{post.content}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
+        </div>
     )
 }
 

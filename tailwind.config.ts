@@ -68,6 +68,8 @@ export default {
         biology: 'hsl(var(--biology))',
         chemistry: 'hsl(var(--chemistry))',
         physics: 'hsl(var(--physics))',
+        maths: 'hsl(var(--maths))',
+        generalScience: 'hsl(var(--general-science))',
       },
       borderRadius: {
         lg: 'var(--radius)',

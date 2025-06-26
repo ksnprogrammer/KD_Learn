@@ -1,11 +1,13 @@
 'use client'
 
 import {
+  BookOpen,
   Castle,
   FlaskConical,
   LayoutDashboard,
   Leaf,
   Settings,
+  Sigma,
   Trophy,
   UserCircle,
   Zap
@@ -54,6 +56,18 @@ export function AppSidebar() {
             <SidebarMenuButton>
               <Zap className="text-physics" />
               The Crimson Dragons
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton>
+              <Sigma className="text-maths" />
+              The Golden Dragons
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+           <SidebarMenuItem>
+            <SidebarMenuButton>
+              <BookOpen className="text-generalScience" />
+              The Argent Dragons
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
