@@ -12,7 +12,6 @@ import {
   MessageSquare,
   Settings,
   Swords,
-  Trophy,
   UserCircle,
   Users,
 } from 'lucide-react'
@@ -99,14 +98,6 @@ export function AppSidebar() {
                   <Link href="/dashboard/hall-of-legends">
                     <Library />
                     Hall of Legends
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/dashboard">
-                    <Trophy />
-                    Leaderboards
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
