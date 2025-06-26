@@ -10,6 +10,8 @@ import { generateAudioFromText } from '@/ai/flows/generate-audio-flow';
 import type { GenerateAudioOutput } from '@/ai/flows/generate-audio-flow';
 import { generateDailyChallenge } from '@/ai/flows/generate-daily-challenge';
 import type { DailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
+import { generateTeamWarReport } from '@/ai/flows/generate-team-war-report';
+import type { TeamWarReportOutput } from '@/ai/flows/generate-team-war-report';
 import { supabase } from '@/lib/supabase';
 import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
@@ -482,5 +484,20 @@ export async function getDailyChallenge(): Promise<{
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     return { success: false, error: `Failed to generate daily challenge: ${errorMessage}` };
+  }
+}
+
+export async function getTeamWarData(): Promise<{
+  success: boolean;
+  data?: TeamWarReportOutput;
+  error?: string;
+}> {
+  try {
+    const output = await generateTeamWarReport();
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate team war data: ${errorMessage}` };
   }
 }
