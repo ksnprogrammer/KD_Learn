@@ -10,6 +10,7 @@ import {
   UserCircle,
   Zap
 } from 'lucide-react'
+import Link from 'next/link'
 
 import { Logo } from '@/components/logo'
 import {
@@ -19,9 +20,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem
 } from '@/components/ui/sidebar'
 
 export function AppSidebar() {
@@ -33,9 +31,11 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton href="#" isActive>
-              <LayoutDashboard />
-              Dashboard
+            <SidebarMenuButton asChild isActive>
+              <Link href="/dashboard">
+                <LayoutDashboard />
+                Dashboard
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -79,9 +79,11 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <ShieldCheck />
-              Admin Panel
+            <SidebarMenuButton asChild>
+              <Link href="/admin">
+                <ShieldCheck />
+                Admin Panel
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

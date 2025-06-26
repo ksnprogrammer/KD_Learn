@@ -3,6 +3,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Sword } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -29,6 +31,7 @@ type FormValues = z.infer<typeof formSchema>;
 export function KnightRegistration() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -51,7 +54,7 @@ export function KnightRegistration() {
       title: 'Welcome, Knight!',
       description: `Sir ${values.name}, your registration is complete. Prepare for adventure!`,
     });
-    form.reset();
+    router.push('/dashboard');
   }
 
   return (
@@ -173,6 +176,12 @@ export function KnightRegistration() {
               </Button>
             </form>
           </Form>
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{' '}
+            <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
+              Log in
+            </Link>
+          </div>
         </div>
       </div>
       <div className="hidden bg-muted lg:block">

@@ -1,5 +1,5 @@
-import { KnightRegistration } from '@/components/knight-registration';
+import { LandingPage } from '@/components/landing-page';
 
 export default function Home() {
-  return <KnightRegistration />;
+  return <LandingPage />;
 }

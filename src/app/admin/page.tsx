@@ -1,0 +1,20 @@
+import { AppHeader } from "@/components/app-header";
+import { AppSidebar } from "@/components/app-sidebar";
+import { AdminPanel } from "@/components/admin-panel";
+import { SidebarProvider } from "@/components/ui/sidebar";
+
+export default function AdminPage() {
+  return (
+    <SidebarProvider>
+      <div className="relative flex min-h-dvh bg-background">
+        <AppSidebar />
+        <div className="relative flex flex-col flex-1">
+          <AppHeader />
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+            <AdminPanel />
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
+  );
+}

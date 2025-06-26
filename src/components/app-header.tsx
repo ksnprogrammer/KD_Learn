@@ -31,7 +31,7 @@ export function AppHeader() {
         <SidebarTrigger />
       </div>
       <h1 className="font-headline text-xl font-semibold tracking-tight">
-        AI Module Creator
+        Dashboard
       </h1>
       <div className="ml-auto flex items-center gap-4">
         <Button variant="ghost" size="icon" className="rounded-full">

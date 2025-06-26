@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: "King Dragons: A Knight's Quest",
-  description: "Embark on an epic quest for knowledge. Register as a knight and conquer the world of science!",
+  title: "KingDragons - Forge Your Legend in Knowledge",
+  description: "Join KingDragons, the gamified learning platform where you conquer science quests, master new skills, and become a legendary knight of knowledge.",
 };
 
 export default function RootLayout({
