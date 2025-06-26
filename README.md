@@ -79,7 +79,19 @@ Your terminal will display a public URL ending in `.trycloudflare.com`. It will 
 
 *   **To Stop the Kingdom:** Press `Ctrl + C` in the terminal where you ran `npm run dev`.
 *   **To Stop the Public Link:** Press `Ctrl + C` in the terminal where you ran `cloudflared tunnel`.
-*   **Pushing Your Changes to GitHub:** As you make changes to the code, you must save them to your GitHub repository. I, your AI assistant, make the code changes. You, the King, must commit them.
+*   **Pushing Your Changes to GitHub:** As you make changes to the code, you must save them to your GitHub repository. I, your AI assistant, make the code changes. You, the King, must commit them. The first time you do this, you must initialize the repository and link it to GitHub. For all future updates, you can just add, commit, and push.
+
+    **First-time setup:**
+    ```bash
+    git init
+    git add .
+    git commit -m "Initial commit: The Kingdom is Born"
+    git branch -M main
+    git remote add origin https://github.com/ksnprogrammer/KD.git
+    git push -u origin main
+    ```
+
+    **For all future updates:**
     ```bash
     git add .
     git commit -m "A new decree from the King"
