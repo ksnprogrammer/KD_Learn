@@ -1,11 +1,11 @@
 'use client';
 
-import { BrainCircuit, Shield, Zap } from 'lucide-react';
+import { BrainCircuit, Gem, HeartHandshake, Shield, Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Logo } from './logo';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 
 export function LandingPage() {
   return (
@@ -100,6 +100,52 @@ export function LandingPage() {
             </Card>
           </div>
         </section>
+
+        <section id="support" className="bg-secondary/30 py-12 sm:py-20 md:py-28">
+          <div className="container">
+            <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+              <h2 className="font-headline text-4xl font-bold tracking-tight">Enhance Your Arsenal & Support the Kingdom</h2>
+              <p className="mt-4 text-lg text-muted-foreground">
+                Our quest is to provide the ultimate learning platform. Your support helps us forge ahead.
+              </p>
+            </div>
+            <div className="mx-auto mt-12 grid max-w-5xl gap-8 lg:grid-cols-2">
+                <Card className="flex flex-col text-center items-center p-8">
+                  <CardHeader>
+                     <div className="rounded-full bg-primary/10 p-4 text-primary mb-4">
+                        <Gem className="w-10 h-10" />
+                      </div>
+                    <CardTitle className="font-headline text-3xl">Premium Membership</CardTitle>
+                    <CardDescription className="pt-2">
+                      Unlock the full power of a Dragon Knight with exclusive quests, advanced tools, and unique rewards.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    <Button size="lg" asChild>
+                      <Link href="/membership">View Membership Tiers</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+                 <Card className="flex flex-col text-center items-center p-8">
+                  <CardHeader>
+                     <div className="rounded-full bg-primary/10 p-4 text-primary mb-4">
+                        <HeartHandshake className="w-10 h-10" />
+                      </div>
+                    <CardTitle className="font-headline text-3xl">Donate to the Cause</CardTitle>
+                    <CardDescription className="pt-2">
+                        Help us maintain the kingdom's servers, develop new features, and keep the flame of knowledge burning bright for all.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                     <Button size="lg" variant="outline" asChild>
+                      <Link href="/donate">Make a Donation</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+            </div>
+          </div>
+        </section>
+
       </main>
       <footer className="border-t py-6">
         <div className="container flex items-center justify-between">

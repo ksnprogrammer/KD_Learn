@@ -4,13 +4,15 @@ import {
   BookOpen,
   Castle,
   FlaskConical,
+  Gem,
+  HeartHandshake,
   LayoutDashboard,
   Leaf,
   Settings,
   Sigma,
   Trophy,
   UserCircle,
-  Zap
+  Zap,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -22,6 +24,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarSeparator,
 } from '@/components/ui/sidebar'
 
 export function AppSidebar() {
@@ -86,6 +89,23 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarContent className="!flex-initial">
         <SidebarMenu>
+           <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href="/membership">
+                <Gem />
+                Membership
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+           <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href="/donate">
+                <HeartHandshake />
+                Donate
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarSeparator />
           <SidebarMenuItem>
             <SidebarMenuButton>
               <Settings />
