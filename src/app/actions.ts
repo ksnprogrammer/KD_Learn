@@ -64,6 +64,7 @@ export async function signup(formData: FormData) {
       data: {
         name: name,
         exam_level: examLevel,
+        role: 'knight',
       },
     },
   });

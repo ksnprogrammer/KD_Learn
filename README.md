@@ -75,7 +75,7 @@ Your terminal will display a public URL ending in `.trycloudflare.com`. It will 
 
 ---
 
-## Part 3: Managing the Realm
+## Part 3: Ruling the Kingdom
 
 *   **To Stop the Kingdom:** Press `Ctrl + C` in the terminal where you ran `npm run dev`.
 *   **To Stop the Public Link:** Press `Ctrl + C` in the terminal where you ran `cloudflared tunnel`.
@@ -85,4 +85,22 @@ Your terminal will display a public URL ending in `.trycloudflare.com`. It will 
     git commit -m "A new decree from the King"
     git push origin main
     ```
+
+### Granting Admin Privileges
+To access the King's Court at `/admin`, a user must have the `admin` role. By default, all new knights are assigned the `knight` role. To elevate a knight to an administrator:
+1. Go to your Supabase project dashboard.
+2. Navigate to the **Authentication** section.
+3. Find the user you wish to promote and click on them.
+4. Under the **User Management** section, find the **User Metadata** editor.
+5. Add or edit the `role` field to be `"admin"`. It should look like this:
+   ```json
+   {
+     "name": "The King",
+     "exam_level": "A/L",
+     "role": "admin"
+   }
+   ```
+6. Save the changes. The user will now have access to the King's Court.
+
+---
 The kingdom is ready. Your reign may now begin.
