@@ -12,49 +12,27 @@ import { Input } from './ui/input';
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { getPosts, createPost } from '@/app/actions';
+import { getPosts, createPost, getApprovedModules } from '@/app/actions';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/use-user';
+import type { CreateModuleOutput } from "@/ai/flows/create-module-from-description";
 
+interface ApprovedModule {
+    id: number;
+    topic: string;
+    content: CreateModuleOutput;
+    exam_level: string;
+}
 
-const quests = [
-    {
-        title: 'The Verdant Dragon',
-        subject: 'Biology',
-        description: 'Master the secrets of life, from the smallest cell to the largest ecosystem.',
-        icon: Leaf,
-        color: 'text-biology',
-    },
-    {
-        title: 'The Azure Dragon',
-        subject: 'Chemistry',
-        description: 'Unravel the elements and reactions that form the very fabric of our world.',
-        icon: FlaskConical,
-        color: 'text-chemistry',
-    },
-    {
-        title: 'The Crimson Dragon',
-        subject: 'Physics',
-        description: 'Command the fundamental forces of the universe, from motion to energy.',
-        icon: Zap,
-        color: 'text-physics',
-    },
-    {
-        title: 'The Golden Dragon',
-        subject: 'Maths',
-        description: 'Conquer the language of the universe, from algebra to calculus.',
-        icon: Sigma,
-        color: 'text-maths',
-    },
-    {
-        title: 'The Argent Dragon',
-        subject: 'General Science',
-        description: 'Explore the core principles that unite all scientific disciplines.',
-        icon: BookOpen,
-        color: 'text-generalScience',
-    },
-]
+const getSubjectInfo = (topic: string) => {
+    const lowerTopic = topic.toLowerCase();
+    if (lowerTopic.includes('biolog')) return { icon: Leaf, color: 'text-biology', name: 'Biology' };
+    if (lowerTopic.includes('chemis')) return { icon: FlaskConical, color: 'text-chemistry', name: 'Chemistry' };
+    if (lowerTopic.includes('physic')) return { icon: Zap, color: 'text-physics', name: 'Physics' };
+    if (lowerTopic.includes('math')) return { icon: Sigma, color: 'text-maths', name: 'Maths' };
+    return { icon: BookOpen, color: 'text-general-science', name: 'General Science' };
+}
 
 const staticLeaderboardData = [
     { rank: 1, name: 'Sir Galahad', xp: 12500, avatar: 'https://placehold.co/100x100.png', hint: 'knight portrait' },
@@ -69,14 +47,14 @@ const dailyChallenge = {
     reward: '150 XP',
 };
 
-const featuredQuest = quests[0];
-
 export function Dashboard() {
     const user = useUser();
     const { toast } = useToast();
     const [posts, setPosts] = useState<any[]>([]);
     const [newPost, setNewPost] = useState('');
     const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+    const [modules, setModules] = useState<ApprovedModule[]>([]);
+    const [isLoadingModules, setIsLoadingModules] = useState(true);
     
     const userName = user?.user_metadata?.name || 'Knight';
     const userAvatar = 'https://placehold.co/100x100.png'; // Placeholder for now
@@ -101,16 +79,25 @@ export function Dashboard() {
         setIsLoadingPosts(false);
     }, [toast]);
 
+    const fetchModules = useCallback(async () => {
+        setIsLoadingModules(true);
+        const { success, data, error } = await getApprovedModules();
+        if (success && data) {
+            setModules(data as ApprovedModule[]);
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Failed to fetch quests',
+                description: error || 'Could not load available quests.',
+            });
+        }
+        setIsLoadingModules(false);
+    }, [toast]);
+
     useEffect(() => {
         fetchPosts();
-    }, [fetchPosts]);
-
-    const handleBeginQuest = (questTitle: string) => {
-        toast({
-            title: "Quest Not Yet Forged",
-            description: `The quest '${questTitle}' is still being prepared by the Royal Wizards. Check back soon!`,
-        });
-    };
+        fetchModules();
+    }, [fetchPosts, fetchModules]);
     
     const handleAcceptChallenge = (title: string) => {
         toast({
@@ -153,6 +140,9 @@ export function Dashboard() {
             });
         }
     };
+    
+    const featuredQuest = modules.length > 0 ? modules[0] : null;
+    const featuredQuestSubject = featuredQuest ? getSubjectInfo(featuredQuest.topic) : null;
 
     return (
         <div className="container mx-auto py-8 space-y-8">
@@ -209,18 +199,31 @@ export function Dashboard() {
                     <CardHeader>
                         <CardTitle className="font-headline text-2xl">Featured Quest</CardTitle>
                     </CardHeader>
-                    <CardContent className="flex flex-col sm:flex-row items-center gap-6">
-                       <featuredQuest.icon className={`w-24 h-24 sm:w-32 sm:h-32 ${featuredQuest.color} shrink-0`} />
-                       <div className="space-y-3 text-center sm:text-left">
-                           <h3 className="font-headline text-3xl">{featuredQuest.title}</h3>
-                           <p className="text-muted-foreground">{featuredQuest.description}</p>
-                       </div>
+                     <CardContent className="flex flex-col sm:flex-row items-center gap-6 min-h-[170px]">
+                       {isLoadingModules ? (
+                           <Loader2 className="w-16 h-16 animate-spin text-primary" />
+                       ) : featuredQuest && featuredQuestSubject ? (
+                           <>
+                               <featuredQuestSubject.icon className={`w-24 h-24 sm:w-32 sm:h-32 ${featuredQuestSubject.color} shrink-0`} />
+                               <div className="space-y-3 text-center sm:text-left">
+                                   <h3 className="font-headline text-3xl">{featuredQuest.topic}</h3>
+                                   <p className="text-muted-foreground">{featuredQuest.content.lessonOutline[0]?.title || 'A new challenge awaits.'}</p>
+                                   <Badge variant="secondary">{featuredQuest.exam_level}</Badge>
+                               </div>
+                           </>
+                       ) : (
+                           <p className="text-muted-foreground">No featured quest available. Check back soon!</p>
+                       )}
                     </CardContent>
-                    <CardFooter>
-                        <Button className="w-full sm:w-auto" onClick={() => handleBeginQuest(featuredQuest.title)}>
-                            Continue Quest <ChevronRight />
-                        </Button>
-                    </CardFooter>
+                    {featuredQuest && (
+                        <CardFooter>
+                            <Button className="w-full sm:w-auto" asChild>
+                                <Link href={`/dashboard/training/${featuredQuest.id}`}>
+                                    Continue Quest <ChevronRight />
+                                </Link>
+                            </Button>
+                        </CardFooter>
+                    )}
                 </Card>
                 <Card className="flex flex-col">
                      <CardHeader>
@@ -284,27 +287,46 @@ export function Dashboard() {
                 </TabsContent>
                 
                 <TabsContent value="quests">
-                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                        {quests.map((quest) => (
-                            <Card key={quest.title} className="flex flex-col animate-fade-in-up group hover:border-primary/50 transition-all duration-300">
-                                <CardHeader>
-                                    <div className="flex items-center gap-4">
-                                        <quest.icon className={`w-8 h-8 ${quest.color} group-hover:scale-110 transition-transform`} />
-                                        <div>
-                                            <CardTitle className="font-headline text-xl">{quest.title}</CardTitle>
-                                            <CardDescription>{quest.subject}</CardDescription>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="flex-grow">
-                                    <p className="text-muted-foreground text-sm">{quest.description}</p>
-                                </CardContent>
-                                <CardFooter>
-                                    <Button size="sm" className="w-full group-hover:bg-primary/90" onClick={() => handleBeginQuest(quest.title)}>Begin Quest</Button>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
+                    {isLoadingModules ? (
+                         <div className="flex flex-col items-center justify-center text-center gap-4 mt-12">
+                           <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                           <p className="font-headline text-lg">Gathering available quests...</p>
+                       </div>
+                    ) : modules.length === 0 ? (
+                        <div className="text-center text-muted-foreground mt-12 max-w-md mx-auto p-6 bg-muted/50 rounded-lg">
+                           <p className='font-headline text-lg text-card-foreground'>The Training Grounds are Quiet</p>
+                           <p className="mt-2">No quests are available at this time. Check back later, knight!</p>
+                       </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {modules.map((module) => {
+                                const subject = getSubjectInfo(module.topic);
+                                const Icon = subject.icon;
+                                return (
+                                    <Card key={module.id} className="flex flex-col animate-fade-in-up group hover:border-primary/50 transition-all duration-300">
+                                        <CardHeader>
+                                            <div className="flex items-center gap-4">
+                                                <Icon className={`w-8 h-8 ${subject.color} group-hover:scale-110 transition-transform`} />
+                                                <div>
+                                                    <CardTitle className="font-headline text-xl">{module.topic}</CardTitle>
+                                                    <CardDescription>{subject.name}</CardDescription>
+                                                </div>
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent className="flex-grow">
+                                            <p className="text-muted-foreground text-sm">{module.content.quizQuestions.length} questions</p>
+                                            <Badge variant="secondary" className='mt-2'>{module.exam_level}</Badge>
+                                        </CardContent>
+                                        <CardFooter>
+                                            <Button size="sm" className="w-full group-hover:bg-primary/90" asChild>
+                                                <Link href={`/dashboard/training/${module.id}`}>Begin Quest</Link>
+                                            </Button>
+                                        </CardFooter>
+                                    </Card>
+                                )
+                            })}
+                        </div>
+                    )}
                 </TabsContent>
                 
                 <TabsContent value="discussions">
