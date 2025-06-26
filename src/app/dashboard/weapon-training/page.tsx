@@ -1,10 +1,12 @@
+'use client';
+
 import { AppHeader } from "@/components/app-header";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { useToast } from "@/hooks/use-toast";
 import { FlaskConical, Leaf, Swords, Zap } from "lucide-react";
-import Link from "next/link";
 
 const practiceQuizzes = [
   { subject: 'Biology', title: 'Cellular Structures', icon: Leaf, color: 'text-biology', questions: 15 },
@@ -15,6 +17,15 @@ const practiceQuizzes = [
 
 
 function WeaponTrainingContent() {
+    const { toast } = useToast();
+
+    const handleStartTraining = (quizTitle: string) => {
+        toast({
+            title: "Training Session Starting!",
+            description: `Preparing the '${quizTitle}' practice quiz. Ready your mind, knight!`,
+        });
+    };
+
     return (
         <div className="container mx-auto py-8">
              <Card className="w-full max-w-4xl mx-auto mb-8">
@@ -40,7 +51,7 @@ function WeaponTrainingContent() {
                             <p className="text-sm text-muted-foreground">{quiz.subject} &middot; {quiz.questions} questions</p>
                         </CardContent>
                         <CardFooter>
-                            <Button className="w-full">Start Training</Button>
+                            <Button className="w-full" onClick={() => handleStartTraining(quiz.title)}>Start Training</Button>
                         </CardFooter>
                     </Card>
                 ))}

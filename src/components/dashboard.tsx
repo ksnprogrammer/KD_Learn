@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Input } from './ui/input';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const quests = [
     {
@@ -107,6 +108,14 @@ const initialDiscussionPosts = [
 ];
 
 function QuestsTab() {
+    const { toast } = useToast();
+    const handleBeginQuest = (questTitle: string) => {
+        toast({
+            title: "Quest Not Yet Forged",
+            description: `The quest '${questTitle}' is still being prepared by the Royal Wizards. Check back soon!`,
+        });
+    };
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {quests.map((quest) => (
@@ -124,7 +133,7 @@ function QuestsTab() {
                         <p className="text-muted-foreground">{quest.description}</p>
                     </CardContent>
                     <CardFooter>
-                        <Button className="w-full group-hover:bg-primary/90">Begin Quest</Button>
+                        <Button className="w-full group-hover:bg-primary/90" onClick={() => handleBeginQuest(quest.title)}>Begin Quest</Button>
                     </CardFooter>
                 </Card>
             ))}
@@ -175,6 +184,22 @@ function LeaderboardTab() {
 }
 
 function ChallengesTab() {
+    const { toast } = useToast();
+
+    const handleAcceptChallenge = (title: string) => {
+        toast({
+            title: "Challenge Accepted!",
+            description: `You have accepted the challenge: ${title}. Good luck, knight!`,
+        });
+    };
+
+    const handleViewProgress = () => {
+        toast({
+            title: "Coming Soon",
+            description: "Progress tracking for weekly challenges will be available shortly.",
+        });
+    }
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in-up">
             <Card className="bg-gradient-to-br from-card to-secondary/50">
@@ -190,7 +215,7 @@ function ChallengesTab() {
                 </CardContent>
                 <CardFooter className="flex justify-between items-center">
                     <Badge variant="outline">Reward: {dailyChallenge.reward}</Badge>
-                    <Button>Accept</Button>
+                    <Button onClick={() => handleAcceptChallenge(dailyChallenge.title)}>Accept</Button>
                 </CardFooter>
             </Card>
             <Card className="bg-gradient-to-br from-card to-secondary/50">
@@ -206,7 +231,7 @@ function ChallengesTab() {
                 </CardContent>
                 <CardFooter className="flex justify-between items-center">
                     <Badge variant="outline">Reward: {weeklyChallenge.reward}</Badge>
-                    <Button>View Progress</Button>
+                    <Button onClick={handleViewProgress}>View Progress</Button>
                 </CardFooter>
             </Card>
         </div>

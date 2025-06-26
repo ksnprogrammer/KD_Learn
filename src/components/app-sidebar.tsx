@@ -46,33 +46,43 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Leaf className="text-biology" />
-              The Verdant Dragons
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard">
+                <Leaf className="text-biology" />
+                The Verdant Dragons
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <FlaskConical className="text-chemistry" />
-              The Azure Dragons
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard">
+                <FlaskConical className="text-chemistry" />
+                The Azure Dragons
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Zap className="text-physics" />
-              The Crimson Dragons
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard">
+                <Zap className="text-physics" />
+                The Crimson Dragons
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Sigma className="text-maths" />
-              The Golden Dragons
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard">
+                <Sigma className="text-maths" />
+                The Golden Dragons
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
            <SidebarMenuItem>
-            <SidebarMenuButton>
-              <BookOpen className="text-generalScience" />
-              The Argent Dragons
+            <SidebarMenuButton asChild>
+              <Link href="/dashboard">
+                <BookOpen className="text-generalScience" />
+                The Argent Dragons
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>

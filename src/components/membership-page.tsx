@@ -55,6 +55,13 @@ const tiers = [
 export function MembershipPageContent() {
   const { toast } = useToast();
   
+  const handleChooseTier = (tierName: string) => {
+    toast({
+      title: "Tier Selected",
+      description: `You have selected the ${tierName} tier. Please proceed with payment below to complete your upgrade.`,
+    });
+  };
+
   const handleSubmit = () => {
     toast({
       title: "Membership Request Submitted!",
@@ -93,7 +100,7 @@ export function MembershipPageContent() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" variant={tier.variant === 'primary' ? 'default' : 'outline'}>{tier.buttonText}</Button>
+              <Button className="w-full" variant={tier.variant === 'primary' ? 'default' : 'outline'} onClick={() => handleChooseTier(tier.name)}>{tier.buttonText}</Button>
             </CardFooter>
           </Card>
         ))}

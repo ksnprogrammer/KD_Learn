@@ -3,6 +3,7 @@
 
 import { Bell, User, Settings } from 'lucide-react'
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -20,12 +21,17 @@ import { useState, useEffect } from 'react';
 
 export function AppHeader() {
   const [progress, setProgress] = useState(0);
+  const router = useRouter();
 
   useEffect(() => {
     // Simulate XP gain
     const timer = setTimeout(() => setProgress(66), 500)
     return () => clearTimeout(timer)
   }, [])
+
+  const handleLogout = () => {
+    router.push('/login');
+  };
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
@@ -78,7 +84,7 @@ export function AppHeader() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <span>Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
