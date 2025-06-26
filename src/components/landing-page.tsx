@@ -28,9 +28,8 @@ export function LandingPage() {
           <Image
             src="https://placehold.co/1920x1080.png"
             alt="A fierce dragon silhouetted against a red sky"
-            layout="fill"
-            objectFit="cover"
-            className="absolute inset-0 z-0 opacity-30"
+            fill
+            className="absolute inset-0 z-0 object-cover opacity-30"
             data-ai-hint="fantasy landscape dragon"
           />
           <div className="relative z-10 flex h-full flex-col items-center justify-center bg-gradient-to-t from-background via-background/80 to-transparent">
