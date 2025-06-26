@@ -45,7 +45,7 @@ const staticLeaderboardData = [
     { rank: 5, name: 'Elara of the Forest', xp: 9800, avatar: 'https://placehold.co/100x100.png', hint: 'elf knight' },
 ];
 
-export function Dashboard() {
+export default function Dashboard() {
     const user = useUser();
     const { toast } = useToast();
     const [posts, setPosts] = useState<any[]>([]);
