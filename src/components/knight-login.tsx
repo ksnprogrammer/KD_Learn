@@ -50,8 +50,8 @@ export function KnightLogin() {
 
   return (
     <div className="relative min-h-screen w-full lg:grid lg:grid-cols-2">
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[400px] gap-6">
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto grid w-full max-w-sm gap-6">
           <div className="grid gap-2 text-center">
             <div className="mb-4 flex justify-center">
               <Logo />

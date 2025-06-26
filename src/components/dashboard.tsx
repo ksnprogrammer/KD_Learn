@@ -281,13 +281,13 @@ function DiscussionsTab() {
                     <CardDescription>Share wisdom and seek guidance from your fellow knights.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={handleSubmit} className="flex gap-4">
+                    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
                         <Input 
                             placeholder="Share your thoughts, knight..." 
                             value={newPost}
                             onChange={(e) => setNewPost(e.target.value)}
                         />
-                        <Button type="submit"><Send /> Post</Button>
+                        <Button type="submit" className="w-full sm:w-auto"><Send /> Post</Button>
                     </form>
                 </CardContent>
             </Card>

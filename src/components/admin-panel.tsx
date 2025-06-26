@@ -352,9 +352,9 @@ function PaymentApprovals() {
             <TableHeader>
               <TableRow>
                 <TableHead>User</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead className="hidden sm:table-cell">Type</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead className="hidden sm:table-cell">Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -363,9 +363,9 @@ function PaymentApprovals() {
               {payments.map((payment) => (
                 <TableRow key={payment.id}>
                   <TableCell className="font-medium">{payment.user}</TableCell>
-                  <TableCell>{payment.type}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{payment.type}</TableCell>
                   <TableCell>{payment.amount}</TableCell>
-                  <TableCell>{payment.date}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{payment.date}</TableCell>
                   <TableCell>
                     <Badge variant={getBadgeVariant(payment.status)}>{payment.status}</Badge>
                   </TableCell>
@@ -483,7 +483,7 @@ function AnalyticsReports() {
 export function AdminPanel() {
   return (
     <Tabs defaultValue="creator" className="w-full max-w-6xl mx-auto">
-      <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 max-w-2xl">
+      <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
         <TabsTrigger value="creator">Dragon Forge</TabsTrigger>
         <TabsTrigger value="assets">Asset Manager</TabsTrigger>
         <TabsTrigger value="submissions">Submissions</TabsTrigger>
