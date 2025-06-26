@@ -1,8 +1,6 @@
 'use client';
 
-import { AppHeader } from "@/components/app-header";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { useUser } from "@/hooks/use-user";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,16 +16,22 @@ const achievements = [
 ];
 
 function ProfileContent() {
+    const user = useUser();
+    
+    const userName = user?.user_metadata?.name || 'Knight';
+    const examLevel = user?.user_metadata?.exam_level || 'A/L';
+    const userTitle = `Dragon Knight - ${examLevel} Path`;
+
     return (
         <div className="container mx-auto py-8">
             <Card className="w-full max-w-4xl mx-auto">
                 <CardHeader className="items-center text-center">
                     <Avatar className="w-32 h-32 mx-auto mb-4 border-4 border-primary">
                         <AvatarImage src="https://placehold.co/128x128.png" data-ai-hint="dragon avatar" />
-                        <AvatarFallback>KD</AvatarFallback>
+                        <AvatarFallback>{userName.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
-                    <CardTitle className="font-headline text-4xl">King Dragon</CardTitle>
-                    <CardDescription>Dragon Knight of the Azure Gang - A/L Path</CardDescription>
+                    <CardTitle className="font-headline text-4xl">{userName}</CardTitle>
+                    <CardDescription>{userTitle}</CardDescription>
                     <div className="flex justify-center gap-2 mt-4">
                         <Badge>Level 5</Badge>
                         <Badge variant="secondary">11,500 XP</Badge>
@@ -96,17 +100,5 @@ function ProfileContent() {
 
 
 export default function ProfilePage() {
-    return (
-        <SidebarProvider>
-            <div className="relative flex min-h-dvh bg-background">
-                <AppSidebar />
-                <div className="relative flex flex-col flex-1">
-                    <AppHeader />
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                        <ProfileContent />
-                    </main>
-                </div>
-            </div>
-        </SidebarProvider>
-    );
+    return <ProfileContent />;
 }

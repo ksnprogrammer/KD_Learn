@@ -1,11 +1,7 @@
 
 'use client';
 import { FlaskConical, Leaf, Zap, Shield, Swords, Trophy, Target, MessageSquare, Users, BookOpen, Sigma, Send, ChevronRight, Loader2 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { AppSidebar } from '@/components/app-sidebar';
-import { AppHeader } from '@/components/app-header';
-import { SidebarProvider } from '@/components/ui/sidebar';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,6 +15,7 @@ import { Progress } from '@/components/ui/progress';
 import { getPosts, createPost } from '@/app/actions';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useUser } from '@/hooks/use-user';
 
 
 const quests = [
@@ -59,10 +56,9 @@ const quests = [
     },
 ]
 
-const leaderboardData = [
+const staticLeaderboardData = [
     { rank: 1, name: 'Sir Galahad', xp: 12500, avatar: 'https://placehold.co/100x100.png', hint: 'knight portrait' },
     { rank: 2, name: 'Lady Brienne', xp: 11800, avatar: 'https://placehold.co/100x100.png', hint: 'female knight' },
-    { rank: 3, name: 'King Dragon', xp: 11500, avatar: 'https://placehold.co/100x100.png', hint: 'dragon avatar' },
     { rank: 4, name: 'Ser Arthur', xp: 10200, avatar: 'https://placehold.co/100x100.png', hint: 'wise knight' },
     { rank: 5, name: 'Elara of the Forest', xp: 9800, avatar: 'https://placehold.co/100x100.png', hint: 'elf knight' },
 ];
@@ -75,11 +71,20 @@ const dailyChallenge = {
 
 const featuredQuest = quests[0];
 
-function KnightDashboard() {
+export function Dashboard() {
+    const user = useUser();
     const { toast } = useToast();
     const [posts, setPosts] = useState<any[]>([]);
     const [newPost, setNewPost] = useState('');
     const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+    
+    const userName = user?.user_metadata?.name || 'Knight';
+    const userAvatar = 'https://placehold.co/100x100.png'; // Placeholder for now
+
+    const leaderboardData = [
+        ...staticLeaderboardData,
+        { rank: 3, name: userName, xp: 11500, avatar: userAvatar, hint: 'dragon avatar' },
+    ].sort((a,b) => b.xp - a.xp).map((knight, index) => ({ ...knight, rank: index + 1 }));
 
     const fetchPosts = useCallback(async () => {
         setIsLoadingPosts(true);
@@ -116,13 +121,13 @@ function KnightDashboard() {
 
     const handlePostSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!newPost.trim()) return;
+        if (!newPost.trim() || !user) return;
 
         const originalPosts = posts;
         const tempPost = {
             id: 'temp-' + Date.now(),
-            author_name: 'King Dragon',
-            author_avatar: 'https://placehold.co/100x100.png',
+            author_name: userName,
+            author_avatar: userAvatar,
             created_at: new Date().toISOString(),
             content: newPost.trim(),
             isOptimistic: true,
@@ -133,8 +138,8 @@ function KnightDashboard() {
 
         const { success, error } = await createPost(
             newPost.trim(),
-            'King Dragon',
-            'https://placehold.co/100x100.png'
+            userName,
+            userAvatar
         );
 
         if (success) {
@@ -152,7 +157,7 @@ function KnightDashboard() {
     return (
         <div className="container mx-auto py-8 space-y-8">
             <div>
-                <h1 className="font-headline text-4xl font-bold">Welcome back, King Dragon!</h1>
+                <h1 className="font-headline text-4xl font-bold">Welcome back, {userName}!</h1>
                 <p className="text-muted-foreground">Here's your kingdom's status at a glance.</p>
             </div>
             
@@ -256,7 +261,7 @@ function KnightDashboard() {
                                     </TableHeader>
                                     <TableBody>
                                         {leaderboardData.map((knight) => (
-                                            <TableRow key={knight.rank} className={knight.name === 'King Dragon' ? 'bg-primary/10 hover:bg-primary/20' : ''}>
+                                            <TableRow key={knight.rank} className={knight.name === userName ? 'bg-primary/10 hover:bg-primary/20' : ''}>
                                                 <TableCell className="font-bold text-lg text-center">{knight.rank}</TableCell>
                                                 <TableCell>
                                                     <div className="flex items-center gap-4">
@@ -265,7 +270,7 @@ function KnightDashboard() {
                                                             <AvatarFallback>{knight.name.substring(0, 2)}</AvatarFallback>
                                                         </Avatar>
                                                         <span className="font-medium">{knight.name}</span>
-                                                        {knight.name === 'King Dragon' && <Badge variant="secondary" className="ml-2">You</Badge>}
+                                                        {knight.name === userName && <Badge variant="secondary" className="ml-2">You</Badge>}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell className="text-right font-mono">{knight.xp.toLocaleString()}</TableCell>
@@ -366,22 +371,5 @@ function KnightDashboard() {
                 </TabsContent>
             </Tabs>
         </div>
-    )
-}
-
-
-export function Dashboard() {
-    return (
-        <SidebarProvider>
-            <div className="relative flex min-h-dvh bg-background">
-                <AppSidebar />
-                <div className="relative flex flex-col flex-1">
-                    <AppHeader />
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                        <KnightDashboard />
-                    </main>
-                </div>
-            </div>
-        </SidebarProvider>
     )
 }

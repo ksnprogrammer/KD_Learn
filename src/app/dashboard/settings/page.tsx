@@ -1,8 +1,6 @@
 'use client';
 
-import { AppHeader } from "@/components/app-header";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { useUser } from "@/hooks/use-user";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bell, KeyRound, Palette, User } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -12,7 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 function SettingsForm() {
-    // Note: In a real app, you'd use useForm and state to manage these inputs
+    const user = useUser();
+    const userName = user?.user_metadata?.name || 'Knight';
+    const examLevel = user?.user_metadata?.exam_level || 'A/L';
+    const userTitle = `Dragon Knight - ${examLevel} Path`;
+
     return (
          <Tabs defaultValue="profile" className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
@@ -30,11 +32,11 @@ function SettingsForm() {
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="knight-name">Knight Name</Label>
-                            <Input id="knight-name" defaultValue="King Dragon" />
+                            <Input id="knight-name" defaultValue={userName} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="knight-title">Title</Label>
-                            <Input id="knight-title" defaultValue="Dragon Knight of the Azure Gang" />
+                            <Input id="knight-title" defaultValue={userTitle} />
                         </div>
                     </CardContent>
                     <CardFooter>
@@ -51,7 +53,7 @@ function SettingsForm() {
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" defaultValue="king.dragon@kingdom.com" disabled />
+                            <Input id="email" type="email" defaultValue={user?.email} disabled />
                         </div>
                          <div className="space-y-2">
                             <Label>Password</Label>
@@ -136,17 +138,5 @@ function SettingsContent() {
 
 
 export default function SettingsPage() {
-    return (
-        <SidebarProvider>
-            <div className="relative flex min-h-dvh bg-background">
-                <AppSidebar />
-                <div className="relative flex flex-col flex-1">
-                    <AppHeader />
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                        <SettingsContent />
-                    </main>
-                </div>
-            </div>
-        </SidebarProvider>
-    );
+    return <SettingsContent />;
 }

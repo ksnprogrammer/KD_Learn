@@ -75,9 +75,9 @@ function KnightRegistrationForm() {
                         <SelectValue placeholder="Select your exam level" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="scholarship">Grade 5 Scholarship</SelectItem>
-                        <SelectItem value="ol">O/L (Ordinary Level)</SelectItem>
-                        <SelectItem value="al">A/L (Advanced Level)</SelectItem>
+                        <SelectItem value="Grade 5 Scholarship">Grade 5 Scholarship</SelectItem>
+                        <SelectItem value="O/L">O/L (Ordinary Level)</SelectItem>
+                        <SelectItem value="A/L">A/L (Advanced Level)</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

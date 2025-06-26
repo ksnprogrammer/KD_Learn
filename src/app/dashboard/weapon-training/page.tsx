@@ -1,10 +1,7 @@
 'use client';
 
-import { AppHeader } from "@/components/app-header";
-import { AppSidebar } from "@/components/app-sidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Swords, Zap, FlaskConical, Leaf, BookOpen, Sigma } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -119,17 +116,5 @@ function WeaponTrainingContent() {
 
 
 export default function WeaponTrainingPage() {
-    return (
-        <SidebarProvider>
-            <div className="relative flex min-h-dvh bg-background">
-                <AppSidebar />
-                <div className="relative flex flex-col flex-1">
-                    <AppHeader />
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                        <WeaponTrainingContent />
-                    </main>
-                </div>
-            </div>
-        </SidebarProvider>
-    );
+    return <WeaponTrainingContent />;
 }

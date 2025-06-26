@@ -1,8 +1,5 @@
-import { AppHeader } from "@/components/app-header";
-import { AppSidebar } from "@/components/app-sidebar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { BrainCircuit, FlaskConical, Leaf, Zap } from "lucide-react";
 
 const coreConcepts = [
@@ -67,17 +64,5 @@ function MentalTrainingContent() {
 
 
 export default function MentalTrainingPage() {
-    return (
-        <SidebarProvider>
-            <div className="relative flex min-h-dvh bg-background">
-                <AppSidebar />
-                <div className="relative flex flex-col flex-1">
-                    <AppHeader />
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                        <MentalTrainingContent />
-                    </main>
-                </div>
-            </div>
-        </SidebarProvider>
-    );
+    return <MentalTrainingContent />;
 }

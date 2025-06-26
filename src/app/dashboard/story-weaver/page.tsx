@@ -1,8 +1,5 @@
 'use client';
 
-import { AppHeader } from "@/components/app-header";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -160,17 +157,5 @@ function StoryWeaverPanel() {
 }
 
 export default function StoryWeaverPage() {
-    return (
-        <SidebarProvider>
-            <div className="relative flex min-h-dvh bg-background">
-                <AppSidebar />
-                <div className="relative flex flex-col flex-1">
-                    <AppHeader />
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                        <StoryWeaverPanel />
-                    </main>
-                </div>
-            </div>
-        </SidebarProvider>
-    );
+    return <StoryWeaverPanel />;
 }

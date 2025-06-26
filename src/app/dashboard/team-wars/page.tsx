@@ -1,14 +1,10 @@
 
 'use client';
 
-import { AppHeader } from "@/components/app-header";
-import { AppSidebar } from "@/components/app-sidebar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FlaskConical, Leaf, Shield, Swords, Zap } from "lucide-react";
+import { FlaskConical, Leaf, Swords } from "lucide-react";
 
 const liveBattle = {
     teamA: { name: 'Verdant Dragons', icon: Leaf, color: 'text-biology', score: '8,450', members: 12 },
@@ -93,17 +89,5 @@ function TeamWarsDashboard() {
 
 
 export default function TeamWarsPage() {
-    return (
-        <SidebarProvider>
-            <div className="relative flex min-h-dvh bg-background">
-                <AppSidebar />
-                <div className="relative flex flex-col flex-1">
-                    <AppHeader />
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                        <TeamWarsDashboard />
-                    </main>
-                </div>
-            </div>
-        </SidebarProvider>
-    );
+    return <TeamWarsDashboard />;
 }
