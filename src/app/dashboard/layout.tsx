@@ -6,12 +6,17 @@ import { UserProvider } from '@/hooks/use-user';
 import { createServerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { isSupabaseConfigured } from "@/lib/supabase";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  if (!isSupabaseConfigured) {
+    redirect('/login?message=Database is not configured by the administrator.');
+  }
+  
   const cookieStore = cookies();
   const supabase = createServerClient({ cookies: () => cookieStore });
   const { data: { user } } = await supabase.auth.getUser();

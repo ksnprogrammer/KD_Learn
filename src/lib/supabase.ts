@@ -1,15 +1,20 @@
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
-// IMPORTANT: These values are read from the .env file.
-// Make sure you have a .env file at the root of your project with these variables defined.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase URL and anonymous key are required.')
+let supabase: SupabaseClient | null = null;
+const isSupabaseConfigured = supabaseUrl && supabaseAnonKey && !supabaseUrl.includes('YOUR_SUPABASE_URL');
+
+if (isSupabaseConfigured) {
+    supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+} else {
+    // In a server environment, this warning is helpful.
+    if (typeof window === 'undefined') {
+        console.warn('Supabase credentials are not configured or are placeholders. The application will run in a limited, offline mode.');
+    }
 }
 
-// Initialize the Supabase client.
-// This client can be used to interact with your Supabase database, authentication, and storage.
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export { supabase, isSupabaseConfigured };

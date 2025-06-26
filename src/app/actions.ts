@@ -12,14 +12,20 @@ import { generateDailyChallenge } from '@/ai/flows/generate-daily-challenge';
 import type { DailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
 import { generateTeamWarReport } from '@/ai/flows/generate-team-war-report';
 import type { TeamWarReportOutput } from '@/ai/flows/generate-team-war-report';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 
+const DB_NOT_CONFIGURED_ERROR = { success: false, error: 'Database not configured. Please check your .env file.' };
+const DB_NOT_CONFIGURED_ERROR_WITH_DATA = { ...DB_NOT_CONFIGURED_ERROR, data: [] };
 
 export async function login(formData: FormData) {
+  if (!isSupabaseConfigured) {
+    return redirect('/login?message=Database is not configured by the administrator.');
+  }
+
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const cookieStore = cookies();
@@ -38,6 +44,9 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
+  if (!isSupabaseConfigured) {
+    return redirect('/register?message=Database is not configured by the administrator.');
+  }
   const origin = headers().get('origin');
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
@@ -68,6 +77,9 @@ export async function signup(formData: FormData) {
 }
 
 export async function logout() {
+  if (!isSupabaseConfigured) {
+    return redirect('/');
+  }
   const cookieStore = cookies();
   const supabase = createServerClient({ cookies: () => cookieStore });
   await supabase.auth.signOut();
@@ -120,6 +132,7 @@ export async function submitModuleForReview(moduleData: CreateModuleOutput, topi
   success: boolean;
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -152,6 +165,7 @@ export async function getSubmissions(): Promise<{
   data?: any[];
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -174,6 +188,7 @@ export async function updateSubmissionStatus(id: number, status: 'Approved' | 'R
   success: boolean;
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
   try {
     const { error } = await supabase
       .from('submissions')
@@ -196,6 +211,7 @@ export async function saveStory(storyData: CreateStoryOutput): Promise<{
   success: boolean;
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
   try {
     const { error } = await supabase
       .from('stories')
@@ -224,6 +240,7 @@ export async function getStories(): Promise<{
   data?: any[];
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
   try {
     const { data, error } = await supabase
       .from('stories')
@@ -247,6 +264,7 @@ export async function getPosts(): Promise<{
   data?: any[];
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
   try {
     const { data, error } = await supabase
       .from('posts')
@@ -271,6 +289,7 @@ export async function createPost(content: string, author_name: string, author_av
   data?: any;
   error?: string;
 }> {
+   if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
    if (!content.trim()) {
     return { success: false, error: 'Post content cannot be empty.' };
   }
@@ -305,6 +324,7 @@ export async function getApprovedModules(): Promise<{
   data?: any[];
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -334,6 +354,7 @@ export async function getSubmissionById(id: number): Promise<{
   };
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -368,6 +389,7 @@ export async function submitPaymentForReview(
   success: boolean;
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
   try {
     // Note: receipt_url is omitted as we aren't handling file uploads yet
     const { error } = await supabase
@@ -398,6 +420,7 @@ export async function getPayments(): Promise<{
   data?: any[];
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
   try {
     const { data, error } = await supabase
       .from('payments')
@@ -420,6 +443,7 @@ export async function updatePaymentStatus(id: number, status: 'Approved' | 'Reje
   success: boolean;
   error?: string;
 }> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
   try {
     const { error } = await supabase
       .from('payments')

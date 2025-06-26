@@ -3,7 +3,7 @@
  * @fileOverview An AI agent that generates a report on the kingdom's content status.
  */
 import {ai} from '@/ai/genkit';
-import {supabase} from '@/lib/supabase';
+import {supabase, isSupabaseConfigured} from '@/lib/supabase';
 import {z} from 'zod';
 
 const getSubmissionStats = ai.defineTool({
@@ -16,6 +16,10 @@ const getSubmissionStats = ai.defineTool({
     rejected: z.number(),
   }),
 }, async () => {
+  if (!isSupabaseConfigured || !supabase) {
+    return { pending: 0, approved: 0, rejected: 0 };
+  }
+
   const { count: pending, error: pErr } = await supabase.from('submissions').select('id', { count: 'exact', head: true }).eq('status', 'Pending');
   const { count: approved, error: aErr } = await supabase.from('submissions').select('id', { count: 'exact', head: true }).eq('status', 'Approved');
   const { count: rejected, error: rErr } = await supabase.from('submissions').select('id', { count: 'exact', head: true }).eq('status', 'Rejected');
