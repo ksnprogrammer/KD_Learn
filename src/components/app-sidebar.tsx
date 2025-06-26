@@ -1,29 +1,30 @@
 'use client'
 
 import {
-  BookOpen,
-  Castle,
+  BrainCircuit,
   Briefcase,
+  Castle,
   Feather,
-  FlaskConical,
   Gem,
   HeartHandshake,
   LayoutDashboard,
-  Leaf,
   Library,
   MessageSquare,
   Settings,
-  Sigma,
+  Swords,
   Trophy,
   UserCircle,
-  Zap,
+  Users,
 } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 import { Logo } from '@/components/logo'
 import {
   Sidebar,
   SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
@@ -32,6 +33,9 @@ import {
 } from '@/components/ui/sidebar'
 
 export function AppSidebar() {
+  const pathname = usePathname()
+  const isActive = (path: string) => pathname === path
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -40,89 +44,86 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive>
+            <SidebarMenuButton asChild isActive={isActive('/dashboard')}>
               <Link href="/dashboard">
                 <LayoutDashboard />
                 Dashboard
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+        </SidebarMenu>
+        
+        <SidebarGroup>
+          <SidebarGroupLabel>Training Grounds</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={isActive('/dashboard/weapon-training')}>
+                <Link href="/dashboard/weapon-training">
+                  <Swords />
+                  Weapon Training
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={isActive('/dashboard/mental-training')}>
+                <Link href="/dashboard/mental-training">
+                  <BrainCircuit />
+                  Mental Training
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={isActive('/dashboard/team-wars')}>
+                <Link href="/dashboard/team-wars">
+                  <Users />
+                  Team Wars
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+        
+        <SidebarGroup>
+           <SidebarGroupLabel>Kingdom Archives</SidebarGroupLabel>
+           <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive('/dashboard/story-weaver')}>
+                  <Link href="/dashboard/story-weaver">
+                    <Feather />
+                    Story Weaver
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive('/dashboard/hall-of-legends')}>
+                  <Link href="/dashboard/hall-of-legends">
+                    <Library />
+                    Hall of Legends
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/dashboard">
+                    <Trophy />
+                    Leaderboards
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+           </SidebarMenu>
+        </SidebarGroup>
+
+      </SidebarContent>
+      <SidebarContent className="!flex-initial">
+        <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/dashboard">
-                <Leaf className="text-biology" />
-                The Verdant Dragons
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/dashboard">
-                <FlaskConical className="text-chemistry" />
-                The Azure Dragons
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/dashboard">
-                <Zap className="text-physics" />
-                The Crimson Dragons
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/dashboard">
-                <Sigma className="text-maths" />
-                The Golden Dragons
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/dashboard">
-                <BookOpen className="text-generalScience" />
-                The Argent Dragons
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild isActive={isActive('/dashboard/profile')}>
               <Link href="/dashboard/profile">
                 <UserCircle />
                 My Profile
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/dashboard/story-weaver">
-                <Feather />
-                Story Weaver
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/dashboard/hall-of-legends">
-                <Library />
-                Hall of Legends
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link href="/dashboard">
-                <Trophy />
-                Leaderboards
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarContent>
-      <SidebarContent className="!flex-initial">
-        <SidebarMenu>
            <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href={process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || '#'}>
@@ -132,7 +133,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
            <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild isActive={isActive('/membership')}>
               <Link href="/membership">
                 <Gem />
                 Membership
@@ -140,7 +141,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
            <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild isActive={isActive('/donate')}>
               <Link href="/donate">
                 <HeartHandshake />
                 Donate
@@ -149,7 +150,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarSeparator />
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild isActive={isActive('/careers')}>
               <Link href="/careers">
                 <Briefcase />
                 Join the Wizards
@@ -157,7 +158,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild isActive={isActive('/dashboard/settings')}>
               <Link href="/dashboard/settings">
                 <Settings />
                 Settings
@@ -165,7 +166,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild isActive={isActive('/admin')}>
               <Link href="/admin">
                 <Castle />
                 King's Court
