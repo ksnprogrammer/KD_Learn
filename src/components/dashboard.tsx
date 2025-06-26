@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from './ui/input';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
 
 const quests = [
     {
@@ -140,6 +141,49 @@ function KnightDashboard() {
                 <p className="text-muted-foreground">Here's your kingdom's status at a glance.</p>
             </div>
             
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 animate-fade-in-up">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Your Rank</CardTitle>
+                        <Trophy className="h-5 w-5 text-primary" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold">#3</div>
+                        <p className="text-xs text-muted-foreground">Top 1% of all knights</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Quests Completed</CardTitle>
+                        <Swords className="h-5 w-5 text-primary" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold">42</div>
+                        <p className="text-xs text-muted-foreground">+5 since last week</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Next Level Progress</CardTitle>
+                        <Users className="h-5 w-5 text-primary" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold">66%</div>
+                        <Progress value={66} className="h-2 mt-2" />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Active Streak</CardTitle>
+                        <Zap className="h-5 w-5 text-primary" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-bold">12 days</div>
+                        <p className="text-xs text-muted-foreground">Keep it up to earn a badge!</p>
+                    </CardContent>
+                </Card>
+            </div>
+
             <div className="grid gap-6 lg:grid-cols-3">
                 <Card className="lg:col-span-2">
                     <CardHeader>
