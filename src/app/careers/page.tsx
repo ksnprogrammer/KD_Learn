@@ -1,3 +1,4 @@
+
 import { LegalLayout } from "@/components/legal-layout";
 import { CareersPageContent } from "@/components/careers-page";
 

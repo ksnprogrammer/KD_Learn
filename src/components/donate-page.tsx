@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { HeartHandshake, Upload, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { submitPaymentForReview } from "@/app/actions";
+import { useUser } from "@/hooks/use-user";
 
 const presetAmounts = [1000, 2500, 5000, 10000];
 
@@ -16,6 +18,8 @@ export function DonatePageContent() {
     const [customAmount, setCustomAmount] = useState("2500");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { toast } = useToast();
+    const user = useUser();
+    const userName = user?.user_metadata?.name || 'A Loyal Subject';
 
     const handlePresetClick = (amount: number) => {
         setSelectedAmount(amount);
@@ -46,8 +50,7 @@ export function DonatePageContent() {
     
         setIsSubmitting(true);
     
-        // In a real app, you would get the user's name from their session.
-        const { success, error } = await submitPaymentForReview('King Dragon', 'Donation', amount);
+        const { success, error } = await submitPaymentForReview(userName, 'Donation', amount);
         
         setIsSubmitting(false);
     

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -8,10 +9,14 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Check, Upload, Loader2 } from "lucide-react";
 import { submitPaymentForReview } from '@/app/actions';
+import { useUser } from '@/hooks/use-user';
+import { cn } from '@/lib/utils';
+
 
 interface Tier {
   name: string;
   price: string;
+  numericPrice: number;
   period: string;
   description: string;
   features: string[];
@@ -23,6 +28,7 @@ const tiers: Tier[] = [
   {
     name: "Squire",
     price: "LKR 499",
+    numericPrice: 499,
     period: "/month",
     description: "For the aspiring knight beginning their journey.",
     features: [
@@ -36,6 +42,7 @@ const tiers: Tier[] = [
   {
     name: "Dragon Knight",
     price: "LKR 999",
+    numericPrice: 999,
     period: "/month",
     description: "For the dedicated knight seeking mastery.",
     features: [
@@ -50,7 +57,8 @@ const tiers: Tier[] = [
   },
   {
     name: "Grand Master",
-    price: "LKR 1999",
+    price: "LKR 1,999",
+    numericPrice: 1999,
     period: "/month",
     description: "For the ultimate legend of the kingdom.",
     features: [
@@ -65,16 +73,20 @@ const tiers: Tier[] = [
 ];
 
 export function MembershipPageContent() {
-  const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
+  const [selectedTier, setSelectedTier] = useState<Tier | null>(tiers[1]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const user = useUser();
+  const userName = user?.user_metadata?.name || 'A New Recruit';
   
   const handleChooseTier = (tier: Tier) => {
     setSelectedTier(tier);
     toast({
       title: "Tier Selected",
-      description: `You have selected the ${tier.name} tier. Please proceed with payment below to complete your upgrade.`,
+      description: `You have selected the ${tier.name} tier. Please proceed with payment below.`,
     });
+    // scroll to payment section
+    document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleSubmit = async () => {
@@ -86,15 +98,13 @@ export function MembershipPageContent() {
         });
         return;
     }
-    // Note: We are not handling the file input yet.
     
     setIsSubmitting(true);
     
-    const amount = parseInt(selectedTier.price.replace('LKR ', '').replace(',', ''), 10);
+    const amount = selectedTier.numericPrice;
     const paymentType = `Membership (${selectedTier.name})`;
 
-    // In a real app, you would get the user's name from their session.
-    const { success, error } = await submitPaymentForReview('King Dragon', paymentType, amount);
+    const { success, error } = await submitPaymentForReview(userName, paymentType, amount);
     
     setIsSubmitting(false);
 
@@ -121,9 +131,13 @@ export function MembershipPageContent() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
         {tiers.map((tier) => (
-          <Card key={tier.name} className={`flex flex-col ${selectedTier?.name === tier.name ? 'border-primary border-2 shadow-primary/20 shadow-lg' : tier.variant === 'primary' ? 'border-primary/50' : ''}`}>
+          <Card key={tier.name} className={cn(
+            'flex flex-col',
+            tier.variant === 'primary' && 'border-primary border-2 shadow-primary/20 shadow-lg',
+            selectedTier?.name === tier.name && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+            )}>
             <CardHeader>
               <CardTitle className="font-headline text-3xl">{tier.name}</CardTitle>
               <CardDescription>{tier.description}</CardDescription>
@@ -149,7 +163,7 @@ export function MembershipPageContent() {
         ))}
       </div>
 
-       <Card className="w-full max-w-4xl mx-auto mt-12">
+       <Card id="payment-section" className="w-full max-w-4xl mx-auto mt-12 scroll-mt-20">
         <CardHeader>
             <CardTitle>How to Activate Your Membership</CardTitle>
             <CardDescription>
