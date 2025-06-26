@@ -23,7 +23,14 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
-import { generateModule, getSubmissions, submitModuleForReview, updateSubmissionStatus } from '@/app/actions';
+import {
+  generateModule,
+  getSubmissions,
+  submitModuleForReview,
+  updateSubmissionStatus,
+  getPayments,
+  updatePaymentStatus,
+} from '@/app/actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -46,6 +53,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 const formSchema = z.object({
   topicDescription: z.string().min(10, 'Please enter a description of at least 10 characters.'),
@@ -424,25 +432,44 @@ function ContentSubmissions() {
 
 function PaymentApprovals() {
   const { toast } = useToast();
-  const [payments, setPayments] = useState([
-    {
-      id: 1,
-      user: 'Sir Lancelot',
-      type: 'Membership (Dragon Knight)',
-      amount: 'LKR 999',
-      date: '2024-07-28',
-      status: 'Pending',
-    },
-    { id: 2, user: 'Lady Brienne', type: 'Donation', amount: 'LKR 2500', date: '2024-07-28', status: 'Pending' },
-    { id: 3, user: 'Bard Finn', type: 'Membership (Squire)', amount: 'LKR 499', date: '2024-07-27', status: 'Approved' },
-  ]);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleStatusChange = (id: number, newStatus: 'Approved' | 'Rejected') => {
-    setPayments(payments.map((p) => (p.id === id ? { ...p, status: newStatus } : p)));
-    toast({
-      title: `Payment ${newStatus}`,
-      description: `The payment has been ${newStatus.toLowerCase()}.`,
-    });
+  const fetchPayments = useCallback(async () => {
+    const { success, data, error } = await getPayments();
+    if (success && data) {
+      setPayments(data);
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error Loading Payments',
+        description: error || 'An unexpected error occurred.',
+      });
+      setPayments([]);
+    }
+    setIsLoading(false);
+  }, [toast]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchPayments();
+  }, [fetchPayments]);
+
+  const handleStatusChange = async (id: number, newStatus: 'Approved' | 'Rejected') => {
+    const { success, error } = await updatePaymentStatus(id, newStatus);
+    if (success) {
+      toast({
+        title: `Payment ${newStatus}`,
+        description: `The payment has been ${newStatus.toLowerCase()}.`,
+      });
+      fetchPayments();
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error Updating Status',
+        description: error || 'An unexpected error occurred.',
+      });
+    }
   };
 
   const getBadgeVariant = (status: string) => {
@@ -463,57 +490,72 @@ function PaymentApprovals() {
         <CardDescription>Review and approve manual payments for memberships and donations.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead className="hidden sm:table-cell">Type</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead className="hidden sm:table-cell">Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payments.map((payment) => (
-                <TableRow key={payment.id}>
-                  <TableCell className="font-medium">{payment.user}</TableCell>
-                  <TableCell className="hidden sm:table-cell">{payment.type}</TableCell>
-                  <TableCell>{payment.amount}</TableCell>
-                  <TableCell className="hidden sm:table-cell">{payment.date}</TableCell>
-                  <TableCell>
-                    <Badge variant={getBadgeVariant(payment.status)}>{payment.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex gap-1 justify-end">
-                      <Button variant="ghost" size="icon" title="View Receipt (Not Implemented)">
-                        <Eye />
-                        <span className="sr-only">View Receipt</span>
-                      </Button>
-                      {payment.status === 'Pending' && (
-                        <>
-                          <Button variant="ghost" size="icon" onClick={() => handleStatusChange(payment.id, 'Approved')}>
-                            <CheckCircle className="text-biology" />
-                            <span className="sr-only">Approve</span>
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleStatusChange(payment.id, 'Rejected')}>
-                            <XCircle className="text-physics" />
-                            <span className="sr-only">Reject</span>
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </TableCell>
+        {isLoading ? (
+          <div className="flex h-48 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead className="hidden sm:table-cell">Type</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead className="hidden sm:table-cell">Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {payments.length > 0 ? (
+                  payments.map((payment) => (
+                    <TableRow key={payment.id}>
+                      <TableCell className="font-medium">{payment.user_name}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{payment.payment_type}</TableCell>
+                      <TableCell>LKR {payment.amount}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{format(new Date(payment.created_at), 'yyyy-MM-dd')}</TableCell>
+                      <TableCell>
+                        <Badge variant={getBadgeVariant(payment.status)}>{payment.status}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex gap-1 justify-end">
+                          <Button variant="ghost" size="icon" title="View Receipt (Not Implemented)" disabled>
+                            <Eye />
+                            <span className="sr-only">View Receipt</span>
+                          </Button>
+                          {payment.status === 'Pending' && (
+                            <>
+                              <Button variant="ghost" size="icon" onClick={() => handleStatusChange(payment.id, 'Approved')}>
+                                <CheckCircle className="text-biology" />
+                                <span className="sr-only">Approve</span>
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => handleStatusChange(payment.id, 'Rejected')}>
+                                <XCircle className="text-physics" />
+                                <span className="sr-only">Reject</span>
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                 ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      No pending payments.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 }
+
 
 function AnalyticsReports() {
   const newKnightsData = [

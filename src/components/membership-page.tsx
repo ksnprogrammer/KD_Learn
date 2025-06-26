@@ -1,13 +1,25 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Check, Upload } from "lucide-react";
+import { Check, Upload, Loader2 } from "lucide-react";
+import { submitPaymentForReview } from '@/app/actions';
 
-const tiers = [
+interface Tier {
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  features: string[];
+  buttonText: string;
+  variant: "primary" | "secondary";
+}
+
+const tiers: Tier[] = [
   {
     name: "Squire",
     price: "LKR 499",
@@ -53,20 +65,51 @@ const tiers = [
 ];
 
 export function MembershipPageContent() {
+  const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
-  const handleChooseTier = (tierName: string) => {
+  const handleChooseTier = (tier: Tier) => {
+    setSelectedTier(tier);
     toast({
       title: "Tier Selected",
-      description: `You have selected the ${tierName} tier. Please proceed with payment below to complete your upgrade.`,
+      description: `You have selected the ${tier.name} tier. Please proceed with payment below to complete your upgrade.`,
     });
   };
 
-  const handleSubmit = () => {
-    toast({
-      title: "Membership Request Submitted!",
-      description: "Thank you! Your request is being reviewed and will be approved within 24 hours.",
-    });
+  const handleSubmit = async () => {
+    if (!selectedTier) {
+        toast({
+            variant: "destructive",
+            title: "No Tier Selected",
+            description: "Please choose a membership tier before submitting.",
+        });
+        return;
+    }
+    // Note: We are not handling the file input yet.
+    
+    setIsSubmitting(true);
+    
+    const amount = parseInt(selectedTier.price.replace('LKR ', '').replace(',', ''), 10);
+    const paymentType = `Membership (${selectedTier.name})`;
+
+    // In a real app, you would get the user's name from their session.
+    const { success, error } = await submitPaymentForReview('King Dragon', paymentType, amount);
+    
+    setIsSubmitting(false);
+
+    if (success) {
+        toast({
+            title: "Membership Request Submitted!",
+            description: "Thank you! Your request is being reviewed and will be approved within 24 hours.",
+        });
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Submission Failed",
+            description: error || "Could not submit your request. Please try again.",
+        });
+    }
   }
 
   return (
@@ -80,7 +123,7 @@ export function MembershipPageContent() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {tiers.map((tier) => (
-          <Card key={tier.name} className={`flex flex-col ${tier.variant === 'primary' ? 'border-primary border-2 shadow-primary/20 shadow-lg' : ''}`}>
+          <Card key={tier.name} className={`flex flex-col ${selectedTier?.name === tier.name ? 'border-primary border-2 shadow-primary/20 shadow-lg' : tier.variant === 'primary' ? 'border-primary/50' : ''}`}>
             <CardHeader>
               <CardTitle className="font-headline text-3xl">{tier.name}</CardTitle>
               <CardDescription>{tier.description}</CardDescription>
@@ -100,7 +143,7 @@ export function MembershipPageContent() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" variant={tier.variant === 'primary' ? 'default' : 'outline'} onClick={() => handleChooseTier(tier.name)}>{tier.buttonText}</Button>
+              <Button className="w-full" variant={tier.variant === 'primary' ? 'default' : 'outline'} onClick={() => handleChooseTier(tier)}>{tier.buttonText}</Button>
             </CardFooter>
           </Card>
         ))}
@@ -109,13 +152,15 @@ export function MembershipPageContent() {
        <Card className="w-full max-w-4xl mx-auto mt-12">
         <CardHeader>
             <CardTitle>How to Activate Your Membership</CardTitle>
-            <CardDescription>Follow these steps to pay for your chosen tier and begin your advanced training.</CardDescription>
+            <CardDescription>
+              {selectedTier ? `You have selected the ${selectedTier.name} tier.` : "Please select a tier above."} Follow these steps to pay and begin your advanced training.
+            </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
             <div>
                 <h3 className="font-semibold mb-2">Step 1: Bank Transfer or Cash Deposit</h3>
                 <p className="text-sm text-muted-foreground">
-                    Please deposit your chosen membership fee to the following bank account. Use your name or email as the reference.
+                    Please deposit the fee for your chosen tier to the following bank account. Use your name or email as the reference.
                 </p>
                 <div className="mt-2 p-3 bg-muted rounded-md text-sm">
                     <p><strong>Bank:</strong> People's Bank</p>
@@ -136,9 +181,9 @@ export function MembershipPageContent() {
             </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full text-lg py-6" onClick={handleSubmit}>
-            <Upload className="mr-2" />
-            Submit for Approval
+          <Button className="w-full text-lg py-6" onClick={handleSubmit} disabled={isSubmitting || !selectedTier}>
+             {isSubmitting ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <Upload className="mr-2" />}
+             {isSubmitting ? 'Submitting...' : 'Submit for Approval'}
           </Button>
         </CardFooter>
       </Card>

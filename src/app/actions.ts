@@ -288,3 +288,81 @@ export async function getSubmissionById(id: number): Promise<{
     return { success: false, error: `Failed to fetch submission: ${errorMessage}` };
   }
 }
+
+export async function submitPaymentForReview(
+  userName: string, 
+  paymentType: string, 
+  amount: number
+): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    // Note: receipt_url is omitted as we aren't handling file uploads yet
+    const { error } = await supabase
+      .from('payments')
+      .insert([
+        { 
+          user_name: userName, 
+          payment_type: paymentType,
+          amount,
+          status: 'Pending',
+        }
+      ]);
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    };
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to submit payment for review: ${errorMessage}` };
+  }
+}
+
+export async function getPayments(): Promise<{
+  success: boolean;
+  data?: any[];
+  error?: string;
+}> {
+  try {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    }
+    return { success: true, data: data || [] };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to fetch payments: ${errorMessage}` };
+  }
+}
+
+export async function updatePaymentStatus(id: number, status: 'Approved' | 'Rejected'): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    const { error } = await supabase
+      .from('payments')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    }
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to update payment status: ${errorMessage}` };
+  }
+}
