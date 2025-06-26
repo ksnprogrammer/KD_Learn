@@ -40,6 +40,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
@@ -48,6 +49,9 @@ import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   topicDescription: z.string().min(10, 'Please enter a description of at least 10 characters.'),
+  examLevel: z.enum(['Grade 5 Scholarship', 'O/L', 'A/L'], {
+    required_error: 'You must select an exam level.',
+  }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -70,7 +74,7 @@ function AiDragonCreator() {
     setIsLoading(true);
     setResult(null);
     setCurrentTopic(values.topicDescription);
-    const { success, data, error } = await generateModule(values.topicDescription);
+    const { success, data, error } = await generateModule(values.topicDescription, values.examLevel);
     setIsLoading(false);
 
     if (success && data) {
@@ -87,8 +91,18 @@ function AiDragonCreator() {
   async function handleSubmitForReview() {
     if (!result || !currentTopic) return;
 
+    const examLevel = form.getValues('examLevel');
+    if (!examLevel) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Could not find exam level. Please try again.',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
-    const { success, error } = await submitModuleForReview(result, currentTopic);
+    const { success, error } = await submitModuleForReview(result, currentTopic, examLevel);
     setIsSubmitting(false);
 
     if (success) {
@@ -118,23 +132,51 @@ function AiDragonCreator() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="topicDescription"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dragon Essence (Topic)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="e.g., 'The process of cellular respiration and its importance to life in the kingdom.'"
-                        className="min-h-[120px] resize-y"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="topicDescription"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dragon Essence (Topic)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="e.g., 'The process of cellular respiration and its importance to life in the kingdom.'"
+                            className="min-h-[120px] resize-y"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="examLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Exam Level</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select target exam" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Grade 5 Scholarship">Grade 5 Scholarship</SelectItem>
+                            <SelectItem value="O/L">O/L</SelectItem>
+                            <SelectItem value="A/L">A/L</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
               <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="mr-2" />}
                 Forge Dragon
@@ -332,7 +374,7 @@ function ContentSubmissions() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Topic</TableHead>
-                  <TableHead className="hidden sm:table-cell">Writer</TableHead>
+                  <TableHead className="hidden sm:table-cell">Exam Level</TableHead>
                   <TableHead className="hidden md:table-cell">Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -342,7 +384,9 @@ function ContentSubmissions() {
                   submissions.map((sub) => (
                     <TableRow key={sub.id}>
                       <TableCell className="font-medium">{sub.topic}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{sub.writer}</TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <Badge variant="outline">{sub.exam_level}</Badge>
+                      </TableCell>
                       <TableCell className="hidden md:table-cell">
                         <Badge variant={getBadgeVariant(sub.status)}>{sub.status}</Badge>
                       </TableCell>

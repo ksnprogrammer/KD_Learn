@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
@@ -24,6 +25,9 @@ const formSchema = z.object({
   password: z.string().min(8, { message: 'Password must be at least 8 characters.' }),
   phone: z.string().min(9, { message: 'Please enter a valid phone number.' }),
   nic: z.string().min(10, { message: 'Please enter a valid NIC number (10-12 characters).' }).max(12),
+  examLevel: z.enum(['scholarship', 'ol', 'al'], {
+    required_error: 'Please select your exam level.',
+  }),
   gender: z.enum(['male', 'female'], {
     required_error: 'You need to select your avatar.',
   }),
@@ -148,6 +152,28 @@ export function KnightRegistration() {
                   </FormItem>
                 )}
               />
+               <FormField
+                  control={form.control}
+                  name="examLevel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Exam Path</FormLabel>
+                       <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your exam level" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="scholarship">Grade 5 Scholarship</SelectItem>
+                          <SelectItem value="ol">O/L (Ordinary Level)</SelectItem>
+                          <SelectItem value="al">A/L (Advanced Level)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               <FormField
                 control={form.control}
                 name="gender"

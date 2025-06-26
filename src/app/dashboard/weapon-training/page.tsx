@@ -11,11 +11,13 @@ import { useEffect, useState } from "react";
 import { getApprovedModules } from "@/app/actions";
 import Link from "next/link";
 import type { CreateModuleOutput } from "@/ai/flows/create-module-from-description";
+import { Badge } from "@/components/ui/badge";
 
 interface ApprovedModule {
     id: number;
     topic: string;
     content: CreateModuleOutput;
+    exam_level: string;
 }
 
 const getSubjectInfo = (topic: string) => {
@@ -89,13 +91,17 @@ function WeaponTrainingContent() {
                         const Icon = subject.icon;
                         
                         return (
-                            <Card key={module.id} className="hover:border-primary/50 transition-all">
-                                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <Card key={module.id} className="hover:border-primary/50 transition-all flex flex-col">
+                                <CardHeader className="flex flex-row items-start justify-between pb-2">
                                     <CardTitle className="text-lg font-medium">{module.topic}</CardTitle>
                                     <Icon className={`w-6 h-6 ${subject.color}`} />
                                 </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground">{subject.name} &middot; {quiz.length} questions</p>
+                                <CardContent className="flex-grow">
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant="outline">{subject.name}</Badge>
+                                        <Badge variant="secondary">{module.exam_level}</Badge>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mt-2">{quiz.length} questions</p>
                                 </CardContent>
                                 <CardFooter>
                                     <Button className="w-full" asChild>

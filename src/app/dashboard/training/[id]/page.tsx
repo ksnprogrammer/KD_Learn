@@ -2,6 +2,7 @@ import { getSubmissionById } from '@/app/actions';
 import { AppHeader } from '@/components/app-header';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TrainingSession } from '@/components/training-session';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarProvider } from '@/components/ui/sidebar';
@@ -43,8 +44,9 @@ export default async function TrainingPage({ params }: { params: { id: string } 
                                     <BookOpen className="w-10 h-10" />
                                 </div>
                                 <CardTitle className="font-headline text-3xl">{module.topic}</CardTitle>
-                                <CardDescription>
-                                    A training module forged to test your knowledge. Study the anatomy, then face the trial.
+                                <CardDescription className='flex items-center justify-center gap-2'>
+                                    A training module forged to test your knowledge.
+                                    <Badge variant="secondary">{module.exam_level}</Badge>
                                 </CardDescription>
                             </CardHeader>
                         </Card>

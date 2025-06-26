@@ -27,7 +27,7 @@ function ProfileContent() {
                         <AvatarFallback>KD</AvatarFallback>
                     </Avatar>
                     <CardTitle className="font-headline text-4xl">King Dragon</CardTitle>
-                    <CardDescription>Dragon Knight of the Azure Gang</CardDescription>
+                    <CardDescription>Dragon Knight of the Azure Gang - A/L Path</CardDescription>
                     <div className="flex justify-center gap-2 mt-4">
                         <Badge>Level 5</Badge>
                         <Badge variant="secondary">11,500 XP</Badge>

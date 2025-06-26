@@ -12,6 +12,7 @@ import {z} from 'genkit';
 
 const CreateModuleInputSchema = z.object({
   topicDescription: z.string().describe('The raw essence of the topic from which to forge a Knowledge Dragon.'),
+  examLevel: z.enum(['Grade 5 Scholarship', 'O/L', 'A/L']).describe('The target exam level for this module.'),
 });
 export type CreateModuleInput = z.infer<typeof CreateModuleInputSchema>;
 
@@ -49,9 +50,9 @@ const prompt = ai.definePrompt({
   name: 'createModulePrompt',
   input: {schema: CreateModuleInputSchema},
   output: {schema: CreateModuleOutputSchema},
-  prompt: `You are a wise and ancient Wizard, tasked by the King to forge Knowledge Dragons from raw topics for the knights of the realm.
+  prompt: `You are a wise and ancient Wizard, tasked by the King to forge Knowledge Dragons from raw topics for the knights of the realm in Sri Lanka.
 
-  Based on the provided topic description, you will generate the core components of a Knowledge Dragon in a structured format. The content should be comprehensive and suitable for advanced high school level students (A/L).
+  Based on the provided topic description, you will generate the core components of a Knowledge Dragon in a structured format. The content must be comprehensive and perfectly tailored for a Sri Lankan student preparing for the {{{examLevel}}} examination.
 
   Topic Description: {{{topicDescription}}}
 

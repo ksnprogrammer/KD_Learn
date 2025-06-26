@@ -6,7 +6,7 @@ import { createStory } from '@/ai/flows/create-story-flow';
 import type { CreateStoryOutput } from '@/ai/flows/create-story-flow';
 import { supabase } from '@/lib/supabase';
 
-export async function generateModule(topicDescription: string): Promise<{
+export async function generateModule(topicDescription: string, examLevel: 'Grade 5 Scholarship' | 'O/L' | 'A/L'): Promise<{
   success: boolean;
   data?: CreateModuleOutput;
   error?: string;
@@ -14,9 +14,12 @@ export async function generateModule(topicDescription: string): Promise<{
   if (!topicDescription) {
     return { success: false, error: 'Topic description cannot be empty.' };
   }
+  if (!examLevel) {
+    return { success: false, error: 'Exam level must be selected.' };
+  }
 
   try {
-    const output = await createModuleFromDescription({ topicDescription });
+    const output = await createModuleFromDescription({ topicDescription, examLevel });
     return { success: true, data: output };
   } catch (e) {
     console.error(e);
@@ -44,21 +47,20 @@ export async function generateStory(prompt: string): Promise<{
   }
 }
 
-export async function submitModuleForReview(moduleData: CreateModuleOutput, topicDescription: string): Promise<{
+export async function submitModuleForReview(moduleData: CreateModuleOutput, topicDescription: string, examLevel: string): Promise<{
   success: boolean;
   error?: string;
 }> {
   try {
-    // NOTE: This assumes a 'submissions' table exists in Supabase
-    // with columns: topic (text), writer (text), status (text), content (jsonb)
     const { data, error } = await supabase
       .from('submissions')
       .insert([
         { 
           topic: topicDescription, 
-          writer: 'Royal Wizard', // In a real app, this would be the logged-in user's name
+          writer: 'Royal Wizard', 
           status: 'Pending',
-          content: moduleData 
+          content: moduleData,
+          exam_level: examLevel,
         }
       ])
       .select();
@@ -178,7 +180,7 @@ export async function getApprovedModules(): Promise<{
   try {
     const { data, error } = await supabase
       .from('submissions')
-      .select('id, topic, content')
+      .select('id, topic, content, exam_level')
       .eq('status', 'Approved')
       .order('created_at', { ascending: false });
 
@@ -199,13 +201,14 @@ export async function getSubmissionById(id: number): Promise<{
   data?: {
     topic: string;
     content: CreateModuleOutput;
+    exam_level: string;
   };
   error?: string;
 }> {
   try {
     const { data, error } = await supabase
       .from('submissions')
-      .select('topic, content')
+      .select('topic, content, exam_level')
       .eq('id', id)
       .eq('status', 'Approved')
       .single();
