@@ -139,7 +139,7 @@ export function KnightRegistration() {
                               width={80}
                               height={80}
                               className="mb-3 rounded-full"
-                              data-ai-hint="male knight"
+                              data-ai-hint="male knight fantasy"
                             />
                             Male Knight
                           </FormLabel>
@@ -160,7 +160,7 @@ export function KnightRegistration() {
                               width={80}
                               height={80}
                               className="mb-3 rounded-full"
-                              data-ai-hint="female knight"
+                              data-ai-hint="female knight fantasy"
                             />
                             Female Knight
                           </FormLabel>
@@ -190,8 +190,8 @@ export function KnightRegistration() {
           alt="Image"
           width="1080"
           height="1920"
-          className="h-full w-full object-cover dark:brightness-[0.3] dark:grayscale"
-          data-ai-hint="fantasy dragon"
+          className="h-full w-full object-cover dark:brightness-[0.3]"
+          data-ai-hint="fantasy dragon crest"
         />
       </div>
     </div>

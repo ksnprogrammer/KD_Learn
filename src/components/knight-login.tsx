@@ -106,8 +106,8 @@ export function KnightLogin() {
           alt="Image"
           width="1080"
           height="1920"
-          className="h-full w-full object-cover dark:brightness-[0.3] dark:grayscale"
-          data-ai-hint="fantasy castle"
+          className="h-full w-full object-cover dark:brightness-[0.3]"
+          data-ai-hint="fantasy kingdom gate"
         />
       </div>
     </div>

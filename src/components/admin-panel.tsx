@@ -1,17 +1,131 @@
 'use client';
 
-import { Upload } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, Sparkles, Upload } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
+import { generateModule } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
-export function AdminPanel() {
+const formSchema = z.object({
+  topicDescription: z.string().min(10, 'Please enter a description of at least 10 characters.'),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+function AiDragonCreator() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<CreateModuleOutput | null>(null);
+  const { toast } = useToast();
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      topicDescription: '',
+    },
+  });
+
+  async function onSubmit(values: FormValues) {
+    setIsLoading(true);
+    setResult(null);
+    const { success, data, error } = await generateModule(values.topicDescription);
+    setIsLoading(false);
+
+    if (success && data) {
+      setResult(data);
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error || 'An unexpected error occurred.',
+      });
+    }
+  }
+
   return (
-    <Card className="max-w-2xl">
+    <div className="space-y-8">
+      <Card className="border-0 bg-transparent shadow-none sm:border sm:bg-card sm:shadow">
+        <CardHeader>
+          <CardTitle className="font-headline text-3xl">AI Dragon Forge</CardTitle>
+          <CardDescription>Describe a topic, and the Royal Wizard will forge a Knowledge Dragon.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="topicDescription"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Dragon Essence (Topic)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="e.g., 'The process of cellular respiration and its importance to life in the kingdom.'"
+                        className="min-h-[120px] resize-y"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+                {isLoading ? <Loader2 className="animate-spin" /> : <Sparkles className="mr-2" />}
+                Forge Dragon
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+
+      {result && (
+        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+          <Card className="animate-fade-in-up">
+            <CardHeader>
+              <CardTitle>Dragon's Anatomy</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="whitespace-pre-wrap font-body text-sm">{result.lessonOutline}</pre>
+            </CardContent>
+          </Card>
+          <Card className="animate-fade-in-up [animation-delay:200ms]">
+            <CardHeader>
+              <CardTitle>Trial by Fire</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="whitespace-pre-wrap font-body text-sm">{result.quizQuestions}</pre>
+            </CardContent>
+          </Card>
+          <Card className="animate-fade-in-up [animation-delay:400ms]">
+            <CardHeader>
+              <CardTitle>Ancient Tomes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="whitespace-pre-wrap font-body text-sm">{result.resourceSuggestions}</pre>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AssetManager() {
+  return (
+    <Card>
       <CardHeader>
-        <CardTitle>Content Management</CardTitle>
-        <CardDescription>Upload and manage images for the platform.</CardDescription>
+        <CardTitle>Asset Management</CardTitle>
+        <CardDescription>Manage the Kingdom's visual assets.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6">
@@ -24,12 +138,27 @@ export function AdminPanel() {
                 Upload
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground">
-              You can upload PNG, JPG, or GIF files. Max size 5MB.
-            </p>
+            <p className="text-sm text-muted-foreground">You can upload PNG, JPG, or GIF files. Max size 5MB.</p>
           </div>
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+export function AdminPanel() {
+  return (
+    <Tabs defaultValue="creator" className="w-full max-w-6xl mx-auto">
+      <TabsList className="grid w-full grid-cols-2 max-w-md">
+        <TabsTrigger value="creator">Dragon Forge</TabsTrigger>
+        <TabsTrigger value="assets">Asset Manager</TabsTrigger>
+      </TabsList>
+      <TabsContent value="creator" className="mt-6">
+        <AiDragonCreator />
+      </TabsContent>
+      <TabsContent value="assets" className="mt-6">
+        <AssetManager />
+      </TabsContent>
+    </Tabs>
   );
 }

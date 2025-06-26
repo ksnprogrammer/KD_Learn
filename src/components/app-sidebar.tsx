@@ -1,10 +1,10 @@
 'use client'
 
 import {
+  Castle,
   FlaskConical,
   LayoutDashboard,
   Leaf,
-  ShieldCheck,
   Settings,
   Trophy,
   UserCircle,
@@ -81,8 +81,8 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href="/admin">
-                <ShieldCheck />
-                Admin Panel
+                <Castle />
+                King's Court
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

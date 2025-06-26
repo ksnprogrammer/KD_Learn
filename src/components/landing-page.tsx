@@ -1,6 +1,6 @@
 'use client';
 
-import { BrainCircuit, FlaskConical, Shield, Zap } from 'lucide-react';
+import { BrainCircuit, Shield, Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from './ui/button';
@@ -27,11 +27,11 @@ export function LandingPage() {
         <section className="relative h-[80vh] min-h-[600px]">
           <Image
             src="https://placehold.co/1920x1080.png"
-            alt="A fierce dragon bathed in red light"
+            alt="A fierce dragon silhouetted against a red sky"
             layout="fill"
             objectFit="cover"
-            className="absolute inset-0 z-0 opacity-20 dark:grayscale"
-            data-ai-hint="fierce dragon red light"
+            className="absolute inset-0 z-0 opacity-30"
+            data-ai-hint="fantasy landscape dragon"
           />
           <div className="relative z-10 flex h-full flex-col items-center justify-center bg-gradient-to-t from-background via-background/80 to-transparent">
             <div className="container flex flex-col items-center text-center">
@@ -40,7 +40,7 @@ export function LandingPage() {
               </h1>
               <p className="mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl animate-fade-in-up [animation-delay:200ms]">
                 Join KingDragons, the gamified learning platform where you conquer science quests, master new skills,
-                and become a legendary knight of knowledge.
+                and become a legendary knight of knowledge in Sri Lanka.
               </p>
               <div className="mt-8 animate-fade-in-up [animation-delay:400ms]">
                 <Button size="lg" asChild>
@@ -59,39 +59,39 @@ export function LandingPage() {
             </p>
           </div>
           <div className="mx-auto mt-12 grid max-w-5xl justify-center gap-6 sm:grid-cols-2 md:grid-cols-3">
-            <Card className="animate-fade-in-up [animation-delay:100ms]">
+            <Card className="animate-fade-in-up [animation-delay:100ms] border-2 border-transparent hover:border-primary transition-colors">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   <div className="rounded-md bg-primary/10 p-2 text-primary">
                     <BrainCircuit />
                   </div>
-                  <span>AI-Powered Modules</span>
+                  <span>Summon Knowledge Dragons</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                Instantly generate entire learning modules, from outlines to quizzes, with our powerful AI assistant.
+                Our King's powerful wizards can instantly forge entire learning modules, from outlines to quizzes, with a formidable AI assistant.
               </CardContent>
             </Card>
-            <Card className="animate-fade-in-up [animation-delay:300ms]">
+            <Card className="animate-fade-in-up [animation-delay:300ms] border-2 border-transparent hover:border-primary transition-colors">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   <div className="rounded-md bg-primary/10 p-2 text-primary">
                     <Zap className="text-physics"/>
                   </div>
-                  <span>Master the Sciences</span>
+                  <span>Conquer the Sciences</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                Explore interactive lessons in Biology, Chemistry, and Physics, designed to be engaging and fun.
+                Explore interactive quests in Biology, Chemistry, and Physics, designed to be engaging and fun.
               </CardContent>
             </Card>
-            <Card className="animate-fade-in-up [animation-delay:500ms]">
+            <Card className="animate-fade-in-up [animation-delay:500ms] border-2 border-transparent hover:border-primary transition-colors">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                   <div className="rounded-md bg-primary/10 p-2 text-primary">
                     <Shield />
                   </div>
-                  <span>Rise Through the Ranks</span>
+                  <span>Become a Dragon Knight</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
