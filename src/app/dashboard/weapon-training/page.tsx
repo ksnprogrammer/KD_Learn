@@ -1,13 +1,23 @@
 import { AppHeader } from "@/components/app-header";
 import { AppSidebar } from "@/components/app-sidebar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Swords } from "lucide-react";
+import { FlaskConical, Leaf, Swords, Zap } from "lucide-react";
+import Link from "next/link";
+
+const practiceQuizzes = [
+  { subject: 'Biology', title: 'Cellular Structures', icon: Leaf, color: 'text-biology', questions: 15 },
+  { subject: 'Chemistry', title: 'Periodic Table Basics', icon: FlaskConical, color: 'text-chemistry', questions: 20 },
+  { subject: 'Physics', title: 'Kinematics Fundamentals', icon: Zap, color: 'text-physics', questions: 18 },
+  { subject: 'Biology', title: 'Photosynthesis', icon: Leaf, color: 'text-biology', questions: 12 },
+];
+
 
 function WeaponTrainingContent() {
     return (
         <div className="container mx-auto py-8">
-             <Card className="w-full max-w-4xl mx-auto">
+             <Card className="w-full max-w-4xl mx-auto mb-8">
                 <CardHeader className="text-center">
                     <div className="mx-auto bg-primary/10 text-primary rounded-full p-4 w-fit mb-4">
                         <Swords className="w-10 h-10" />
@@ -17,12 +27,24 @@ function WeaponTrainingContent() {
                         Sharpen your skills with practice quizzes. The forge of knowledge is hot, and only the sharpest blades will prevail.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <div className="text-center text-muted-foreground">
-                        <p>Practice quizzes coming soon. Check back to test your might!</p>
-                    </div>
-                </CardContent>
             </Card>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                {practiceQuizzes.map((quiz) => (
+                    <Card key={quiz.title} className="hover:border-primary/50 transition-all">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-lg font-medium">{quiz.title}</CardTitle>
+                            <quiz.icon className={`w-6 h-6 ${quiz.color}`} />
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">{quiz.subject} &middot; {quiz.questions} questions</p>
+                        </CardContent>
+                        <CardFooter>
+                            <Button className="w-full">Start Training</Button>
+                        </CardFooter>
+                    </Card>
+                ))}
+            </div>
         </div>
     )
 }

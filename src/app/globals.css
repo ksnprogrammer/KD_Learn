@@ -43,25 +43,25 @@
   }
 
   .dark {
-    --background: 224 71% 4%; /* very dark blue/black */
-    --foreground: 210 40% 98%; /* almost white */
-    --card: 220 40% 8%; /* slightly lighter than background */
+    --background: 0 0% 6%; /* Jet Black */
+    --foreground: 210 40% 98%;
+    --card: 0 0% 10%;
     --card-foreground: 210 40% 98%;
-    --popover: 224 71% 4%;
+    --popover: 0 0% 6%;
     --popover-foreground: 210 40% 98%;
-    --primary: 350 90% 55%; /* vibrant red */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 215 28% 17%; /* muted blue-grey */
+    --primary: 0 72% 51%; /* Crimson Red */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 220 30% 15%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 215 28% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 215 28% 17%;
+    --muted: 220 30% 15%;
+    --muted-foreground: 210 20% 65%;
+    --accent: 220 30% 15%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-    --border: 215 28% 17%;
-    --input: 215 28% 17%;
-    --ring: 350 90% 55%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 0 72% 51%;
 
     /* Custom colors */
     --biology: 145 63% 49%;

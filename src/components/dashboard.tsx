@@ -109,10 +109,10 @@ function QuestsTab() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {quests.map((quest) => (
-                <Card key={quest.title} className="flex flex-col animate-fade-in-up">
+                <Card key={quest.title} className="flex flex-col animate-fade-in-up group hover:border-primary/50 transition-all duration-300">
                     <CardHeader>
                         <div className="flex items-center gap-4">
-                            <quest.icon className={`w-8 h-8 ${quest.color}`} />
+                            <quest.icon className={`w-8 h-8 ${quest.color} group-hover:scale-110 transition-transform`} />
                             <div>
                                 <CardTitle className="font-headline text-2xl">{quest.title}</CardTitle>
                                 <CardDescription>{quest.subject}</CardDescription>
@@ -123,7 +123,7 @@ function QuestsTab() {
                         <p className="text-muted-foreground">{quest.description}</p>
                     </CardContent>
                     <CardFooter>
-                        <Button className="w-full">Begin Quest</Button>
+                        <Button className="w-full group-hover:bg-primary/90">Begin Quest</Button>
                     </CardFooter>
                 </Card>
             ))}
@@ -150,7 +150,7 @@ function LeaderboardTab() {
                         </TableHeader>
                         <TableBody>
                             {leaderboardData.map((knight) => (
-                                <TableRow key={knight.rank}>
+                                <TableRow key={knight.rank} className={knight.name === 'King Dragon' ? 'bg-primary/10 hover:bg-primary/20' : ''}>
                                     <TableCell className="font-bold text-lg text-center">{knight.rank}</TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-4">
@@ -159,6 +159,7 @@ function LeaderboardTab() {
                                                 <AvatarFallback>{knight.name.substring(0, 2)}</AvatarFallback>
                                             </Avatar>
                                             <span className="font-medium">{knight.name}</span>
+                                            {knight.name === 'King Dragon' && <Badge variant="secondary" className="ml-2">You</Badge>}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right font-mono">{knight.xp.toLocaleString()}</TableCell>
