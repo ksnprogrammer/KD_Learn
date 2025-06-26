@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Sparkles, Upload, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Sparkles, Upload, CheckCircle, XCircle, BarChart, CheckCheck, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -227,13 +227,119 @@ function ContentSubmissions() {
   );
 }
 
+function PaymentApprovals() {
+  const { toast } = useToast();
+   const [payments, setPayments] = useState([
+    { id: 1, user: 'Sir Lancelot', type: 'Membership (Dragon Knight)', amount: 'LKR 999', date: '2024-07-28', status: 'Pending' },
+    { id: 2, user: 'Lady Brienne', type: 'Donation', amount: 'LKR 2500', date: '2024-07-28', status: 'Pending' },
+    { id: 3, user: 'Bard Finn', type: 'Membership (Squire)', amount: 'LKR 499', date: '2024-07-27', status: 'Approved' },
+  ]);
+
+  const handleStatusChange = (id: number, newStatus: 'Approved' | 'Rejected') => {
+     setPayments(
+      payments.map((p) => (p.id === id ? { ...p, status: newStatus } : p))
+    );
+    toast({
+      title: `Payment ${newStatus}`,
+      description: `The payment has been ${newStatus.toLowerCase()}.`,
+    });
+  };
+
+  const getBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'Approved':
+        return 'default';
+      case 'Rejected':
+        return 'destructive';
+      default:
+        return 'secondary';
+    }
+  };
+  
+  return (
+     <Card>
+      <CardHeader>
+        <CardTitle>Payment Approvals</CardTitle>
+        <CardDescription>Review and approve manual payments for memberships and donations.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>User</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {payments.map((payment) => (
+                <TableRow key={payment.id}>
+                  <TableCell className="font-medium">{payment.user}</TableCell>
+                  <TableCell>{payment.type}</TableCell>
+                  <TableCell>{payment.amount}</TableCell>
+                  <TableCell>{payment.date}</TableCell>
+                  <TableCell>
+                    <Badge variant={getBadgeVariant(payment.status)}>{payment.status}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex gap-1 justify-end">
+                       <Button variant="ghost" size="icon" title="View Receipt (Not Implemented)">
+                          <Eye />
+                          <span className="sr-only">View Receipt</span>
+                        </Button>
+                      {payment.status === 'Pending' && (
+                        <>
+                          <Button variant="ghost" size="icon" onClick={() => handleStatusChange(payment.id, 'Approved')}>
+                            <CheckCircle className="text-biology" />
+                            <span className="sr-only">Approve</span>
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleStatusChange(payment.id, 'Rejected')}>
+                            <XCircle className="text-physics" />
+                            <span className="sr-only">Reject</span>
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function AnalyticsReports() {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Analytics & Reports</CardTitle>
+                <CardDescription>Gain insights into your kingdom's growth and your knights' progress.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-center justify-center h-48 border-2 border-dashed rounded-md">
+                    <p className="text-muted-foreground">Advanced analytics are being forged by the wizards. Coming soon!</p>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
 export function AdminPanel() {
   return (
     <Tabs defaultValue="creator" className="w-full max-w-6xl mx-auto">
-      <TabsList className="grid w-full grid-cols-3 max-w-lg">
+      <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 max-w-2xl">
         <TabsTrigger value="creator">Dragon Forge</TabsTrigger>
         <TabsTrigger value="assets">Asset Manager</TabsTrigger>
         <TabsTrigger value="submissions">Submissions</TabsTrigger>
+        <TabsTrigger value="approvals"><CheckCheck className="mr-2" />Approvals</TabsTrigger>
+        <TabsTrigger value="reports"><BarChart className="mr-2" />Reports</TabsTrigger>
       </TabsList>
       <TabsContent value="creator" className="mt-6">
         <AiDragonCreator />
@@ -243,6 +349,12 @@ export function AdminPanel() {
       </TabsContent>
       <TabsContent value="submissions" className="mt-6">
         <ContentSubmissions />
+      </TabsContent>
+       <TabsContent value="approvals" className="mt-6">
+        <PaymentApprovals />
+      </TabsContent>
+       <TabsContent value="reports" className="mt-6">
+        <AnalyticsReports />
       </TabsContent>
     </Tabs>
   );

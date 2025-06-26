@@ -2,7 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Check, Upload } from "lucide-react";
 
 const tiers = [
   {
@@ -50,6 +53,15 @@ const tiers = [
 ];
 
 export function MembershipPageContent() {
+  const { toast } = useToast();
+  
+  const handleSubmit = () => {
+    toast({
+      title: "Membership Request Submitted!",
+      description: "Thank you! Your request is being reviewed and will be approved within 24 hours.",
+    });
+  }
+
   return (
     <div className="container mx-auto py-8">
       <div className="text-center mb-12">
@@ -86,6 +98,43 @@ export function MembershipPageContent() {
           </Card>
         ))}
       </div>
+
+       <Card className="w-full max-w-4xl mx-auto mt-12">
+        <CardHeader>
+            <CardTitle>How to Activate Your Membership</CardTitle>
+            <CardDescription>Follow these steps to pay for your chosen tier and begin your advanced training.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+            <div>
+                <h3 className="font-semibold mb-2">Step 1: Bank Transfer or Cash Deposit</h3>
+                <p className="text-sm text-muted-foreground">
+                    Please deposit your chosen membership fee to the following bank account. Use your name or email as the reference.
+                </p>
+                <div className="mt-2 p-3 bg-muted rounded-md text-sm">
+                    <p><strong>Bank:</strong> People's Bank</p>
+                    <p><strong>Account Name:</strong> The King's Treasury</p>
+                    <p><strong>Account Number:</strong> 123-456-7890</p>
+                    <p><strong>Branch:</strong> Royal Capital Branch</p>
+                </div>
+            </div>
+             <div>
+                <h3 className="font-semibold mb-2">Step 2: Upload Proof of Payment</h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                    Upload a screenshot or photo of your payment receipt. Approval may take up to 24 hours.
+                </p>
+                <div className="grid w-full items-center gap-2">
+                    <Label htmlFor="receipt-membership">Payment Receipt</Label>
+                    <Input id="receipt-membership" type="file" />
+                </div>
+            </div>
+        </CardContent>
+        <CardFooter>
+          <Button className="w-full text-lg py-6" onClick={handleSubmit}>
+            <Upload className="mr-2" />
+            Submit for Approval
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

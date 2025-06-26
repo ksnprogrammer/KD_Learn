@@ -22,6 +22,8 @@ const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
   password: z.string().min(8, { message: 'Password must be at least 8 characters.' }),
+  phone: z.string().min(9, { message: 'Please enter a valid phone number.' }),
+  nic: z.string().min(10, { message: 'Please enter a valid NIC number (10-12 characters).' }).max(12),
   gender: z.enum(['male', 'female'], {
     required_error: 'You need to select your avatar.',
   }),
@@ -43,6 +45,8 @@ export function KnightRegistration() {
       name: '',
       email: '',
       password: '',
+      phone: '',
+      nic: '',
       terms: false,
     },
   });
@@ -100,6 +104,32 @@ export function KnightRegistration() {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input type="email" placeholder="knight@kingdom.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>WhatsApp Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="07..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="nic"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>National Identity Card (NIC)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your or your parent's NIC" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
