@@ -1,5 +1,5 @@
-import { Dashboard } from '@/components/dashboard';
+import { KnightRegistration } from '@/components/knight-registration';
 
 export default function Home() {
-  return <Dashboard />;
+  return <KnightRegistration />;
 }
