@@ -13,6 +13,10 @@ import {
   Upload,
   Users,
   XCircle,
+  Video,
+  FileText,
+  Book,
+  MousePointerClick,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -20,6 +24,7 @@ import { z } from 'zod';
 
 import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
 import { generateModule } from '@/app/actions';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,10 +39,12 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   topicDescription: z.string().min(10, 'Please enter a description of at least 10 characters.'),
@@ -111,29 +118,83 @@ function AiDragonCreator() {
       </Card>
 
       {result && (
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
-          <Card className="animate-fade-in-up">
+        <div className="mt-8 space-y-8 animate-fade-in-up">
+          <Card>
             <CardHeader>
-              <CardTitle>Dragon's Anatomy</CardTitle>
+              <CardTitle className="font-headline text-2xl">Dragon's Anatomy (Lesson Outline)</CardTitle>
+              <CardDescription>The core knowledge forged from the essence you provided.</CardDescription>
             </CardHeader>
             <CardContent>
-              <pre className="whitespace-pre-wrap font-body text-sm">{result.lessonOutline}</pre>
+              <Accordion type="single" collapsible className="w-full">
+                {result.lessonOutline.map((section, index) => (
+                  <AccordionItem value={`item-${index}`} key={index}>
+                    <AccordionTrigger className="text-lg">{section.title}</AccordionTrigger>
+                    <AccordionContent>
+                      <pre className="whitespace-pre-wrap font-body text-sm text-muted-foreground">{section.content}</pre>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </CardContent>
           </Card>
-          <Card className="animate-fade-in-up [animation-delay:200ms]">
+
+          <Card>
             <CardHeader>
-              <CardTitle>Trial by Fire</CardTitle>
+              <CardTitle className="font-headline text-2xl">Trial by Fire (Quiz)</CardTitle>
+              <CardDescription>Questions to test the mettle of any knight who dares to learn.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <pre className="whitespace-pre-wrap font-body text-sm">{result.quizQuestions}</pre>
+            <CardContent className="space-y-6">
+              {result.quizQuestions.map((quiz, index) => (
+                <div key={index} className="rounded-lg border p-4">
+                  <p className="font-semibold">
+                    {index + 1}. {quiz.question}
+                  </p>
+                  <RadioGroup disabled className="mt-4 space-y-2">
+                    {quiz.options.map((option, optIndex) => (
+                      <div key={optIndex} className="flex items-center space-x-2">
+                        <RadioGroupItem value={option} id={`q${index}-opt${optIndex}`} />
+                        <Label
+                          htmlFor={`q${index}-opt${optIndex}`}
+                          className={cn(option === quiz.correctAnswer && 'text-biology font-bold')}
+                        >
+                          {option}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                  <div className="mt-4 rounded-md bg-muted/50 p-3 text-sm">
+                    <p>
+                      <span className="font-semibold">Correct Answer:</span> {quiz.correctAnswer}
+                    </p>
+                    <p className="text-muted-foreground mt-1">
+                      <span className="font-semibold">Explanation:</span> {quiz.explanation}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
-          <Card className="animate-fade-in-up [animation-delay:400ms]">
+
+          <Card>
             <CardHeader>
-              <CardTitle>Ancient Tomes</CardTitle>
+              <CardTitle className="font-headline text-2xl">Ancient Tomes (Resources)</CardTitle>
+              <CardDescription>Further readings and artifacts for the truly dedicated scholar.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <pre className="whitespace-pre-wrap font-body text-sm">{result.resourceSuggestions}</pre>
+            <CardContent className="space-y-4">
+              {result.resourceSuggestions.map((resource, index) => (
+                <div key={index} className="flex items-start gap-4 rounded-lg border p-4">
+                  <div className="bg-primary/10 text-primary rounded-md p-2">
+                    {resource.type === 'video' && <Video className="h-6 w-6" />}
+                    {resource.type === 'article' && <FileText className="h-6 w-6" />}
+                    {resource.type === 'book' && <Book className="h-6 w-6" />}
+                    {resource.type === 'interactive' && <MousePointerClick className="h-6 w-6" />}
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">{resource.title}</h4>
+                    <p className="text-muted-foreground">{resource.description}</p>
+                  </div>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>
@@ -178,9 +239,7 @@ function ContentSubmissions() {
   ]);
 
   const handleStatusChange = (id: number, newStatus: 'Approved' | 'Rejected') => {
-    setSubmissions(
-      submissions.map((sub) => (sub.id === id ? { ...sub, status: newStatus } : sub))
-    );
+    setSubmissions(submissions.map((sub) => (sub.id === id ? { ...sub, status: newStatus } : sub)));
     toast({
       title: `Submission ${newStatus}`,
       description: `The topic has been ${newStatus.toLowerCase()}.`,
@@ -250,7 +309,14 @@ function ContentSubmissions() {
 function PaymentApprovals() {
   const { toast } = useToast();
   const [payments, setPayments] = useState([
-    { id: 1, user: 'Sir Lancelot', type: 'Membership (Dragon Knight)', amount: 'LKR 999', date: '2024-07-28', status: 'Pending' },
+    {
+      id: 1,
+      user: 'Sir Lancelot',
+      type: 'Membership (Dragon Knight)',
+      amount: 'LKR 999',
+      date: '2024-07-28',
+      status: 'Pending',
+    },
     { id: 2, user: 'Lady Brienne', type: 'Donation', amount: 'LKR 2500', date: '2024-07-28', status: 'Pending' },
     { id: 3, user: 'Bard Finn', type: 'Membership (Squire)', amount: 'LKR 499', date: '2024-07-27', status: 'Approved' },
   ]);
