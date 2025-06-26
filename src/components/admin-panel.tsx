@@ -1,7 +1,19 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Sparkles, Upload, CheckCircle, XCircle, BarChart, CheckCheck, Eye } from 'lucide-react';
+import { Bar, BarChart as RechartsBarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import {
+  BarChart as BarChartIcon,
+  CheckCheck,
+  CheckCircle,
+  DollarSign,
+  Eye,
+  Loader2,
+  Sparkles,
+  Upload,
+  Users,
+  XCircle,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -11,6 +23,14 @@ import { generateModule } from '@/app/actions';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '@/components/ui/chart';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -229,16 +249,14 @@ function ContentSubmissions() {
 
 function PaymentApprovals() {
   const { toast } = useToast();
-   const [payments, setPayments] = useState([
+  const [payments, setPayments] = useState([
     { id: 1, user: 'Sir Lancelot', type: 'Membership (Dragon Knight)', amount: 'LKR 999', date: '2024-07-28', status: 'Pending' },
     { id: 2, user: 'Lady Brienne', type: 'Donation', amount: 'LKR 2500', date: '2024-07-28', status: 'Pending' },
     { id: 3, user: 'Bard Finn', type: 'Membership (Squire)', amount: 'LKR 499', date: '2024-07-27', status: 'Approved' },
   ]);
 
   const handleStatusChange = (id: number, newStatus: 'Approved' | 'Rejected') => {
-     setPayments(
-      payments.map((p) => (p.id === id ? { ...p, status: newStatus } : p))
-    );
+    setPayments(payments.map((p) => (p.id === id ? { ...p, status: newStatus } : p)));
     toast({
       title: `Payment ${newStatus}`,
       description: `The payment has been ${newStatus.toLowerCase()}.`,
@@ -255,9 +273,9 @@ function PaymentApprovals() {
         return 'secondary';
     }
   };
-  
+
   return (
-     <Card>
+    <Card>
       <CardHeader>
         <CardTitle>Payment Approvals</CardTitle>
         <CardDescription>Review and approve manual payments for memberships and donations.</CardDescription>
@@ -287,10 +305,10 @@ function PaymentApprovals() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex gap-1 justify-end">
-                       <Button variant="ghost" size="icon" title="View Receipt (Not Implemented)">
-                          <Eye />
-                          <span className="sr-only">View Receipt</span>
-                        </Button>
+                      <Button variant="ghost" size="icon" title="View Receipt (Not Implemented)">
+                        <Eye />
+                        <span className="sr-only">View Receipt</span>
+                      </Button>
                       {payment.status === 'Pending' && (
                         <>
                           <Button variant="ghost" size="icon" onClick={() => handleStatusChange(payment.id, 'Approved')}>
@@ -312,23 +330,88 @@ function PaymentApprovals() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function AnalyticsReports() {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Analytics & Reports</CardTitle>
-                <CardDescription>Gain insights into your kingdom's growth and your knights' progress.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center justify-center h-48 border-2 border-dashed rounded-md">
-                    <p className="text-muted-foreground">Advanced analytics are being forged by the wizards. Coming soon!</p>
-                </div>
-            </CardContent>
-        </Card>
-    );
+  const newKnightsData = [
+    { month: 'Jan', knights: 18 },
+    { month: 'Feb', knights: 30 },
+    { month: 'Mar', knights: 45 },
+    { month: 'Apr', knights: 60 },
+    { month: 'May', knights: 55 },
+    { month: 'Jun', knights: 78 },
+  ];
+
+  const knightsChartConfig = {
+    knights: {
+      label: 'New Knights',
+      color: 'hsl(var(--primary))',
+    },
+  } satisfies ChartConfig;
+
+  const revenueData = [
+    { month: 'Jan', revenue: 8000 },
+    { month: 'Feb', revenue: 12000 },
+    { month: 'Mar', revenue: 19000 },
+    { month: 'Apr', revenue: 25000 },
+    { month: 'May', revenue: 22000 },
+    { month: 'Jun', revenue: 31000 },
+  ];
+
+  const revenueChartConfig = {
+    revenue: {
+      label: 'Revenue (LKR)',
+      color: 'hsl(var(--biology))',
+    },
+  } satisfies ChartConfig;
+
+  return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users />
+            New Knight Enlistment
+          </CardTitle>
+          <CardDescription>Monthly new knights joining the kingdom.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={knightsChartConfig} className="h-[300px] w-full">
+            <RechartsBarChart accessibilityLayer data={newKnightsData}>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey="knights" fill="var(--color-knights)" radius={4} />
+            </RechartsBarChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign />
+            Kingdom Treasury
+          </CardTitle>
+          <CardDescription>Monthly revenue from memberships and donations.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={revenueChartConfig} className="h-[300px] w-full">
+            <LineChart accessibilityLayer data={revenueData}>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
+              <YAxis tickFormatter={(value) => `LKR ${Number(value) / 1000}k`} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Line type="monotone" dataKey="revenue" stroke="var(--color-revenue)" strokeWidth={2} dot={true} />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export function AdminPanel() {
@@ -338,8 +421,14 @@ export function AdminPanel() {
         <TabsTrigger value="creator">Dragon Forge</TabsTrigger>
         <TabsTrigger value="assets">Asset Manager</TabsTrigger>
         <TabsTrigger value="submissions">Submissions</TabsTrigger>
-        <TabsTrigger value="approvals"><CheckCheck className="mr-2" />Approvals</TabsTrigger>
-        <TabsTrigger value="reports"><BarChart className="mr-2" />Reports</TabsTrigger>
+        <TabsTrigger value="approvals">
+          <CheckCheck className="mr-2" />
+          Approvals
+        </TabsTrigger>
+        <TabsTrigger value="reports">
+          <BarChartIcon className="mr-2" />
+          Reports
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="creator" className="mt-6">
         <AiDragonCreator />
@@ -350,10 +439,10 @@ export function AdminPanel() {
       <TabsContent value="submissions" className="mt-6">
         <ContentSubmissions />
       </TabsContent>
-       <TabsContent value="approvals" className="mt-6">
+      <TabsContent value="approvals" className="mt-6">
         <PaymentApprovals />
       </TabsContent>
-       <TabsContent value="reports" className="mt-6">
+      <TabsContent value="reports" className="mt-6">
         <AnalyticsReports />
       </TabsContent>
     </Tabs>
