@@ -169,3 +169,61 @@ export async function getStories(): Promise<{
     return { success: false, error: `Failed to fetch stories: ${errorMessage}` };
   }
 }
+
+export async function getApprovedModules(): Promise<{
+  success: boolean;
+  data?: any[];
+  error?: string;
+}> {
+  try {
+    const { data, error } = await supabase
+      .from('submissions')
+      .select('id, topic, content')
+      .eq('status', 'Approved')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    }
+    return { success: true, data: data || [] };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to fetch approved modules: ${errorMessage}` };
+  }
+}
+
+export async function getSubmissionById(id: number): Promise<{
+  success: boolean;
+  data?: {
+    topic: string;
+    content: CreateModuleOutput;
+  };
+  error?: string;
+}> {
+  try {
+    const { data, error } = await supabase
+      .from('submissions')
+      .select('topic, content')
+      .eq('id', id)
+      .eq('status', 'Approved')
+      .single();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      if (error.code === 'PGRST116') { // "JSON object requested, but single row not found"
+        return { success: false, error: 'Quest not found or not yet approved.' };
+      }
+      throw new Error(error.message);
+    }
+    if (!data) {
+        return { success: false, error: 'Quest not found or not yet approved.' };
+    }
+    return { success: true, data: data as any };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to fetch submission: ${errorMessage}` };
+  }
+}

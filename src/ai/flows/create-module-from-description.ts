@@ -26,6 +26,7 @@ const QuizQuestionSchema = z.object({
   correctAnswer: z.string().describe("The correct answer from the options array."),
   explanation: z.string().describe("A brief explanation for why the correct answer is right.")
 });
+export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
 
 const ResourceSuggestionSchema = z.object({
   title: z.string().describe("The title of the suggested resource (e.g., book, website, video)."),

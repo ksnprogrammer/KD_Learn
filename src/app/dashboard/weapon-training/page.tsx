@@ -6,25 +6,52 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
-import { FlaskConical, Leaf, Swords, Zap } from "lucide-react";
+import { Loader2, Swords, Zap, FlaskConical, Leaf, BookOpen, Sigma } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getApprovedModules } from "@/app/actions";
+import Link from "next/link";
+import type { CreateModuleOutput } from "@/ai/flows/create-module-from-description";
 
-const practiceQuizzes = [
-  { subject: 'Biology', title: 'Cellular Structures', icon: Leaf, color: 'text-biology', questions: 15 },
-  { subject: 'Chemistry', title: 'Periodic Table Basics', icon: FlaskConical, color: 'text-chemistry', questions: 20 },
-  { subject: 'Physics', title: 'Kinematics Fundamentals', icon: Zap, color: 'text-physics', questions: 18 },
-  { subject: 'Biology', title: 'Photosynthesis', icon: Leaf, color: 'text-biology', questions: 12 },
-];
+interface ApprovedModule {
+    id: number;
+    topic: string;
+    content: CreateModuleOutput;
+}
+
+const getSubjectInfo = (topic: string) => {
+    const lowerTopic = topic.toLowerCase();
+    if (lowerTopic.includes('biolog')) return { icon: Leaf, color: 'text-biology', name: 'Biology' };
+    if (lowerTopic.includes('chemis')) return { icon: FlaskConical, color: 'text-chemistry', name: 'Chemistry' };
+    if (lowerTopic.includes('physic')) return { icon: Zap, color: 'text-physics', name: 'Physics' };
+    if (lowerTopic.includes('math')) return { icon: Sigma, color: 'text-maths', name: 'Maths' };
+    return { icon: BookOpen, color: 'text-general-science', name: 'General Science' };
+}
 
 
 function WeaponTrainingContent() {
     const { toast } = useToast();
+    const [modules, setModules] = useState<ApprovedModule[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const handleStartTraining = (quizTitle: string) => {
-        toast({
-            title: "Training Session Starting!",
-            description: `Preparing the '${quizTitle}' practice quiz. Ready your mind, knight!`,
-        });
-    };
+    useEffect(() => {
+        const fetchModules = async () => {
+            setIsLoading(true);
+            const { success, data, error } = await getApprovedModules();
+            if (success && data) {
+                setModules(data as ApprovedModule[]);
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Failed to fetch training modules',
+                    description: error || 'Could not load available quests.',
+                });
+            }
+            setIsLoading(false);
+        };
+
+        fetchModules();
+    }, [toast]);
+
 
     return (
         <div className="container mx-auto py-8">
@@ -40,22 +67,46 @@ function WeaponTrainingContent() {
                 </CardHeader>
             </Card>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                {practiceQuizzes.map((quiz) => (
-                    <Card key={quiz.title} className="hover:border-primary/50 transition-all">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-lg font-medium">{quiz.title}</CardTitle>
-                            <quiz.icon className={`w-6 h-6 ${quiz.color}`} />
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-muted-foreground">{quiz.subject} &middot; {quiz.questions} questions</p>
-                        </CardContent>
-                        <CardFooter>
-                            <Button className="w-full" onClick={() => handleStartTraining(quiz.title)}>Start Training</Button>
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
+            {isLoading && (
+                <div className="flex flex-col items-center justify-center text-center gap-4 mt-12">
+                    <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                    <p className="font-headline text-lg">Gathering available quests...</p>
+                </div>
+            )}
+
+            {!isLoading && modules.length === 0 && (
+                <div className="text-center text-muted-foreground mt-12 max-w-md mx-auto p-6 bg-muted/50 rounded-lg">
+                    <p className='font-headline text-lg text-card-foreground'>The Training Grounds are Quiet</p>
+                    <p className="mt-2">A Royal Wizard must first forge new Knowledge Dragons in the King's Court and have them approved before knights can begin their training.</p>
+                </div>
+            )}
+
+            {!isLoading && modules.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto animate-fade-in-up">
+                    {modules.map((module) => {
+                        const subject = getSubjectInfo(module.topic);
+                        const quiz = module.content.quizQuestions;
+                        const Icon = subject.icon;
+                        
+                        return (
+                            <Card key={module.id} className="hover:border-primary/50 transition-all">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                    <CardTitle className="text-lg font-medium">{module.topic}</CardTitle>
+                                    <Icon className={`w-6 h-6 ${subject.color}`} />
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">{subject.name} &middot; {quiz.length} questions</p>
+                                </CardContent>
+                                <CardFooter>
+                                    <Button className="w-full" asChild>
+                                        <Link href={`/dashboard/training/${module.id}`}>Start Training</Link>
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        )
+                    })}
+                </div>
+            )}
         </div>
     )
 }
