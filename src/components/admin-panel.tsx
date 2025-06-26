@@ -18,16 +18,16 @@ import {
   Book,
   MousePointerClick,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
-import { generateModule } from '@/app/actions';
+import { generateModule, getSubmissions, submitModuleForReview, updateSubmissionStatus } from '@/app/actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChartContainer,
   ChartLegend,
@@ -54,7 +54,9 @@ type FormValues = z.infer<typeof formSchema>;
 
 function AiDragonCreator() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<CreateModuleOutput | null>(null);
+  const [currentTopic, setCurrentTopic] = useState('');
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -67,6 +69,7 @@ function AiDragonCreator() {
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
     setResult(null);
+    setCurrentTopic(values.topicDescription);
     const { success, data, error } = await generateModule(values.topicDescription);
     setIsLoading(false);
 
@@ -76,6 +79,30 @@ function AiDragonCreator() {
       toast({
         variant: 'destructive',
         title: 'Error',
+        description: error || 'An unexpected error occurred.',
+      });
+    }
+  }
+
+  async function handleSubmitForReview() {
+    if (!result || !currentTopic) return;
+
+    setIsSubmitting(true);
+    const { success, error } = await submitModuleForReview(result, currentTopic);
+    setIsSubmitting(false);
+
+    if (success) {
+      toast({
+        title: 'Success!',
+        description: 'Your dragon has been submitted to the scribes for review.',
+      });
+      setResult(null);
+      setCurrentTopic('');
+      form.reset();
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error Submitting',
         description: error || 'An unexpected error occurred.',
       });
     }
@@ -196,6 +223,12 @@ function AiDragonCreator() {
                 </div>
               ))}
             </CardContent>
+            <CardFooter>
+              <Button onClick={handleSubmitForReview} disabled={isSubmitting} className="w-full sm:w-auto">
+                {isSubmitting ? <Loader2 className="animate-spin" /> : <Upload className="mr-2" />}
+                Submit For Review
+              </Button>
+            </CardFooter>
           </Card>
         </div>
       )}
@@ -231,19 +264,44 @@ function AssetManager() {
 
 function ContentSubmissions() {
   const { toast } = useToast();
-  const [submissions, setSubmissions] = useState([
-    { id: 1, topic: 'Mitochondria: The Powerhouse', writer: 'Scribe Elara', status: 'Pending' },
-    { id: 2, topic: 'The Carbon Cycle', writer: 'Chronicler Leo', status: 'Approved' },
-    { id: 3, topic: 'Basics of Electromagnetism', writer: 'Bard Finn', status: 'Rejected' },
-    { id: 4, topic: 'Trigonometric Identities', writer: 'Calculator Cassian', status: 'Pending' },
-  ]);
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleStatusChange = (id: number, newStatus: 'Approved' | 'Rejected') => {
-    setSubmissions(submissions.map((sub) => (sub.id === id ? { ...sub, status: newStatus } : sub)));
-    toast({
-      title: `Submission ${newStatus}`,
-      description: `The topic has been ${newStatus.toLowerCase()}.`,
-    });
+  const fetchSubmissions = useCallback(async () => {
+    const { success, data, error } = await getSubmissions();
+    if (success && data) {
+      setSubmissions(data);
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error Loading Submissions',
+        description: error || 'An unexpected error occurred.',
+      });
+      setSubmissions([]);
+    }
+    setIsLoading(false);
+  }, [toast]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchSubmissions();
+  }, [fetchSubmissions]);
+
+  const handleStatusChange = async (id: number, newStatus: 'Approved' | 'Rejected') => {
+    const { success, error } = await updateSubmissionStatus(id, newStatus);
+    if (success) {
+      toast({
+        title: `Submission ${newStatus}`,
+        description: `The topic has been ${newStatus.toLowerCase()}.`,
+      });
+      fetchSubmissions();
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error Updating Status',
+        description: error || 'An unexpected error occurred.',
+      });
+    }
   };
 
   const getBadgeVariant = (status: string) => {
@@ -264,43 +322,57 @@ function ContentSubmissions() {
         <CardDescription>Review and approve content from Dragon Writers.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Topic</TableHead>
-                <TableHead className="hidden sm:table-cell">Writer</TableHead>
-                <TableHead className="hidden md:table-cell">Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {submissions.map((sub) => (
-                <TableRow key={sub.id}>
-                  <TableCell className="font-medium">{sub.topic}</TableCell>
-                  <TableCell className="hidden sm:table-cell">{sub.writer}</TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    <Badge variant={getBadgeVariant(sub.status)}>{sub.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {sub.status === 'Pending' && (
-                      <div className="flex gap-1 justify-end">
-                        <Button variant="ghost" size="icon" onClick={() => handleStatusChange(sub.id, 'Approved')}>
-                          <CheckCircle className="text-biology" />
-                          <span className="sr-only">Approve</span>
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleStatusChange(sub.id, 'Rejected')}>
-                          <XCircle className="text-physics" />
-                          <span className="sr-only">Reject</span>
-                        </Button>
-                      </div>
-                    )}
-                  </TableCell>
+        {isLoading ? (
+          <div className="flex h-48 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Topic</TableHead>
+                  <TableHead className="hidden sm:table-cell">Writer</TableHead>
+                  <TableHead className="hidden md:table-cell">Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {submissions.length > 0 ? (
+                  submissions.map((sub) => (
+                    <TableRow key={sub.id}>
+                      <TableCell className="font-medium">{sub.topic}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{sub.writer}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <Badge variant={getBadgeVariant(sub.status)}>{sub.status}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {sub.status === 'Pending' && (
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleStatusChange(sub.id, 'Approved')}>
+                              <CheckCircle className="text-biology" />
+                              <span className="sr-only">Approve</span>
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleStatusChange(sub.id, 'Rejected')}>
+                              <XCircle className="text-physics" />
+                              <span className="sr-only">Reject</span>
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center">
+                      No pending submissions.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
