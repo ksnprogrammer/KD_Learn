@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
     ],
   },
   // This helps Next.js and Vercel correctly bundle Genkit's server-side dependencies.
-  serverExternalPackages: ['@opentelemetry/instrumentation'],
+  serverExternalPackages: ['@opentelemetry/instrumentation', 'handlebars', 'dotprompt'],
 };
 
 export default nextConfig;
