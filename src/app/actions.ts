@@ -49,7 +49,7 @@ export async function signup(formData: FormData) {
   if (!isSupabaseConfigured) {
     return redirect('/register?message=Database is not configured by the administrator.');
   }
-  const origin = headers().get('origin');
+
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const name = formData.get('name') as string;
@@ -69,7 +69,6 @@ export async function signup(formData: FormData) {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
       data: {
         name: name,
         exam_level: examLevel,
@@ -87,7 +86,7 @@ export async function signup(formData: FormData) {
     return redirect('/register?message=Could not authenticate user. Please try again.');
   }
 
-  return redirect('/register?message=Check your email to continue the sign-up process.');
+  return redirect('/dashboard');
 }
 
 export async function logout() {
