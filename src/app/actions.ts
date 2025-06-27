@@ -17,6 +17,7 @@ import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 
 const DB_NOT_CONFIGURED_ERROR = { success: false, error: 'Database not configured. Please check your .env file.' };
 const DB_NOT_CONFIGURED_ERROR_WITH_DATA = { ...DB_NOT_CONFIGURED_ERROR, data: [] };
@@ -498,7 +499,10 @@ export async function generateKingdomAnalytics(): Promise<{
   data?: KingdomReportOutput;
   error?: string;
 }> {
-  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+  if (!isSupabaseConfigured) {
+    if (!supabase) return { success: false, error: 'Database not configured.' };
+    return DB_NOT_CONFIGURED_ERROR;
+  };
   try {
     const output = await generateKingdomReport();
     return { success: true, data: output };
@@ -556,4 +560,37 @@ export async function getTeamWarData(): Promise<{
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     return { success: false, error: `Failed to generate team war data: ${errorMessage}` };
   }
+}
+
+export async function updateUserPublicProfile(name: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
+  if (!name.trim()) {
+    return { success: false, error: 'Knight Name cannot be empty.' };
+  }
+
+  const cookieStore = cookies();
+  const supabase = createServerClient({ cookies: () => cookieStore });
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: 'User not authenticated.' };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    data: { name: name.trim() }
+  });
+
+  if (error) {
+    console.error('Update user error:', error);
+    return { success: false, error: 'Could not update profile. Please try again.' };
+  }
+
+  revalidatePath('/dashboard/settings');
+  revalidatePath('/dashboard/profile');
+  revalidatePath('/dashboard');
+
+  return { success: true };
 }

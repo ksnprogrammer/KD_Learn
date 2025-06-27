@@ -2,18 +2,63 @@
 
 import { useUser } from "@/hooks/use-user";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, KeyRound, Palette, User } from "lucide-react";
+import { Bell, KeyRound, Palette, User, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { updateUserPublicProfile } from "@/app/actions";
+
+const profileFormSchema = z.object({
+  knightName: z.string().min(3, "Name must be at least 3 characters.").max(50, "Name cannot exceed 50 characters."),
+});
+
+type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 function SettingsForm() {
     const user = useUser();
+    const { toast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
     const userName = user?.user_metadata?.name || 'Knight';
     const examLevel = user?.user_metadata?.exam_level || 'A/L';
     const userTitle = `Dragon Knight - ${examLevel} Path`;
+
+    const form = useForm<ProfileFormValues>({
+        resolver: zodResolver(profileFormSchema),
+        defaultValues: {
+            knightName: userName,
+        },
+        mode: 'onChange',
+    });
+
+    async function onSubmit(values: ProfileFormValues) {
+        setIsSubmitting(true);
+        const { success, error } = await updateUserPublicProfile(values.knightName);
+        setIsSubmitting(false);
+
+        if (success) {
+            toast({
+                title: "Profile Updated",
+                description: "Your Knight Name has been successfully changed.",
+            });
+            // Reset form dirty state so the button becomes disabled again
+            form.reset({ knightName: values.knightName });
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Update Failed",
+                description: error || "An unexpected error occurred.",
+            });
+        }
+    }
 
     return (
          <Tabs defaultValue="profile" className="w-full">
@@ -24,25 +69,41 @@ function SettingsForm() {
                 <TabsTrigger value="appearance"><Palette className="mr-2 hidden md:flex" />Appearance</TabsTrigger>
             </TabsList>
             <TabsContent value="profile" className="mt-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Public Profile</CardTitle>
-                        <CardDescription>This is how others will see you in the kingdom.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="knight-name">Knight Name</Label>
-                            <Input id="knight-name" defaultValue={userName} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="knight-title">Title</Label>
-                            <Input id="knight-title" defaultValue={userTitle} />
-                        </div>
-                    </CardContent>
-                    <CardFooter>
-                        <Button>Save Changes</Button>
-                    </CardFooter>
-                </Card>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)}>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Public Profile</CardTitle>
+                                <CardDescription>This is how others will see you in the kingdom.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <FormField
+                                    control={form.control}
+                                    name="knightName"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Knight Name</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Your knightly name" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <div className="space-y-2">
+                                    <Label htmlFor="knight-title">Title</Label>
+                                    <Input id="knight-title" defaultValue={userTitle} disabled />
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <Button type="submit" disabled={isSubmitting || !form.formState.isDirty || !form.formState.isValid}>
+                                    {isSubmitting && <Loader2 className="mr-2 animate-spin" />}
+                                    Save Changes
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </form>
+                </Form>
             </TabsContent>
             <TabsContent value="account" className="mt-6">
                  <Card>
