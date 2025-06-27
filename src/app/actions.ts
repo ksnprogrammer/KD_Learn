@@ -1,3 +1,4 @@
+
 'use server';
 
 import { createModuleFromDescription } from '@/ai/flows/create-module-from-description';
@@ -30,7 +31,7 @@ export async function login(formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const cookieStore = cookies();
-  const supabase = createServerClient({ cookies: () => cookieStore });
+  const supabase = createServerClient(cookieStore);
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -63,7 +64,7 @@ export async function signup(formData: FormData) {
   const avatarUrl = gender === 'male' ? maleAvatarUrl : femaleAvatarUrl;
   
   const cookieStore = cookies();
-  const supabase = createServerClient({ cookies: () => cookieStore });
+  const supabase = createServerClient(cookieStore);
 
   const { error } = await supabase.auth.signUp({
     email,
@@ -95,7 +96,7 @@ export async function logout() {
     return redirect('/');
   }
   const cookieStore = cookies();
-  const supabase = createServerClient({ cookies: () => cookieStore });
+  const supabase = createServerClient(cookieStore);
   await supabase.auth.signOut();
   return redirect('/');
 }
@@ -309,7 +310,7 @@ export async function createPost(content: string): Promise<{
   }
 
   const cookieStore = cookies();
-  const supabaseServer = createServerClient({ cookies: () => cookieStore });
+  const supabaseServer = createServerClient(cookieStore);
   const { data: { user } } = await supabaseServer.auth.getUser();
 
   if (!user) {
@@ -413,7 +414,7 @@ export async function getSignedUrl(fileName: string, fileType: string) {
         return { success: false, error: 'Database not configured.' };
     }
     const cookieStore = cookies();
-    const supabaseServer = createServerClient({ cookies: () => cookieStore });
+    const supabaseServer = createServerClient(cookieStore);
     const { data: { user } } = await supabaseServer.auth.getUser();
 
     if (!user) {
@@ -597,7 +598,7 @@ export async function updateUserPublicProfile(name: string): Promise<{
   }
 
   const cookieStore = cookies();
-  const supabase = createServerClient({ cookies: () => cookieStore });
+  const supabase = createServerClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -637,7 +638,7 @@ export async function getUserStats() {
     if (!isSupabaseConfigured || !supabase) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error, data: defaultStats };
     
     const cookieStore = cookies();
-    const supabaseServer = createServerClient({ cookies: () => cookieStore });
+    const supabaseServer = createServerClient(cookieStore);
     const { data: { user } } = await supabaseServer.auth.getUser();
 
     if (!user) return { success: false, error: 'User not authenticated.', data: defaultStats };
@@ -711,7 +712,7 @@ export async function recordQuestCompletion(submissionId: number, score: number,
      if (!isSupabaseConfigured || !supabase) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error };
 
     const cookieStore = cookies();
-    const supabaseServer = createServerClient({ cookies: () => cookieStore });
+    const supabaseServer = createServerClient(cookieStore);
     const { data: { user } } = await supabaseServer.auth.getUser();
 
     if (!user) return { success: false, error: 'User not authenticated.' };

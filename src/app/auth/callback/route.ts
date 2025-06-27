@@ -1,3 +1,4 @@
+
 import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   if (code && isSupabaseConfigured) {
     const cookieStore = cookies();
-    const supabase = createServerClient({ cookies: () => cookieStore });
+    const supabase = createServerClient(cookieStore);
     await supabase.auth.exchangeCodeForSession(code);
   }
 

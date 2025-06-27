@@ -13,7 +13,7 @@ export default async function MembershipPage() {
     let user = null;
 
     if (isSupabaseConfigured) {
-      const supabase = createServerClient({ cookies: () => cookieStore });
+      const supabase = createServerClient(cookieStore);
       const { data } = await supabase.auth.getUser();
       user = data.user;
     }

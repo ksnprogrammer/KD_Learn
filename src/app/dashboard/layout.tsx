@@ -18,7 +18,7 @@ export default async function DashboardLayout({
   }
   
   const cookieStore = cookies();
-  const supabase = createServerClient({ cookies: () => cookieStore });
+  const supabase = createServerClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

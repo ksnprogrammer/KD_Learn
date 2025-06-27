@@ -1,3 +1,4 @@
+
 import { createServerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -13,7 +14,7 @@ export default async function AdminLayout({
   }
 
   const cookieStore = cookies();
-  const supabase = createServerClient({ cookies: () => cookieStore });
+  const supabase = createServerClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
