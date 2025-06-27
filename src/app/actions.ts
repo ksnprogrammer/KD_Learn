@@ -522,6 +522,7 @@ export async function updatePaymentStatus(id: number, status: 'Approved' | 'Reje
       console.error('Supabase error:', error);
       throw new Error(error.message);
     }
+    revalidatePath('/admin');
     return { success: true };
   } catch (e) {
     console.error(e);
