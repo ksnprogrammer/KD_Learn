@@ -53,9 +53,9 @@ export function TrainingSession({ module, submissionId }: TrainingSessionProps) 
     setScore(correctAnswers);
     setIsSubmitted(true);
     
-    const { success, error, xpGained, message } = await recordQuestCompletion(submissionId, correctAnswers, module.quizQuestions.length) as any;
-    if (success) {
-      if (message) { // Already completed
+    const result = await recordQuestCompletion(submissionId, correctAnswers, module.quizQuestions.length);
+    if (result.success) {
+      if (result.message) { // Already completed
          toast({
             title: "Already Completed",
             description: `You have already earned credit for this quest.`,
@@ -63,14 +63,14 @@ export function TrainingSession({ module, submissionId }: TrainingSessionProps) 
       } else {
         toast({
             title: "Victory!",
-            description: `Your progress has been recorded. You earned ${xpGained} XP!`,
+            description: `Your progress has been recorded. You earned ${result.xpGained} XP!`,
         });
       }
     } else {
         toast({
             variant: "destructive",
             title: "Recording Failed",
-            description: error || "Could not save your quest progress.",
+            description: result.error || "Could not save your quest progress.",
         });
     }
 

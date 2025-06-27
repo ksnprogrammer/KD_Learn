@@ -754,7 +754,11 @@ export async function getLeaderboard() {
     })) };
 }
 
-export async function recordQuestCompletion(submissionId: number, score: number, totalQuestions: number) {
+export type QuestCompletionResult = 
+  | { success: true; xpGained?: number; message?: string; }
+  | { success: false; error: string; };
+
+export async function recordQuestCompletion(submissionId: number, score: number, totalQuestions: number): Promise<QuestCompletionResult> {
      if (!isSupabaseConfigured) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error };
 
     const supabase = createSupabaseServerClient();
