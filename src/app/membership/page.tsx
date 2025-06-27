@@ -4,16 +4,14 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { MembershipPageContent } from "@/components/membership-page";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { UserProvider } from "@/hooks/use-user";
-import { createServerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from 'next/headers';
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from '@/lib/supabase';
 
 export default async function MembershipPage() {
-    const cookieStore = cookies();
     let user = null;
 
     if (isSupabaseConfigured) {
-      const supabase = createServerClient(cookieStore);
+      const supabase = createSupabaseServerClient();
       const { data } = await supabase.auth.getUser();
       user = data.user;
     }

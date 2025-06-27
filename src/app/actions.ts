@@ -11,13 +11,12 @@ import { generateAudioFromText } from '@/ai/flows/generate-audio-flow';
 import type { GenerateAudioOutput } from '@/ai/flows/generate-audio-flow';
 import { generateDailyChallenge } from '@/ai/flows/generate-daily-challenge';
 import { gradeDailyChallenge } from '@/ai/flows/grade-daily-challenge';
-import type { GradeChallengeOutput } from '@/ai/flows/grade-daily-challenge';
+import type { GradeChallengeOutput } from '@/ai/schemas';
 import { generateTeamWarReport } from '@/ai/flows/generate-team-war-report';
 import type { TeamWarReportOutput } from '@/ai/flows/generate-team-war-report';
 import type { DailyChallengeOutput } from '@/ai/schemas';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { createServerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { isSupabaseConfigured } from '@/lib/supabase';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
@@ -32,8 +31,7 @@ export async function login(formData: FormData) {
 
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
-  const cookieStore = cookies();
-  const supabase = createServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -65,8 +63,7 @@ export async function signup(formData: FormData) {
   
   const avatarUrl = gender === 'male' ? maleAvatarUrl : femaleAvatarUrl;
   
-  const cookieStore = cookies();
-  const supabase = createServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
 
   const { error } = await supabase.auth.signUp({
     email,
@@ -97,8 +94,7 @@ export async function logout() {
   if (!isSupabaseConfigured) {
     return redirect('/');
   }
-  const cookieStore = cookies();
-  const supabase = createServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   await supabase.auth.signOut();
   return redirect('/');
 }
@@ -149,7 +145,8 @@ export async function submitModuleForReview(moduleData: CreateModuleOutput, topi
   success: boolean;
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+  const supabase = createSupabaseServerClient();
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -182,7 +179,8 @@ export async function getSubmissions(): Promise<{
   data?: any[];
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  const supabase = createSupabaseServerClient();
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -205,7 +203,8 @@ export async function updateSubmissionStatus(id: number, status: 'Approved' | 'R
   success: boolean;
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+  const supabase = createSupabaseServerClient();
   try {
     const { error } = await supabase
       .from('submissions')
@@ -228,7 +227,8 @@ export async function saveStory(storyData: CreateStoryOutput): Promise<{
   success: boolean;
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+  const supabase = createSupabaseServerClient();
   try {
     const { error } = await supabase
       .from('stories')
@@ -257,7 +257,8 @@ export async function getStories(): Promise<{
   data?: any[];
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  const supabase = createSupabaseServerClient();
   try {
     const { data, error } = await supabase
       .from('stories')
@@ -281,7 +282,8 @@ export async function getPosts(): Promise<{
   data?: any[];
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  const supabase = createSupabaseServerClient();
   try {
     const { data, error } = await supabase
       .from('posts')
@@ -306,14 +308,13 @@ export async function createPost(content: string): Promise<{
   data?: any;
   error?: string;
 }> {
-   if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
+   if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
    if (!content.trim()) {
     return { success: false, error: 'Post content cannot be empty.' };
   }
 
-  const cookieStore = cookies();
-  const supabaseServer = createServerClient(cookieStore);
-  const { data: { user } } = await supabaseServer.auth.getUser();
+  const supabase = createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return { success: false, error: 'User not authenticated.' };
@@ -354,7 +355,8 @@ export async function getApprovedModules(): Promise<{
   data?: any[];
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  const supabase = createSupabaseServerClient();
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -384,7 +386,8 @@ export async function getSubmissionById(id: number): Promise<{
   };
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return { ...DB_NOT_CONFIGURED_ERROR, data: undefined };
+  if (!isSupabaseConfigured) return { ...DB_NOT_CONFIGURED_ERROR, data: undefined };
+  const supabase = createSupabaseServerClient();
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -412,12 +415,11 @@ export async function getSubmissionById(id: number): Promise<{
 }
 
 export async function getSignedUrl(fileName: string, fileType: string) {
-    if (!isSupabaseConfigured || !supabase) {
+    if (!isSupabaseConfigured) {
         return { success: false, error: 'Database not configured.' };
     }
-    const cookieStore = cookies();
-    const supabaseServer = createServerClient(cookieStore);
-    const { data: { user } } = await supabaseServer.auth.getUser();
+    const supabase = createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
         return { success: false, error: 'User not authenticated.' };
@@ -449,7 +451,8 @@ export async function submitPaymentForReview(
   success: boolean;
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+  const supabase = createSupabaseServerClient();
   try {
     const { error } = await supabase
       .from('payments')
@@ -480,7 +483,8 @@ export async function getPayments(): Promise<{
   data?: any[];
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  const supabase = createSupabaseServerClient();
   try {
     const { data, error } = await supabase
       .from('payments')
@@ -503,7 +507,8 @@ export async function updatePaymentStatus(id: number, status: 'Approved' | 'Reje
   success: boolean;
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+  const supabase = createSupabaseServerClient();
   try {
     const { error } = await supabase
       .from('payments')
@@ -528,8 +533,7 @@ export async function generateKingdomAnalytics(): Promise<{
   error?: string;
 }> {
   if (!isSupabaseConfigured) {
-    if (!supabase) return { success: false, error: 'Database not configured.' };
-    return DB_NOT_CONFIGURED_ERROR;
+    return { success: false, error: 'Database not configured.' };
   };
   try {
     const output = await generateKingdomReport();
@@ -584,12 +588,11 @@ export async function submitDailyChallengeAnswer(challenge: DailyChallengeOutput
     const gradingResult = await gradeDailyChallenge({ challenge, userAnswer });
     
     if (gradingResult.isCorrect) {
-      if (!isSupabaseConfigured || !supabase) {
+      if (!isSupabaseConfigured) {
          console.log("Database not configured. Skipping XP award.");
       } else {
-        const cookieStore = cookies();
-        const supabaseServer = createServerClient(cookieStore);
-        const { data: { user } } = await supabaseServer.auth.getUser();
+        const supabase = createSupabaseServerClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
         if (user) {
           // Parse XP from the reward string, e.g., "150 XP"
@@ -636,13 +639,12 @@ export async function updateUserPublicProfile(name: string): Promise<{
   success: boolean;
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
   if (!name.trim()) {
     return { success: false, error: 'Knight Name cannot be empty.' };
   }
 
-  const cookieStore = cookies();
-  const supabase = createServerClient(cookieStore);
+  const supabase = createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -679,11 +681,10 @@ const calculateProgress = (xp: number) => {
 const defaultStats = { xp: 0, level: 1, progress: 0, questsCompleted: 0, rank: 'N/A', activeStreak: 0 };
 
 export async function getUserStats() {
-    if (!isSupabaseConfigured || !supabase) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error, data: defaultStats };
+    if (!isSupabaseConfigured) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error, data: defaultStats };
     
-    const cookieStore = cookies();
-    const supabaseServer = createServerClient(cookieStore);
-    const { data: { user } } = await supabaseServer.auth.getUser();
+    const supabase = createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) return { success: false, error: 'User not authenticated.', data: defaultStats };
 
@@ -735,8 +736,9 @@ export async function getUserStats() {
 
 
 export async function getLeaderboard() {
-    if (!isSupabaseConfigured || !supabase) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error, data: [] };
+    if (!isSupabaseConfigured) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error, data: [] };
 
+    const supabase = createSupabaseServerClient();
     const { data, error } = await supabase
         .rpc('get_leaderboard');
 
@@ -753,11 +755,10 @@ export async function getLeaderboard() {
 }
 
 export async function recordQuestCompletion(submissionId: number, score: number, totalQuestions: number) {
-     if (!isSupabaseConfigured || !supabase) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error };
+     if (!isSupabaseConfigured) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error };
 
-    const cookieStore = cookies();
-    const supabaseServer = createServerClient(cookieStore);
-    const { data: { user } } = await supabaseServer.auth.getUser();
+    const supabase = createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) return { success: false, error: 'User not authenticated.' };
 
