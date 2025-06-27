@@ -87,6 +87,7 @@ export async function signup(formData: FormData) {
     return redirect(`/register?message=${error.message}`);
   }
 
+  revalidatePath('/', 'layout');
   return redirect('/login?message=Check your email for the confirmation link.');
 }
 
@@ -215,6 +216,7 @@ export async function updateSubmissionStatus(id: number, status: 'Approved' | 'R
       console.error('Supabase error:', error);
       throw new Error(error.message);
     }
+    revalidatePath('/admin');
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -244,6 +246,7 @@ export async function saveStory(storyData: CreateStoryOutput): Promise<{
       console.error('Supabase error:', error);
       throw new Error(error.message);
     };
+    revalidatePath('/dashboard/hall-of-legends');
     return { success: true };
   } catch (e) {
     console.error(e);
