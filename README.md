@@ -3,7 +3,7 @@
 
 Welcome, my liege, to the source code of your digital kingdom. This document contains the sacred instructions to summon, run, and deploy your application, making it accessible to your entire realm.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fksnprogrammer%2FKD&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,GOOGLE_API_KEY&envDescription=Your%20Supabase%20and%20Google%20AI%20credentials%20are%20needed%20for%20the%20app%20to%20function.&project-name=kingdragons&repository-name=kingdragons-clone)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fksnprogrammer%2FKD&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,GOOGLE_API_KEY,NEXT_PUBLIC_WHATSAPP_CHANNEL_URL&envDescription=Your%20Supabase%20and%20Google%20AI%20credentials%20are%20needed%20for%20the%20app%20to%20function.%20The%20WhatsApp%20URL%20is%20optional.&project-name=kingdragons&repository-name=kingdragons-clone)
 
 ---
 
@@ -16,6 +16,7 @@ You will need three keys to run the application:
 - `NEXT_PUBLIC_SUPABASE_URL` (From your Supabase Project's API Settings)
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (From your Supabase Project's API Settings)
 - `GOOGLE_API_KEY` (From [Google AI Studio](https://aistudio.google.com/app/apikey))
+- `NEXT_PUBLIC_WHATSAPP_CHANNEL_URL` (Optional: The full URL to your WhatsApp channel)
 
 Keep these safe and ready for the deployment step.
 
@@ -194,11 +195,11 @@ To make your kingdom accessible to knights across the globe, we will use Vercel.
 
 **1. Click the Deploy Button:**
 Click the button at the top of this document or right here:
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fksnprogrammer%2FKD&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,GOOGLE_API_KEY&envDescription=Your%20Supabase%20and%20Google%20AI%20credentials%20are%20needed%20for%20the%20app%20to%20function.&project-name=kingdragons&repository-name=kingdragons-clone)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fksnprogrammer%2FKD&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,GOOGLE_API_KEY,NEXT_PUBLIC_WHATSAPP_CHANNEL_URL&envDescription=Your%20Supabase%20and%20Google%20AI%20credentials%20are%20needed%20for%20the%20app%20to%20function.%20The%20WhatsApp%20URL%20is%20optional.&project-name=kingdragons&repository-name=kingdragons-clone)
 
 **2. Follow the Vercel Wizard:**
 1.  Vercel will ask you to connect your GitHub account. This will create a copy (a clone) of the kingdom's repository for you.
-2.  Next, it will ask you to fill in the Environment Variables. Paste the three keys you gathered in "Part 0.1".
+2.  Next, it will ask you to fill in the Environment Variables. Paste the keys you gathered in "Part 0.1".
 3.  Click **"Deploy"**. Vercel will build your application and provide you with a public URL (e.g., `kingdragons.vercel.app`).
 
 **Automatic Deployments:**
@@ -224,6 +225,9 @@ If you wish to modify the kingdom's source code, you'll need a local setup.
 
     # Google AI credential for Genkit AI features
     GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
+
+    # (Optional) Full URL to your WhatsApp channel for the "Join" buttons
+    NEXT_PUBLIC_WHATSAPP_CHANNEL_URL="YOUR_WHATSAPP_CHANNEL_URL"
     ```
 2.  **Install All Dependencies:** Open a terminal in the project directory and run:
     ```bash
