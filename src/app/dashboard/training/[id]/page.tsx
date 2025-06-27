@@ -19,12 +19,13 @@ async function getModule(id: number) {
     return { data, error: null };
 }
 
-export default async function TrainingPage({
-  params: { id },
-}: {
+// Define a specific interface to avoid name collisions with Next.js internals.
+interface TrainingPageProps {
   params: { id: string };
-}) {
-  const submissionId = parseInt(id, 10);
+}
+
+export default async function TrainingPage({ params }: TrainingPageProps) {
+  const submissionId = parseInt(params.id, 10);
   if (isNaN(submissionId)) {
     notFound();
   }
