@@ -20,12 +20,11 @@ async function getModule(id: number) {
 }
 
 export default async function TrainingPage({
-  params,
+  params: { id },
 }: {
   params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const submissionId = parseInt(params.id, 10);
+  const submissionId = parseInt(id, 10);
   if (isNaN(submissionId)) {
     notFound();
   }
