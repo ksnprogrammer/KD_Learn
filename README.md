@@ -1,6 +1,6 @@
 # KingDragons (KD) - The Royal Deployment Decree
 
-Welcome, my liege, to the source code of your digital kingdom. This document contains the sacred instructions to summon, run, and manage your application on your own machine, turning it into the central server for your entire realm.
+Welcome, my liege, to the source code of your digital kingdom. This document contains the sacred instructions to summon, run, and deploy your application, making it accessible to your entire realm.
 
 ---
 
@@ -9,13 +9,18 @@ Welcome, my liege, to the source code of your digital kingdom. This document con
 Before you can run the code, you must first prepare your Supabase project to act as the kingdom's database and file storage.
 
 ### 0.1: Set Your Environment Variables
-Your Supabase Project URL and Public API Key must be provided to the application.
+You must provide your Supabase and Google AI credentials to the application.
 1. In the root directory of your project, create a new file named `.env`.
-2. Copy and paste the following into the file, replacing the placeholder values with the real credentials from your Supabase dashboard.
+2. Copy and paste the following into the file, replacing the placeholder values with your real credentials.
 
 ```
+# Supabase credentials from your project's dashboard
 NEXT_PUBLIC_SUPABASE_URL="https://doevrgqwwemzavyaitya.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvZXZyZ3F3d2VtemF2eWFpdHlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5NDE4NTAsImV4cCI6MjA2NjUxNzg1MH0.1ZWkQ-lC2Nk8208d49tPChYisj_DaIP1fXrmLmd3XE4"
+
+# Google AI credential for Genkit AI features
+# Get your key from Google AI Studio: https://aistudio.google.com/app/apikey
+GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
 ```
 
 ### 0.2: Set Up the Database Schema
@@ -187,9 +192,9 @@ With the kingdom's foundations prepared, you may now proceed.
 
 ---
 
-## Part 1: Forging the Local Kingdom
+## Part 1: Local Development Setup
 
-Before you begin, you must have the foundational tools installed on your Windows 10 PC. The kingdom cannot automate the installation of these base magics.
+Before you begin, you must have the foundational tools installed.
 
 ### Prerequisites
 1.  **Node.js**: The magical energy that powers the kingdom. Download and install it from [nodejs.org](https://nodejs.org/).
@@ -200,73 +205,66 @@ Before you begin, you must have the foundational tools installed on your Windows
 Follow these steps in a terminal (like Command Prompt, PowerShell, or the terminal inside VS Code).
 
 **1. Clone the Kingdom's Code:**
-First, you must retrieve the complete and finalized code from its repository.
-
 ```bash
 git clone https://github.com/ksnprogrammer/KD.git
 ```
 
 **2. Enter the Kingdom's Directory:**
-Navigate into the newly created folder. All subsequent commands must be run from here.
-
 ```bash
 cd KD
 ```
 
 **3. Install All Dependencies:**
-This single command will automatically read the `package.json` scroll and install all the necessary magical components (dependencies) for the kingdom to function.
-
 ```bash
 npm install
 ```
 
 **4. Run the Kingdom:**
-This command starts your local development server. Your PC is now the official server for KingDragons!
-
+This command starts your local development server.
 ```bash
 npm run dev
 ```
 
-Once you see a "ready" message in your terminal, your kingdom is running. You can access it on your own machine in your web browser at: **[http://localhost:9002](http://localhost:9002)**
+Once you see a "ready" message, you can access your local kingdom at: **[http://localhost:9002](http://localhost:9002)**
 
 ---
 
-## Part 2: Opening the Gates to the World
+## Part 2: Deploying to the World with Vercel
 
-To allow knights from across the globe to access the kingdom running on your PC, we will use a magical conduit called **Cloudflare Tunnel**.
+To make your kingdom accessible to knights across the globe, we will use Vercel, a platform designed for modern web applications like ours. Deployment is free, easy, and mostly automatic.
 
-**1. Install Cloudflare Tunnel:**
-This tool must be installed manually. Follow the official Cloudflare guide to install `cloudflared` on your Windows machine: [Install cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/install-and-setup/installation/).
+**1. Push to GitHub:**
+Your project must be on GitHub. If you haven't already, follow the git commands in "Part 3" to push your code to your repository.
 
-**2. Authenticate Cloudflare:**
-Open a **new, separate terminal** and run this command. It will open a browser window asking you to log in to Cloudflare and authorize the tunnel.
+**2. Create a Vercel Project:**
+1.  Go to [vercel.com](https://vercel.com) and sign up for a free account using your GitHub account.
+2.  On your Vercel dashboard, click **"Add New... > Project"**.
+3.  Import your kingdom's GitHub repository (`ksnprogrammer/KD`).
+4.  Vercel will automatically detect that it's a Next.js project. You do not need to change any build settings.
 
-```bash
-cloudflared tunnel login
-```
+**3. Configure Environment Variables:**
+This is the most important step. Vercel needs access to the same credentials you use for local development.
+1.  In your new Vercel project's settings, go to the **"Environment Variables"** section.
+2.  Add the following three variables, copying the values from your local `.env` file:
+    *   `NEXT_PUBLIC_SUPABASE_URL`
+    *   `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+    *   `GOOGLE_API_KEY`
+3.  Ensure the keys match exactly.
 
-**3. Create and Run the Public Link:**
-While your application is still running (from `npm run dev` in the other terminal), run the following command in your new terminal. This creates a secure, public link directly to your local server.
+**4. Deploy!**
+Click the **"Deploy"** button. Vercel will build your application and provide you with a public URL (e.g., `kd.vercel.app`).
 
-```bash
-cloudflared tunnel --url http://localhost:9002
-```
-
-Your terminal will display a public URL ending in `.trycloudflare.com`. It will look something like this:
-
-`https://your-random-tunnel-name.trycloudflare.com`
-
-**This is the live, public link to your KD system! You can share it with anyone in the world to access the kingdom running on your PC.**
+**Automatic Deployments:**
+From now on, every time you `git push` a change to your `main` branch on GitHub, Vercel will automatically redeploy your kingdom with the latest updates.
 
 ---
 
-## Part 3: Ruling the Kingdom
+## Part 3: Managing Your Kingdom
 
-*   **To Stop the Kingdom:** Press `Ctrl + C` in the terminal where you ran `npm run dev`.
-*   **To Stop the Public Link:** Press `Ctrl + C` in the terminal where you ran `cloudflared tunnel`.
-*   **Pushing Your Changes to GitHub:** As you make changes to the code, you must save them to your GitHub repository. I, your AI assistant, make the code changes. You, the King, must commit them. The first time you do this, you must initialize the repository and link it to GitHub. For all future updates, you can just add, commit, and push.
+*   **To Stop the Local Server:** Press `Ctrl + C` in the terminal where you ran `npm run dev`.
+*   **Pushing Changes:** To update your live kingdom on Vercel, you must commit your changes and push them to GitHub.
 
-    **First-time setup:**
+    **First-time setup (if you haven't done it):**
     ```bash
     git init
     git add .
@@ -282,6 +280,7 @@ Your terminal will display a public URL ending in `.trycloudflare.com`. It will 
     git commit -m "A new decree from the King"
     git push origin main
     ```
+    Vercel will automatically detect the push and redeploy your site.
 
 ### Granting Admin Privileges
 To access the King's Court at `/admin`, a user must have the `admin` role. By default, all new knights are assigned the `knight` role. To elevate a knight to an administrator:
