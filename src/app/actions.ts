@@ -54,6 +54,8 @@ export async function signup(formData: FormData) {
   const name = formData.get('name') as string;
   const examLevel = formData.get('examLevel') as string;
   const gender = formData.get('gender') as string;
+  const phone = formData.get('phone') as string;
+  const nic = formData.get('nic') as string;
 
   const maleAvatarUrl = "https://placehold.co/400x400.png";
   const femaleAvatarUrl = "https://placehold.co/400x400.png";
@@ -73,7 +75,9 @@ export async function signup(formData: FormData) {
         exam_level: examLevel,
         role: 'knight',
         avatar_url: avatarUrl,
-        avatar_hint: gender === 'male' ? 'male knight fantasy' : 'female knight fantasy'
+        avatar_hint: gender === 'male' ? 'male knight fantasy' : 'female knight fantasy',
+        phone: phone,
+        nic: nic,
       },
     },
   });
