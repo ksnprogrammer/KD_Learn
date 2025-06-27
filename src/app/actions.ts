@@ -53,6 +53,12 @@ export async function signup(formData: FormData) {
   const password = formData.get('password') as string;
   const name = formData.get('name') as string;
   const examLevel = formData.get('examLevel') as string;
+  const gender = formData.get('gender') as string;
+
+  const maleAvatarUrl = "https://placehold.co/400x400.png";
+  const femaleAvatarUrl = "https://placehold.co/400x400.png";
+  
+  const avatarUrl = gender === 'male' ? maleAvatarUrl : femaleAvatarUrl;
   
   const cookieStore = cookies();
   const supabase = createServerClient({ cookies: () => cookieStore });
@@ -66,6 +72,8 @@ export async function signup(formData: FormData) {
         name: name,
         exam_level: examLevel,
         role: 'knight',
+        avatar_url: avatarUrl,
+        avatar_hint: gender === 'male' ? 'male knight fantasy' : 'female knight fantasy'
       },
     },
   });
@@ -286,7 +294,7 @@ export async function getPosts(): Promise<{
   }
 }
 
-export async function createPost(content: string, author_name: string, author_avatar: string): Promise<{
+export async function createPost(content: string): Promise<{
   success: boolean;
   data?: any;
   error?: string;
@@ -295,6 +303,18 @@ export async function createPost(content: string, author_name: string, author_av
    if (!content.trim()) {
     return { success: false, error: 'Post content cannot be empty.' };
   }
+
+  const cookieStore = cookies();
+  const supabaseServer = createServerClient({ cookies: () => cookieStore });
+  const { data: { user } } = await supabaseServer.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: 'User not authenticated.' };
+  }
+  
+  const author_name = user.user_metadata?.name || 'Knight';
+  const author_avatar = user.user_metadata?.avatar_url || 'https://placehold.co/100x100.png';
+
   try {
     const { data, error } = await supabase
       .from('posts')
@@ -312,6 +332,7 @@ export async function createPost(content: string, author_name: string, author_av
       console.error('Supabase error:', error);
       throw new Error(error.message);
     };
+    revalidatePath('/dashboard');
     return { success: true, data };
   } catch (e) {
     console.error(e);
@@ -409,7 +430,7 @@ export async function getSignedUrl(fileName: string, fileType: string) {
     
     const { data: { publicUrl } } = supabase.storage.from('receipts').getPublicUrl(data.path);
 
-    return { success: true, data: { ...data, publicUrl } };
+    return { success: true, data: { signedUrl: data.path, publicUrl } };
 }
 
 export async function submitPaymentForReview(
@@ -624,7 +645,9 @@ export async function getUserStats() {
         .single();
 
     if (profileError || !profile) {
-        console.error('Profile fetch error:', profileError?.message);
+        if (profileError?.code !== 'PGRST116') { // Ignore "No rows found"
+            console.error('Profile fetch error:', profileError?.message);
+        }
         return { success: true, data: defaultStats };
     }
 
@@ -675,8 +698,8 @@ export async function getLeaderboard() {
 
     return { success: true, data: data.map((profile: any) => ({
         ...profile,
-        avatar: 'https://placehold.co/100x100.png',
-        hint: 'knight portrait'
+        avatar: profile.avatar_url || 'https://placehold.co/100x100.png',
+        hint: profile.avatar_hint || 'knight portrait'
     })) };
 }
 

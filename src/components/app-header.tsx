@@ -49,6 +49,8 @@ export function AppHeader() {
   }
   
   const userName = user?.user_metadata?.name || 'Knight';
+  const userAvatar = user?.user_metadata?.avatar_url || 'https://placehold.co/100x100.png';
+  const userAvatarHint = user?.user_metadata?.avatar_hint || 'dragon avatar';
   const userLevel = user ? `Level 5` : 'Visitor';
 
   return (
@@ -68,7 +70,7 @@ export function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                <AvatarImage src="https://placehold.co/100x100.png" alt={userName} data-ai-hint="dragon avatar" />
+                <AvatarImage src={userAvatar} alt={userName} data-ai-hint={userAvatarHint} />
                 <AvatarFallback>{userName?.substring(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
             </Button>

@@ -63,7 +63,8 @@ export default function Dashboard() {
     const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
 
     const userName = user?.user_metadata?.name || 'Knight';
-    const userAvatar = 'https://placehold.co/100x100.png'; // Placeholder for now
+    const userAvatar = user?.user_metadata?.avatar_url || 'https://placehold.co/100x100.png';
+    const userAvatarHint = user?.user_metadata?.avatar_hint || 'knight avatar';
 
     const fetchPosts = useCallback(async () => {
         setIsLoadingPosts(true);
@@ -170,11 +171,7 @@ export default function Dashboard() {
         setPosts([tempPost, ...posts]);
         setNewPost('');
 
-        const { success, error } = await createPost(
-            newPost.trim(),
-            userName,
-            userAvatar
-        );
+        const { success, error } = await createPost(newPost.trim());
 
         if (success) {
             await fetchPosts();

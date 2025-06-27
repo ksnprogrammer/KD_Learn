@@ -53,6 +53,9 @@ function ProfileContent() {
     const userName = user?.user_metadata?.name || 'Knight';
     const examLevel = user?.user_metadata?.exam_level || 'A/L';
     const userTitle = `Dragon Knight - ${examLevel} Path`;
+    const userAvatar = user?.user_metadata?.avatar_url || "https://placehold.co/128x128.png";
+    const userAvatarHint = user?.user_metadata?.avatar_hint || 'dragon avatar';
+
 
     const renderStatCard = (title: string, value: any, icon: React.ReactNode) => (
         <Card>
@@ -69,7 +72,7 @@ function ProfileContent() {
             <Card className="w-full max-w-4xl mx-auto">
                 <CardHeader className="items-center text-center">
                     <Avatar className="w-32 h-32 mx-auto mb-4 border-4 border-primary">
-                        <AvatarImage src="https://placehold.co/128x128.png" data-ai-hint="dragon avatar" />
+                        <AvatarImage src={userAvatar} data-ai-hint={userAvatarHint} />
                         <AvatarFallback>{userName.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <CardTitle className="font-headline text-4xl">{userName}</CardTitle>
