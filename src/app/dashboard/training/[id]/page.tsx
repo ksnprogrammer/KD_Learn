@@ -9,7 +9,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
-type TrainingPageProps = {
+// This defines the expected props for the page, satisfying Next.js's strict type requirements.
+type PageProps = {
     params: { id: string };
     searchParams: { [key: string]: string | string[] | undefined };
 };
@@ -24,7 +25,7 @@ async function getModule(id: number) {
     return { data, error: null };
 }
 
-export default async function TrainingPage({ params }: TrainingPageProps) {
+export default async function TrainingPage({ params }: PageProps) {
   const submissionId = parseInt(params.id, 10);
   if (isNaN(submissionId)) {
     notFound();
