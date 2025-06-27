@@ -10,3 +10,15 @@ export const DailyChallengeOutputSchema = z.object({
   reward: z.string().describe("The reward for completing the challenge, e.g., '150 XP'."),
 });
 export type DailyChallengeOutput = z.infer<typeof DailyChallengeOutputSchema>;
+
+export const GradeChallengeInputSchema = z.object({
+  challenge: DailyChallengeOutputSchema,
+  userAnswer: z.string().describe("The user's submitted answer to the challenge."),
+});
+export type GradeChallengeInput = z.infer<typeof GradeChallengeInputSchema>;
+
+export const GradeChallengeOutputSchema = z.object({
+  isCorrect: z.boolean().describe("Whether the user's answer is correct."),
+  explanation: z.string().describe("A brief, one-sentence explanation for why the answer is correct or incorrect. Be encouraging."),
+});
+export type GradeChallengeOutput = z.infer<typeof GradeChallengeOutputSchema>;

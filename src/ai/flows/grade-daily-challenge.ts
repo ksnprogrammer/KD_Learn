@@ -4,19 +4,15 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { DailyChallengeOutputSchema } from '@/ai/schemas';
+import { 
+    GradeChallengeInputSchema, 
+    GradeChallengeOutputSchema,
+    type GradeChallengeInput,
+    type GradeChallengeOutput,
+} from '@/ai/schemas';
 
-export const GradeChallengeInputSchema = z.object({
-  challenge: DailyChallengeOutputSchema,
-  userAnswer: z.string().describe("The user's submitted answer to the challenge."),
-});
-export type GradeChallengeInput = z.infer<typeof GradeChallengeInputSchema>;
+export type { GradeChallengeInput, GradeChallengeOutput };
 
-export const GradeChallengeOutputSchema = z.object({
-  isCorrect: z.boolean().describe("Whether the user's answer is correct."),
-  explanation: z.string().describe("A brief, one-sentence explanation for why the answer is correct or incorrect. Be encouraging."),
-});
-export type GradeChallengeOutput = z.infer<typeof GradeChallengeOutputSchema>;
 
 export async function gradeDailyChallenge(input: GradeChallengeInput): Promise<GradeChallengeOutput> {
   return gradeChallengeFlow(input);
