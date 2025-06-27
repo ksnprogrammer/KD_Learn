@@ -4,7 +4,7 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { DailyChallengeOutputSchema } from './generate-daily-challenge';
+import { DailyChallengeOutputSchema } from '@/ai/schemas';
 
 export const GradeChallengeInputSchema = z.object({
   challenge: DailyChallengeOutputSchema,
