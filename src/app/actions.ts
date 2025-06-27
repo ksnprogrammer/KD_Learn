@@ -167,6 +167,7 @@ export async function submitModuleForReview(moduleData: CreateModuleOutput, topi
       console.error('Supabase error:', error);
       throw new Error(error.message);
     };
+    revalidatePath('/admin');
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -473,6 +474,7 @@ export async function submitPaymentForReview(
       console.error('Supabase error:', error);
       throw new Error(error.message);
     };
+    revalidatePath('/admin');
     return { success: true };
   } catch (e) {
     console.error(e);
