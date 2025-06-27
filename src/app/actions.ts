@@ -39,9 +39,10 @@ export async function login(formData: FormData) {
   });
 
   if (error) {
-    return redirect('/login?message=Could not authenticate user');
+    return redirect(`/login?message=${error.message}`);
   }
 
+  revalidatePath('/', 'layout');
   return redirect('/dashboard');
 }
 
@@ -83,9 +84,10 @@ export async function signup(formData: FormData) {
 
   if (error) {
     console.error('Signup Error:', error);
-    return redirect('/register?message=Could not authenticate user. Please try again.');
+    return redirect(`/register?message=${error.message}`);
   }
 
+  revalidatePath('/', 'layout');
   return redirect('/dashboard');
 }
 
