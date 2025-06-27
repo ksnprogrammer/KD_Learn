@@ -9,6 +9,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
+// This is the complete and explicit type definition that Next.js expects,
+// resolving the persistent build error.
+type TrainingPageProps = {
+    params: { id: string };
+    searchParams: { [key: string]: string | string[] | undefined };
+};
+
 async function getModule(id: number) {
     const { success, data, error } = await getSubmissionById(id);
 
@@ -19,9 +26,7 @@ async function getModule(id: number) {
     return { data, error: null };
 }
 
-// This defines the page props inline, which is a more robust way to handle types in Next.js 15.
-// This resolves the persistent build error.
-export default async function TrainingPage({ params }: { params: { id: string } }) {
+export default async function TrainingPage({ params }: TrainingPageProps) {
   const submissionId = parseInt(params.id, 10);
   if (isNaN(submissionId)) {
     notFound();
