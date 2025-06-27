@@ -382,17 +382,46 @@ export async function getSubmissionById(id: number): Promise<{
   }
 }
 
+export async function getSignedUrl(fileName: string, fileType: string) {
+    if (!isSupabaseConfigured || !supabase) {
+        return { success: false, error: 'Database not configured.' };
+    }
+    const cookieStore = cookies();
+    const supabaseServer = createServerClient({ cookies: () => cookieStore });
+    const { data: { user } } = await supabaseServer.auth.getUser();
+
+    if (!user) {
+        return { success: false, error: 'User not authenticated.' };
+    }
+
+    const cleanFileName = fileName.replace(/[^a-zA-Z0-9.\-_]/g, '');
+    const filePath = `receipts/${user.id}/${Date.now()}-${cleanFileName}`;
+
+    const { data, error } = await supabase.storage
+        .from('receipts')
+        .createSignedUploadUrl(filePath);
+
+    if (error) {
+        console.error('Error creating signed URL:', error);
+        return { success: false, error: 'Could not create upload URL.' };
+    }
+    
+    const { data: { publicUrl } } = supabase.storage.from('receipts').getPublicUrl(data.path);
+
+    return { success: true, data: { ...data, publicUrl } };
+}
+
 export async function submitPaymentForReview(
   userName: string, 
   paymentType: string, 
-  amount: number
+  amount: number,
+  receiptUrl: string
 ): Promise<{
   success: boolean;
   error?: string;
 }> {
   if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
   try {
-    // Note: receipt_url is omitted as we aren't handling file uploads yet
     const { error } = await supabase
       .from('payments')
       .insert([
@@ -401,6 +430,7 @@ export async function submitPaymentForReview(
           payment_type: paymentType,
           amount,
           status: 'Pending',
+          receipt_url: receiptUrl,
         }
       ]);
 
@@ -468,6 +498,7 @@ export async function generateKingdomAnalytics(): Promise<{
   data?: KingdomReportOutput;
   error?: string;
 }> {
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
   try {
     const output = await generateKingdomReport();
     return { success: true, data: output };

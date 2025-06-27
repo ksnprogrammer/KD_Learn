@@ -515,10 +515,19 @@ function PaymentApprovals() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex gap-1 justify-end">
-                          <Button variant="ghost" size="icon" title="View Receipt (Not Implemented)" disabled>
-                            <Eye />
-                            <span className="sr-only">View Receipt</span>
-                          </Button>
+                          {payment.receipt_url ? (
+                            <Button asChild variant="ghost" size="icon" title="View Receipt">
+                              <a href={payment.receipt_url} target="_blank" rel="noopener noreferrer">
+                                <Eye />
+                                <span className="sr-only">View Receipt</span>
+                              </a>
+                            </Button>
+                          ) : (
+                            <Button variant="ghost" size="icon" title="No Receipt Uploaded" disabled>
+                              <Eye className="text-muted-foreground/50" />
+                              <span className="sr-only">No Receipt Uploaded</span>
+                            </Button>
+                          )}
                           {payment.status === 'Pending' && (
                             <>
                               <Button variant="ghost" size="icon" onClick={() => handleStatusChange(payment.id, 'Approved')}>

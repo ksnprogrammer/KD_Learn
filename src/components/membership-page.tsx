@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Check, Upload, Loader2 } from "lucide-react";
-import { submitPaymentForReview } from '@/app/actions';
+import { submitPaymentForReview, getSignedUrl } from '@/app/actions';
 import { useUser } from '@/hooks/use-user';
 import { cn } from '@/lib/utils';
 
@@ -74,6 +74,7 @@ const tiers: Tier[] = [
 
 export function MembershipPageContent() {
   const [selectedTier, setSelectedTier] = useState<Tier | null>(tiers[1]);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const user = useUser();
@@ -89,6 +90,15 @@ export function MembershipPageContent() {
     document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setReceiptFile(file);
+    } else {
+      setReceiptFile(null);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!selectedTier) {
         toast({
@@ -98,27 +108,67 @@ export function MembershipPageContent() {
         });
         return;
     }
+
+    if (!receiptFile) {
+      toast({
+          variant: "destructive",
+          title: "Receipt Required",
+          description: "Please upload a proof of payment to continue.",
+      });
+      return;
+    }
     
     setIsSubmitting(true);
     
-    const amount = selectedTier.numericPrice;
-    const paymentType = `Membership (${selectedTier.name})`;
+    try {
+      const signedUrlResult = await getSignedUrl(receiptFile.name, receiptFile.type);
+      if (!signedUrlResult.success || !signedUrlResult.data) {
+          throw new Error(signedUrlResult.error || 'Failed to get upload URL.');
+      }
 
-    const { success, error } = await submitPaymentForReview(userName, paymentType, amount);
+      const { signedUrl, publicUrl } = signedUrlResult.data;
+
+      const uploadResponse = await fetch(signedUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': receiptFile.type },
+          body: receiptFile,
+      });
+
+      if (!uploadResponse.ok) {
+          const errorText = await uploadResponse.text();
+          throw new Error(`Upload failed: ${errorText}`);
+      }
+      
+      const amount = selectedTier.numericPrice;
+      const paymentType = `Membership (${selectedTier.name})`;
+
+      const { success, error } = await submitPaymentForReview(userName, paymentType, amount, publicUrl);
     
-    setIsSubmitting(false);
+      if (success) {
+          toast({
+              title: "Membership Request Submitted!",
+              description: "Thank you! Your request is being reviewed and will be approved within 24 hours.",
+          });
+          setReceiptFile(null);
+          const fileInput = document.getElementById('receipt-membership') as HTMLInputElement;
+          if (fileInput) fileInput.value = '';
 
-    if (success) {
-        toast({
-            title: "Membership Request Submitted!",
-            description: "Thank you! Your request is being reviewed and will be approved within 24 hours.",
-        });
-    } else {
-        toast({
-            variant: "destructive",
-            title: "Submission Failed",
-            description: error || "Could not submit your request. Please try again.",
-        });
+      } else {
+          toast({
+              variant: "destructive",
+              title: "Submission Failed",
+              description: error || "Could not submit your request. Please try again.",
+          });
+      }
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+      toast({
+          variant: "destructive",
+          title: "Submission Error",
+          description: errorMessage,
+      });
+    } finally {
+        setIsSubmitting(false);
     }
   }
 
@@ -190,7 +240,7 @@ export function MembershipPageContent() {
                 </p>
                 <div className="grid w-full items-center gap-2">
                     <Label htmlFor="receipt-membership">Payment Receipt</Label>
-                    <Input id="receipt-membership" type="file" />
+                    <Input id="receipt-membership" type="file" onChange={handleFileChange} accept="image/*,application/pdf" />
                 </div>
             </div>
         </CardContent>
