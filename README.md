@@ -2,26 +2,21 @@
 
 Welcome, my liege, to the source code of your digital kingdom. This document contains the sacred instructions to summon, run, and deploy your application, making it accessible to your entire realm.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fksnprogrammer%2FKD&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,GOOGLE_API_KEY&envDescription=Your%20Supabase%20and%20Google%20AI%20credentials%20are%20needed%20for%20the%20app%20to%20function.&project-name=kingdragons&repository-name=kingdragons-clone)
+
 ---
 
 ## Part 0: Preparing the Supabase Kingdom
 
-Before you can run the code, you must first prepare your Supabase project to act as the kingdom's database and file storage.
+Before you can deploy or run the code, you must first prepare your Supabase project to act as the kingdom's database and file storage.
 
-### 0.1: Set Your Environment Variables
-You must provide your Supabase and Google AI credentials to the application.
-1. In the root directory of your project, create a new file named `.env`.
-2. Copy and paste the following into the file, replacing the placeholder values with your real credentials.
+### 0.1: Get Your Credentials
+You will need three keys to run the application:
+- `NEXT_PUBLIC_SUPABASE_URL` (From your Supabase Project's API Settings)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (From your Supabase Project's API Settings)
+- `GOOGLE_API_KEY` (From [Google AI Studio](https://aistudio.google.com/app/apikey))
 
-```
-# Supabase credentials from your project's dashboard
-NEXT_PUBLIC_SUPABASE_URL="https://doevrgqwwemzavyaitya.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvZXZyZ3F3d2VtemF2eWFpdHlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA5NDE4NTAsImV4cCI6MjA2NjUxNzg1MH0.1ZWkQ-lC2Nk8208d49tPChYisj_DaIP1fXrmLmd3XE4"
-
-# Google AI credential for Genkit AI features
-# Get your key from Google AI Studio: https://aistudio.google.com/app/apikey
-GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
-```
+Keep these safe and ready for the deployment step.
 
 ### 0.2: Set Up the Database Schema
 You need to create the tables your application will use.
@@ -192,9 +187,27 @@ With the kingdom's foundations prepared, you may now proceed.
 
 ---
 
-## Part 1: Local Development Setup
+## Part 1: Deploying to the World with Vercel (Easy Mode)
 
-Before you begin, you must have the foundational tools installed.
+To make your kingdom accessible to knights across the globe, we will use Vercel.
+
+**1. Click the Deploy Button:**
+Click the button at the top of this document or right here:
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fksnprogrammer%2FKD&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,GOOGLE_API_KEY&envDescription=Your%20Supabase%20and%20Google%20AI%20credentials%20are%20needed%20for%20the%20app%20to%20function.&project-name=kingdragons&repository-name=kingdragons-clone)
+
+**2. Follow the Vercel Wizard:**
+1.  Vercel will ask you to connect your GitHub account. This will create a copy (a clone) of the kingdom's repository for you.
+2.  Next, it will ask you to fill in the Environment Variables. Paste the three keys you gathered in "Part 0.1".
+3.  Click **"Deploy"**. Vercel will build your application and provide you with a public URL (e.g., `kingdragons.vercel.app`).
+
+**Automatic Deployments:**
+From now on, every time you `git push` a change to your `main` branch on GitHub, Vercel will automatically redeploy your kingdom with the latest updates.
+
+---
+
+## Part 2: Local Development Setup (For Wizards)
+
+If you wish to modify the kingdom's source code, you'll need a local setup.
 
 ### Prerequisites
 1.  **Node.js**: The magical energy that powers the kingdom. Download and install it from [nodejs.org](https://nodejs.org/).
@@ -202,88 +215,31 @@ Before you begin, you must have the foundational tools installed.
 3.  **A Code Editor**: A tool like [Visual Studio Code](https://code.visualstudio.com/) is highly recommended.
 
 ### Summoning a Local Copy
-Follow these steps in a terminal (like Command Prompt, PowerShell, or the terminal inside VS Code).
+1.  **Set Your Environment Variables:** In the root directory of your project, create a new file named `.env` and add your credentials.
+    ```
+    # Supabase credentials from your project's dashboard
+    NEXT_PUBLIC_SUPABASE_URL="YOUR_SUPABASE_URL"
+    NEXT_PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
 
-**1. Clone the Kingdom's Code:**
-```bash
-git clone https://github.com/ksnprogrammer/KD.git
-```
-
-**2. Enter the Kingdom's Directory:**
-```bash
-cd KD
-```
-
-**3. Install All Dependencies:**
-```bash
-npm install
-```
-
-**4. Run the Kingdom:**
-This command starts your local development server.
-```bash
-npm run dev
-```
-
+    # Google AI credential for Genkit AI features
+    GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
+    ```
+2.  **Install All Dependencies:** Open a terminal in the project directory and run:
+    ```bash
+    npm install
+    ```
+3.  **Run the Kingdom:** This command starts your local development server.
+    ```bash
+    npm run dev
+    ```
 Once you see a "ready" message, you can access your local kingdom at: **[http://localhost:9002](http://localhost:9002)**
-
----
-
-## Part 2: Deploying to the World with Vercel
-
-To make your kingdom accessible to knights across the globe, we will use Vercel, a platform designed for modern web applications like ours. Deployment is free, easy, and mostly automatic.
-
-**1. Push to GitHub:**
-Your project must be on GitHub. If you haven't already, follow the git commands in "Part 3" to push your code to your repository.
-
-**2. Create a Vercel Project:**
-1.  Go to [vercel.com](https://vercel.com) and sign up for a free account using your GitHub account.
-2.  On your Vercel dashboard, click **"Add New... > Project"**.
-3.  Import your kingdom's GitHub repository (`ksnprogrammer/KD`).
-4.  Vercel will automatically detect that it's a Next.js project. You do not need to change any build settings.
-
-**3. Configure Environment Variables:**
-This is the most important step. Vercel needs access to the same credentials you use for local development.
-1.  In your new Vercel project's settings, go to the **"Environment Variables"** section.
-2.  Add the following three variables, copying the values from your local `.env` file:
-    *   `NEXT_PUBLIC_SUPABASE_URL`
-    *   `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-    *   `GOOGLE_API_KEY`
-3.  Ensure the keys match exactly.
-
-**4. Deploy!**
-Click the **"Deploy"** button. Vercel will build your application and provide you with a public URL (e.g., `kd.vercel.app`).
-
-**Automatic Deployments:**
-From now on, every time you `git push` a change to your `main` branch on GitHub, Vercel will automatically redeploy your kingdom with the latest updates.
 
 ---
 
 ## Part 3: Managing Your Kingdom
 
-*   **To Stop the Local Server:** Press `Ctrl + C` in the terminal where you ran `npm run dev`.
-*   **Pushing Changes:** To update your live kingdom on Vercel, you must commit your changes and push them to GitHub.
-
-    **First-time setup (if you haven't done it):**
-    ```bash
-    git init
-    git add .
-    git commit -m "Initial commit: The Kingdom is Born"
-    git branch -M main
-    git remote add origin https://github.com/ksnprogrammer/KD.git
-    git push -u origin main
-    ```
-
-    **For all future updates:**
-    ```bash
-    git add .
-    git commit -m "A new decree from the King"
-    git push origin main
-    ```
-    Vercel will automatically detect the push and redeploy your site.
-
 ### Granting Admin Privileges
-To access the King's Court at `/admin`, a user must have the `admin` role. By default, all new knights are assigned the `knight` role. To elevate a knight to an administrator:
+To access the King's Court at `/admin`, a user must have the `admin` role.
 1. Go to your Supabase project dashboard.
 2. Navigate to the **Authentication** section.
 3. Find the user you wish to promote and click on them.
