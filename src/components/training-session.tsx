@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { CreateModuleOutput, QuizQuestion } from '@/ai/flows/create-module-from-description';
-import { generateAudio } from '@/app/actions';
+import { generateAudio, recordQuestCompletion } from '@/app/actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface TrainingSessionProps {
   module: CreateModuleOutput;
+  submissionId: number;
 }
 
 type UserAnswers = {
@@ -28,7 +29,7 @@ type AudioState = {
   audioData: string | null;
 };
 
-export function TrainingSession({ module }: TrainingSessionProps) {
+export function TrainingSession({ module, submissionId }: TrainingSessionProps) {
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
@@ -42,7 +43,7 @@ export function TrainingSession({ module }: TrainingSessionProps) {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let correctAnswers = 0;
     module.quizQuestions.forEach((question, index) => {
       if (userAnswers[index] === question.correctAnswer) {
@@ -51,6 +52,28 @@ export function TrainingSession({ module }: TrainingSessionProps) {
     });
     setScore(correctAnswers);
     setIsSubmitted(true);
+    
+    const { success, error, xpGained, message } = await recordQuestCompletion(submissionId, correctAnswers, module.quizQuestions.length) as any;
+    if (success) {
+      if (message) { // Already completed
+         toast({
+            title: "Already Completed",
+            description: `You have already earned credit for this quest.`,
+        });
+      } else {
+        toast({
+            title: "Victory!",
+            description: `Your progress has been recorded. You earned ${xpGained} XP!`,
+        });
+      }
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Recording Failed",
+            description: error || "Could not save your quest progress.",
+        });
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top to see results
   };
 

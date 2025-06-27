@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { getPosts, createPost, getApprovedModules, getDailyChallenge } from '@/app/actions';
+import { getPosts, createPost, getApprovedModules, getDailyChallenge, getUserStats, getLeaderboard } from '@/app/actions';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/use-user';
@@ -29,6 +29,15 @@ interface ApprovedModule {
     image_data_uri: string;
 }
 
+interface UserStats {
+    xp: number;
+    level: number;
+    progress: number;
+    questsCompleted: number;
+    rank: number | 'N/A';
+    activeStreak: number;
+}
+
 const getSubjectInfo = (topic: string) => {
     const lowerTopic = topic.toLowerCase();
     if (lowerTopic.includes('biolog')) return { icon: Leaf, color: 'text-biology', name: 'Biology' };
@@ -37,13 +46,6 @@ const getSubjectInfo = (topic: string) => {
     if (lowerTopic.includes('math')) return { icon: Sigma, color: 'text-maths', name: 'Maths' };
     return { icon: BookOpen, color: 'text-general-science', name: 'General Science' };
 }
-
-const staticLeaderboardData = [
-    { rank: 1, name: 'Sir Galahad', xp: 12500, avatar: 'https://placehold.co/100x100.png', hint: 'knight portrait' },
-    { rank: 2, name: 'Lady Brienne', xp: 11800, avatar: 'https://placehold.co/100x100.png', hint: 'female knight' },
-    { rank: 4, name: 'Ser Arthur', xp: 10200, avatar: 'https://placehold.co/100x100.png', hint: 'wise knight' },
-    { rank: 5, name: 'Elara of the Forest', xp: 9800, avatar: 'https://placehold.co/100x100.png', hint: 'elf knight' },
-];
 
 export default function Dashboard() {
     const user = useUser();
@@ -55,14 +57,13 @@ export default function Dashboard() {
     const [isLoadingModules, setIsLoadingModules] = useState(true);
     const [dailyChallenge, setDailyChallenge] = useState<DailyChallengeOutput | null>(null);
     const [isLoadingChallenge, setIsLoadingChallenge] = useState(true);
+    const [stats, setStats] = useState<UserStats | null>(null);
+    const [isLoadingStats, setIsLoadingStats] = useState(true);
+    const [leaderboard, setLeaderboard] = useState<any[]>([]);
+    const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
 
     const userName = user?.user_metadata?.name || 'Knight';
     const userAvatar = 'https://placehold.co/100x100.png'; // Placeholder for now
-
-    const leaderboardData = [
-        ...staticLeaderboardData,
-        { rank: 3, name: userName, xp: 11500, avatar: userAvatar, hint: 'dragon avatar' },
-    ].sort((a,b) => b.xp - a.xp).map((knight, index) => ({ ...knight, rank: index + 1 }));
 
     const fetchPosts = useCallback(async () => {
         setIsLoadingPosts(true);
@@ -100,7 +101,6 @@ export default function Dashboard() {
         if (success && data) {
             setDailyChallenge(data);
         } else {
-            // Set a default fallback challenge on error to avoid an empty card
             setDailyChallenge({
                 category: 'Rest Day',
                 title: "The Challenge Master's Day Off",
@@ -116,11 +116,35 @@ export default function Dashboard() {
         setIsLoadingChallenge(false);
     }, [toast]);
 
+    const fetchStats = useCallback(async () => {
+        setIsLoadingStats(true);
+        const { success, data, error } = await getUserStats();
+        if (success && data) {
+            setStats(data as UserStats);
+        } else {
+             toast({ variant: 'destructive', title: 'Failed to load stats', description: error });
+        }
+        setIsLoadingStats(false);
+    }, [toast]);
+
+    const fetchLeaderboard = useCallback(async () => {
+        setIsLoadingLeaderboard(true);
+        const { success, data, error } = await getLeaderboard();
+        if (success && data) {
+            setLeaderboard(data);
+        } else {
+            toast({ variant: 'destructive', title: 'Failed to load leaderboard', description: error });
+        }
+        setIsLoadingLeaderboard(false);
+    }, [toast]);
+
     useEffect(() => {
         fetchPosts();
         fetchModules();
         fetchChallenge();
-    }, [fetchPosts, fetchModules, fetchChallenge]);
+        fetchStats();
+        fetchLeaderboard();
+    }, [fetchPosts, fetchModules, fetchChallenge, fetchStats, fetchLeaderboard]);
     
     const handleAcceptChallenge = (title: string) => {
         toast({
@@ -180,8 +204,8 @@ export default function Dashboard() {
                         <Trophy className="h-5 w-5 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">#3</div>
-                        <p className="text-xs text-muted-foreground">Top 1% of all knights</p>
+                        {isLoadingStats ? <Skeleton className='h-8 w-1/2' /> : <div className="text-3xl font-bold">#{stats?.rank}</div>}
+                        <p className="text-xs text-muted-foreground">on the leaderboard</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -190,8 +214,8 @@ export default function Dashboard() {
                         <Swords className="h-5 w-5 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">42</div>
-                        <p className="text-xs text-muted-foreground">+5 since last week</p>
+                        {isLoadingStats ? <Skeleton className='h-8 w-1/4' /> : <div className="text-3xl font-bold">{stats?.questsCompleted}</div>}
+                        <p className="text-xs text-muted-foreground">total quests</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -200,8 +224,17 @@ export default function Dashboard() {
                         <Users className="h-5 w-5 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">66%</div>
-                        <Progress value={66} className="h-2 mt-2" />
+                        {isLoadingStats ? (
+                            <>
+                                <Skeleton className='h-8 w-1/3 mb-2' />
+                                <Skeleton className='h-2 w-full' />
+                            </>
+                        ) : (
+                            <>
+                                <div className="text-3xl font-bold">{stats?.progress}%</div>
+                                <Progress value={stats?.progress} className="h-2 mt-2" />
+                            </>
+                        )}
                     </CardContent>
                 </Card>
                 <Card>
@@ -210,7 +243,7 @@ export default function Dashboard() {
                         <Zap className="h-5 w-5 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">12 days</div>
+                        {isLoadingStats ? <Skeleton className='h-8 w-1/2' /> : <div className="text-3xl font-bold">{stats?.activeStreak} days</div>}
                         <p className="text-xs text-muted-foreground">Keep it up to earn a badge!</p>
                     </CardContent>
                 </Card>
@@ -309,22 +342,32 @@ export default function Dashboard() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {leaderboardData.map((knight) => (
-                                            <TableRow key={knight.rank} className={knight.name === userName ? 'bg-primary/10 hover:bg-primary/20' : ''}>
-                                                <TableCell className="font-bold text-lg text-center">{knight.rank}</TableCell>
-                                                <TableCell>
-                                                    <div className="flex items-center gap-4">
-                                                        <Avatar>
-                                                            <AvatarImage src={knight.avatar} data-ai-hint={knight.hint} />
-                                                            <AvatarFallback>{knight.name.substring(0, 2)}</AvatarFallback>
-                                                        </Avatar>
-                                                        <span className="font-medium">{knight.name}</span>
-                                                        {knight.name === userName && <Badge variant="secondary" className="ml-2">You</Badge>}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-right font-mono">{knight.xp.toLocaleString()}</TableCell>
-                                            </TableRow>
-                                        ))}
+                                        {isLoadingLeaderboard ? (
+                                            [...Array(5)].map((_, i) => (
+                                                <TableRow key={i}>
+                                                    <TableCell><Skeleton className="h-6 w-4" /></TableCell>
+                                                    <TableCell><Skeleton className="h-6 w-32" /></TableCell>
+                                                    <TableCell className="text-right"><Skeleton className="h-6 w-16 ml-auto" /></TableCell>
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            leaderboard.map((knight) => (
+                                                <TableRow key={knight.rank} className={knight.name === userName ? 'bg-primary/10 hover:bg-primary/20' : ''}>
+                                                    <TableCell className="font-bold text-lg text-center">{knight.rank}</TableCell>
+                                                    <TableCell>
+                                                        <div className="flex items-center gap-4">
+                                                            <Avatar>
+                                                                <AvatarImage src={knight.avatar} data-ai-hint={knight.hint} />
+                                                                <AvatarFallback>{knight.name.substring(0, 2)}</AvatarFallback>
+                                                            </Avatar>
+                                                            <span className="font-medium">{knight.name}</span>
+                                                            {knight.name === userName && <Badge variant="secondary" className="ml-2">You</Badge>}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-right font-mono">{knight.xp.toLocaleString()}</TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
                                     </TableBody>
                                 </Table>
                             </div>

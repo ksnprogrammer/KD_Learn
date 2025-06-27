@@ -356,7 +356,7 @@ export async function getSubmissionById(id: number): Promise<{
   };
   error?: string;
 }> {
-  if (!isSupabaseConfigured || !supabase) return DB_NOT_CONFIGURED_ERROR;
+  if (!isSupabaseConfigured || !supabase) return { ...DB_NOT_CONFIGURED_ERROR, data: undefined };
   try {
     const { data, error } = await supabase
       .from('submissions')
@@ -593,4 +593,142 @@ export async function updateUserPublicProfile(name: string): Promise<{
   revalidatePath('/dashboard');
 
   return { success: true };
+}
+
+
+// --- Dynamic Stats Actions ---
+
+const XP_PER_LEVEL = 1000;
+const calculateLevel = (xp: number) => {
+    return Math.floor(xp / XP_PER_LEVEL) + 1;
+};
+const calculateProgress = (xp: number) => {
+    return (xp % XP_PER_LEVEL) / (XP_PER_LEVEL / 100);
+};
+
+const defaultStats = { xp: 0, level: 1, progress: 0, questsCompleted: 0, rank: 'N/A', activeStreak: 0 };
+
+export async function getUserStats() {
+    if (!isSupabaseConfigured || !supabase) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error, data: defaultStats };
+    
+    const cookieStore = cookies();
+    const supabaseServer = createServerClient({ cookies: () => cookieStore });
+    const { data: { user } } = await supabaseServer.auth.getUser();
+
+    if (!user) return { success: false, error: 'User not authenticated.', data: defaultStats };
+
+    const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('xp')
+        .eq('id', user.id)
+        .single();
+
+    if (profileError || !profile) {
+        console.error('Profile fetch error:', profileError?.message);
+        return { success: true, data: defaultStats };
+    }
+
+    const xp = profile.xp || 0;
+    const level = calculateLevel(xp);
+    const progress = calculateProgress(xp);
+
+    const { count: questsCompleted, error: questsError } = await supabase
+        .from('quest_completions')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+    
+    if (questsError) console.error('Quests completed fetch error:', questsError.message);
+
+    const { data: rankedUsers, error: rankError } = await supabase
+        .from('profiles')
+        .select('id')
+        .order('xp', { ascending: false });
+
+    if (rankError) console.error('Rank fetch error:', rankError.message);
+
+    const rank = rankedUsers ? rankedUsers.findIndex(p => p.id === user.id) + 1 : 0;
+
+    return {
+        success: true,
+        data: {
+            xp,
+            level,
+            progress,
+            questsCompleted: questsCompleted || 0,
+            rank: rank > 0 ? rank : 'N/A',
+            activeStreak: 12, // Static for now
+        }
+    };
+}
+
+
+export async function getLeaderboard() {
+    if (!isSupabaseConfigured || !supabase) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error, data: [] };
+
+    const { data, error } = await supabase
+        .rpc('get_leaderboard');
+
+    if (error) {
+        console.error('Leaderboard fetch error:', error.message);
+        return { success: false, error: 'Could not fetch leaderboard data.', data: [] };
+    }
+
+    return { success: true, data: data.map((profile: any) => ({
+        ...profile,
+        avatar: 'https://placehold.co/100x100.png',
+        hint: 'knight portrait'
+    })) };
+}
+
+export async function recordQuestCompletion(submissionId: number, score: number, totalQuestions: number) {
+     if (!isSupabaseConfigured || !supabase) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error };
+
+    const cookieStore = cookies();
+    const supabaseServer = createServerClient({ cookies: () => cookieStore });
+    const { data: { user } } = await supabaseServer.auth.getUser();
+
+    if (!user) return { success: false, error: 'User not authenticated.' };
+
+    const { data: existingCompletion, error: checkError } = await supabase
+        .from('quest_completions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('submission_id', submissionId)
+        .maybeSingle();
+
+    if (checkError) {
+        console.error("Error checking completion:", checkError.message);
+        return { success: false, error: "Could not verify quest completion." };
+    }
+
+    if (existingCompletion) {
+        return { success: true, message: "Quest already completed." };
+    }
+
+    const xpGained = score * 50;
+
+    const { error: rpcError } = await supabase.rpc('award_xp', { user_id_in: user.id, xp_to_add: xpGained });
+
+    if (rpcError) {
+        console.error("Error awarding XP:", rpcError.message);
+        return { success: false, error: "Could not award experience." };
+    }
+
+    const { error: insertError } = await supabase
+        .from('quest_completions')
+        .insert({
+            user_id: user.id,
+            submission_id: submissionId,
+            score: score,
+            total_questions: totalQuestions,
+        });
+    
+    if (insertError) {
+        console.error("Error recording quest completion:", insertError.message);
+        return { success: false, error: "Could not record quest completion." };
+    }
+    
+    revalidatePath('/dashboard');
+    revalidatePath('/dashboard/profile');
+    return { success: true, xpGained };
 }

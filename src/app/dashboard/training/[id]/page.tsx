@@ -54,7 +54,7 @@ export default async function TrainingPage({ params }: { params: { id: string } 
                     </div>
                 )}
 
-                <TrainingSession module={module.content} />
+                <TrainingSession module={module.content} submissionId={submissionId} />
             </div>
         ) : (
             <Card className="w-full max-w-lg mx-auto text-center">
