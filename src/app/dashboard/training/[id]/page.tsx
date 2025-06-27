@@ -19,11 +19,13 @@ async function getModule(id: number) {
     return { data, error: null };
 }
 
-export default async function TrainingPage(props: {
+export default async function TrainingPage({
+  params,
+}: {
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const submissionId = parseInt(props.params.id, 10);
+  const submissionId = parseInt(params.id, 10);
   if (isNaN(submissionId)) {
     notFound();
   }
