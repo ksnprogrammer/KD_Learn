@@ -17,12 +17,13 @@ function KnightLoginForm() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const errorMessage = searchParams.get('message');
-    if (errorMessage) {
+    const message = searchParams.get('message');
+    if (message) {
+      const isInfo = message.includes('Check your email');
       toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: errorMessage,
+        variant: isInfo ? 'default' : 'destructive',
+        title: isInfo ? 'Check Your Inbox' : 'Authentication Error',
+        description: message,
       });
     }
   }, [searchParams, toast]);

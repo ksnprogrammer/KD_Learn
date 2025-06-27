@@ -87,8 +87,7 @@ export async function signup(formData: FormData) {
     return redirect(`/register?message=${error.message}`);
   }
 
-  revalidatePath('/', 'layout');
-  return redirect('/dashboard');
+  return redirect('/login?message=Check your email for the confirmation link.');
 }
 
 export async function logout() {
