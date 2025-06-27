@@ -1,3 +1,4 @@
+
 import { getSubmissionById } from '@/app/actions';
 import { TrainingSession } from '@/components/training-session';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,11 @@ import { BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+
+type TrainingPageProps = {
+    params: { id: string };
+    searchParams: { [key: string]: string | string[] | undefined };
+};
 
 async function getModule(id: number) {
     const { success, data, error } = await getSubmissionById(id);
@@ -18,7 +24,7 @@ async function getModule(id: number) {
     return { data, error: null };
 }
 
-export default async function TrainingPage({ params }: { params: { id: string } }) {
+export default async function TrainingPage({ params }: TrainingPageProps) {
   const submissionId = parseInt(params.id, 10);
   if (isNaN(submissionId)) {
     notFound();
