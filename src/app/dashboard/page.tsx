@@ -1,6 +1,6 @@
 
 'use client';
-import { FlaskConical, Leaf, Zap, Shield, Swords, Trophy, Target, MessageSquare, Users, BookOpen, Sigma, Send, ChevronRight, Loader2 } from 'lucide-react';
+import { FlaskConical, Leaf, Zap, Shield, Swords, Trophy, Target, MessageSquare, Users, BookOpen, Sigma, Send, ChevronRight, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { getPosts, createPost, getApprovedModules, getDailyChallenge, getUserStats, getLeaderboard } from '@/app/actions';
+import { getPosts, createPost, getApprovedModules, getDailyChallenge, getUserStats, getLeaderboard, submitDailyChallengeAnswer } from '@/app/actions';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/use-user';
@@ -20,6 +20,8 @@ import type { CreateModuleOutput } from "@/ai/flows/create-module-from-descripti
 import type { DailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Textarea } from '@/components/ui/textarea';
 
 interface ApprovedModule {
     id: number;
@@ -61,6 +63,13 @@ export default function Dashboard() {
     const [isLoadingStats, setIsLoadingStats] = useState(true);
     const [leaderboard, setLeaderboard] = useState<any[]>([]);
     const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(true);
+
+    // State for the daily challenge dialog
+    const [isChallengeDialogOpen, setIsChallengeDialogOpen] = useState(false);
+    const [challengeAnswer, setChallengeAnswer] = useState('');
+    const [isSubmittingChallenge, setIsSubmittingChallenge] = useState(false);
+    const [challengeResult, setChallengeResult] = useState<{isCorrect: boolean; explanation: string} | null>(null);
+
 
     const userName = user?.user_metadata?.name || 'Knight';
     const userAvatar = user?.user_metadata?.avatar_url || 'https://placehold.co/100x100.png';
@@ -147,13 +156,6 @@ export default function Dashboard() {
         fetchLeaderboard();
     }, [fetchPosts, fetchModules, fetchChallenge, fetchStats, fetchLeaderboard]);
     
-    const handleAcceptChallenge = (title: string) => {
-        toast({
-            title: "Challenge Accepted!",
-            description: `You have accepted the challenge: ${title}. Good luck, knight!`,
-        });
-    };
-
     const handlePostSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!newPost.trim() || !user) return;
@@ -185,6 +187,35 @@ export default function Dashboard() {
         }
     };
     
+    const handleChallengeSubmit = async () => {
+        if (!challengeAnswer.trim() || !dailyChallenge) return;
+        setIsSubmittingChallenge(true);
+        setChallengeResult(null);
+
+        const { success, data, error } = await submitDailyChallengeAnswer(dailyChallenge, challengeAnswer);
+        setIsSubmittingChallenge(false);
+
+        if (success && data) {
+            setChallengeResult(data);
+            if (data.isCorrect) {
+                // Re-fetch stats after a short delay to allow database to update
+                setTimeout(() => fetchStats(), 1000);
+            }
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Failed to submit answer',
+                description: error,
+            });
+        }
+    };
+
+    const resetChallengeDialog = () => {
+        setChallengeAnswer('');
+        setChallengeResult(null);
+        setIsSubmittingChallenge(false);
+    }
+
     const featuredQuest = modules.length > 0 ? modules[0] : null;
 
     return (
@@ -314,7 +345,60 @@ export default function Dashboard() {
                         ) : (
                             <Badge variant="outline">Reward: {dailyChallenge?.reward}</Badge>
                         )}
-                        <Button size="sm" onClick={() => handleAcceptChallenge(dailyChallenge?.title || '')} disabled={isLoadingChallenge}>Accept</Button>
+                        <Dialog open={isChallengeDialogOpen} onOpenChange={(open) => {
+                            setIsChallengeDialogOpen(open);
+                            if (!open) {
+                                resetChallengeDialog();
+                            }
+                        }}>
+                            <DialogTrigger asChild>
+                                <Button size="sm" disabled={isLoadingChallenge}>Accept</Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle className="font-headline text-2xl">{dailyChallenge?.title}</DialogTitle>
+                                    <DialogDescription>{dailyChallenge?.description}</DialogDescription>
+                                </DialogHeader>
+                                {!challengeResult ? (
+                                    <div className="space-y-4 pt-4">
+                                        <Textarea
+                                            placeholder="Your answer..."
+                                            value={challengeAnswer}
+                                            onChange={(e) => setChallengeAnswer(e.target.value)}
+                                            rows={4}
+                                        />
+                                        <DialogFooter>
+                                            <Button onClick={handleChallengeSubmit} disabled={isSubmittingChallenge || !challengeAnswer.trim()}>
+                                                {isSubmittingChallenge && <Loader2 className="mr-2 animate-spin" />}
+                                                Submit Answer
+                                            </Button>
+                                        </DialogFooter>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4 pt-4">
+                                        <Card className={cn(challengeResult.isCorrect ? "bg-primary/10 border-primary/50" : "bg-destructive/10 border-destructive/50")}>
+                                            <CardHeader>
+                                                 <CardTitle className={cn("flex items-center gap-2", challengeResult.isCorrect ? "text-primary" : "text-destructive")}>
+                                                    {challengeResult.isCorrect ? <CheckCircle /> : <XCircle />}
+                                                    {challengeResult.isCorrect ? "Victory!" : "A Valiant Effort!"}
+                                                </CardTitle>
+                                                <CardDescription className="pt-2 text-card-foreground">{challengeResult.explanation}</CardDescription>
+                                            </CardHeader>
+                                             {challengeResult.isCorrect && (
+                                                <CardContent>
+                                                    <p className="text-sm font-semibold text-primary">You've been awarded {dailyChallenge?.reward}!</p>
+                                                </CardContent>
+                                            )}
+                                        </Card>
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button variant="secondary">Close</Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </div>
+                                )}
+                            </DialogContent>
+                        </Dialog>
                     </CardFooter>
                 </Card>
             </div>

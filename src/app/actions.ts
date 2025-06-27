@@ -11,6 +11,8 @@ import { generateAudioFromText } from '@/ai/flows/generate-audio-flow';
 import type { GenerateAudioOutput } from '@/ai/flows/generate-audio-flow';
 import { generateDailyChallenge } from '@/ai/flows/generate-daily-challenge';
 import type { DailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
+import { gradeDailyChallenge } from '@/ai/flows/grade-daily-challenge';
+import type { GradeChallengeOutput } from '@/ai/flows/grade-daily-challenge';
 import { generateTeamWarReport } from '@/ai/flows/generate-team-war-report';
 import type { TeamWarReportOutput } from '@/ai/flows/generate-team-war-report';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
@@ -570,6 +572,48 @@ export async function getDailyChallenge(): Promise<{
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     return { success: false, error: `Failed to generate daily challenge: ${errorMessage}` };
+  }
+}
+
+export async function submitDailyChallengeAnswer(challenge: DailyChallengeOutput, userAnswer: string): Promise<{
+  success: boolean;
+  data?: GradeChallengeOutput;
+  error?: string;
+}> {
+  try {
+    const gradingResult = await gradeDailyChallenge({ challenge, userAnswer });
+    
+    if (gradingResult.isCorrect) {
+      if (!isSupabaseConfigured || !supabase) {
+         console.log("Database not configured. Skipping XP award.");
+      } else {
+        const cookieStore = cookies();
+        const supabaseServer = createServerClient(cookieStore);
+        const { data: { user } } = await supabaseServer.auth.getUser();
+
+        if (user) {
+          // Parse XP from the reward string, e.g., "150 XP"
+          const xpMatch = challenge.reward.match(/(\d+)\s*XP/i);
+          const xpGained = xpMatch ? parseInt(xpMatch[1], 10) : 50; // Default XP if parsing fails
+
+          const { error: rpcError } = await supabase.rpc('award_xp', { user_id_in: user.id, xp_to_add: xpGained });
+          if (rpcError) {
+             console.error("Error awarding XP for daily challenge:", rpcError.message);
+             // Don't fail the whole operation, just log the error
+          } else {
+            revalidatePath('/dashboard');
+            revalidatePath('/dashboard/profile');
+          }
+        }
+      }
+    }
+
+    return { success: true, data: gradingResult };
+
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to grade answer: ${errorMessage}` };
   }
 }
 
