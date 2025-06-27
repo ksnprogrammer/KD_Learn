@@ -8,12 +8,6 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
-interface TrainingPageProps {
-  params: {
-    id: string;
-  };
-}
-
 async function getModule(id: number) {
     const { success, data, error } = await getSubmissionById(id);
 
@@ -24,7 +18,7 @@ async function getModule(id: number) {
     return { data, error: null };
 }
 
-export default async function TrainingPage({ params }: TrainingPageProps) {
+export default async function TrainingPage({ params }: { params: { id: string } }) {
   const submissionId = parseInt(params.id, 10);
   if (isNaN(submissionId)) {
     notFound();
