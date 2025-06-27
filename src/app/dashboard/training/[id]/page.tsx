@@ -12,7 +12,7 @@ import Image from 'next/image';
 // This defines the expected props for the page, satisfying Next.js's strict type requirements.
 type PageProps = {
     params: { id: string };
-    searchParams: { [key: string]: string | string[] | undefined };
+    searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 async function getModule(id: number) {
