@@ -36,7 +36,7 @@ function MentalTrainingContent() {
                     </div>
                     <CardTitle className="font-headline text-3xl">Mental Training</CardTitle>
                     <CardDescription>
-                        Strengthen your knowledge with core concepts. A knight's mind must be as strong as their sword arm.
+                        Strengthen your knowledge with core concepts. A knight&apos;s mind must be as strong as their sword arm.
                     </CardDescription>
                 </CardHeader>
             </Card>

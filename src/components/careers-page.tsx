@@ -15,7 +15,7 @@ export function CareersPageContent() {
             </div>
           <CardTitle className="font-headline text-3xl">Join the Wizard Team</CardTitle>
           <CardDescription className="max-w-xl mx-auto">
-            We are seeking powerful developers and creative minds to join our council of wizards. Help us forge the future of learning and share in the kingdom's success.
+            We are seeking powerful developers and creative minds to join our council of wizards. Help us forge the future of learning and share in the kingdom&#39;s success.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-8 text-muted-foreground px-8 py-6">
@@ -26,9 +26,9 @@ export function CareersPageContent() {
                 </p>
             </div>
             <div className="space-y-4">
-                <h3 className="font-headline text-2xl text-card-foreground flex items-center gap-2"><Code /> Who We're Looking For</h3>
+                <h3 className="font-headline text-2xl text-card-foreground flex items-center gap-2"><Code /> Who We&#39;re Looking For</h3>
                 <p>
-                    We seek skilled wizards proficient in the arcane arts of modern web development. If you have experience with Next.js, React, TypeScript, and a passion for creating magical user experiences, we want to hear from you. We value creativity, collaboration, and a desire to push the boundaries of what's possible.
+                    We seek skilled wizards proficient in the arcane arts of modern web development. If you have experience with Next.js, React, TypeScript, and a passion for creating magical user experiences, we want to hear from you. We value creativity, collaboration, and a desire to push the boundaries of what&apos;s possible.
                 </p>
                 <ul className="list-disc pl-6 space-y-2">
                     <li>Frontend Wizards (React, Next.js, Tailwind CSS)</li>
@@ -39,7 +39,7 @@ export function CareersPageContent() {
             <div className="space-y-4">
                 <h3 className="font-headline text-2xl text-card-foreground">What We Offer</h3>
                  <p>
-                    Join a collaborative team where your ideas can shape the kingdom. You'll work on a meaningful project with the potential for great rewards. We offer competitive compensation and a share in the treasures we create together.
+                    Join a collaborative team where your ideas can shape the kingdom. You&apos;ll work on a meaningful project with the potential for great rewards. We offer competitive compensation and a share in the treasures we create together.
                 </p>
             </div>
             <div className="text-center pt-4">

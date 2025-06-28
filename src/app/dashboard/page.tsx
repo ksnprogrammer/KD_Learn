@@ -17,7 +17,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/use-user';
 import type { CreateModuleOutput } from "@/ai/flows/create-module-from-description";
-import type { DailyChallengeOutput } from '@/ai/flows/generate-daily-challenge';
+import type { DailyChallengeOutput } from '@/ai/schemas/daily-challenge';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
@@ -112,11 +112,11 @@ export default function Dashboard() {
             setDailyChallenge(data);
         } else {
             setDailyChallenge({
-                category: 'Rest Day',
+                category: 'Riddle',
                 title: "The Challenge Master's Day Off",
                 description: "The realm is quiet today. A perfect time to review your past quests! The Challenge Master will return tomorrow with a new trial.",
                 reward: 'Priceless Wisdom'
-            });
+            } as DailyChallengeOutput);
             toast({
                 variant: 'default',
                 title: 'Daily Challenge Unavailable',
@@ -222,7 +222,7 @@ export default function Dashboard() {
         <div className="container mx-auto py-8 space-y-8">
             <div>
                 <h1 className="font-headline text-4xl font-bold">Welcome back, {userName}!</h1>
-                <p className="text-muted-foreground">Here's your kingdom's status at a glance.</p>
+                <p className="text-muted-foreground">Here&apos;s your kingdom&apos;s status at a glance.</p>
             </div>
             
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 animate-fade-in-up">
@@ -386,7 +386,7 @@ export default function Dashboard() {
                                             </CardHeader>
                                              {challengeResult.isCorrect && (
                                                 <CardContent>
-                                                    <p className="text-sm font-semibold text-primary">You've been awarded {dailyChallenge?.reward}!</p>
+                                                    <p className="text-sm font-semibold text-primary">You&apos;ve been awarded {dailyChallenge?.reward}!</p>
                                                 </CardContent>
                                             )}
                                         </Card>

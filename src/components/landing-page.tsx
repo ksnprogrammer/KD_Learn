@@ -68,7 +68,7 @@ export function LandingPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                Our King's powerful wizards can instantly forge entire learning modules, from outlines to quizzes, with a formidable AI assistant.
+                Our King&#39;s powerful wizards can instantly forge entire learning modules, from outlines to quizzes, with a formidable AI assistant.
               </CardContent>
             </Card>
             <Card className="animate-fade-in-up [animation-delay:300ms] border-2 border-transparent hover:border-primary transition-colors">
@@ -132,7 +132,7 @@ export function LandingPage() {
                       </div>
                     <CardTitle className="font-headline text-3xl">Donate to the Cause</CardTitle>
                     <CardDescription className="pt-2">
-                        Help us maintain the kingdom's servers, develop new features, and keep the flame of knowledge burning bright for all.
+                        Help us maintain the kingdom&#39;s servers, develop new features, and keep the flame of knowledge burning bright for all.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="flex-1">

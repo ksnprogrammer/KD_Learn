@@ -57,12 +57,14 @@ function ProfileContent() {
     const userAvatarHint = user?.user_metadata?.avatar_hint || 'dragon avatar';
 
 
-    const renderStatCard = (title: string, value: any, icon: React.ReactNode) => (
+    const renderStatCard = (title: string, value: any, icon: React.ReactNode, loading: boolean) => (
         <Card>
             <CardHeader>
                 {icon}
                 <CardTitle>{title}</CardTitle>
-                <CardDescription>{value}</CardDescription>
+                <CardDescription>
+                    {loading ? <Skeleton className="h-6 w-10 mx-auto" /> : value}
+                </CardDescription>
             </CardHeader>
         </Card>
     );
@@ -106,19 +108,9 @@ function ProfileContent() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                        {isLoading ? (
-                            <>
-                                {renderStatCard("Rank", <Skeleton className="h-6 w-10 mx-auto" />, <Trophy className="mx-auto w-8 h-8 text-primary" />)}
-                                {renderStatCard("Quests", <Skeleton className="h-6 w-10 mx-auto" />, <Swords className="mx-auto w-8 h-8 text-primary" />)}
-                                {renderStatCard("Badges", <Skeleton className="h-6 w-10 mx-auto" />, <Shield className="mx-auto w-8 h-8 text-primary" />)}
-                            </>
-                        ) : (
-                            <>
-                               {renderStatCard("Rank", `#${stats?.rank}`, <Trophy className="mx-auto w-8 h-8 text-primary" />)}
-                               {renderStatCard("Quests", stats?.questsCompleted, <Swords className="mx-auto w-8 h-8 text-primary" />)}
-                               {renderStatCard("Badges", achievements.length, <Shield className="mx-auto w-8 h-8 text-primary" />)}
-                            </>
-                        )}
+                        {renderStatCard("Rank", stats?.rank !== 'N/A' ? `#${stats?.rank}` : stats?.rank, <Trophy className="mx-auto w-8 h-8 text-primary" />, isLoading)}
+                        {renderStatCard("Quests", stats?.questsCompleted, <Swords className="mx-auto w-8 h-8 text-primary" />, isLoading)}
+                        {renderStatCard("Badges", achievements.length, <Shield className="mx-auto w-8 h-8 text-primary" />, isLoading)}
                     </div>
                     
                     <div>

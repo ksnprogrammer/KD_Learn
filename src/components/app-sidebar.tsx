@@ -160,7 +160,7 @@ export function AppSidebar() {
             <SidebarMenuButton asChild isActive={isActive('/admin')}>
               <Link href="/admin">
                 <Castle />
-                King's Court
+                King&apos;s Court
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -66,7 +66,7 @@ const createStoryFlow = ai.defineFlow(
       },
     });
 
-    if (!media.url) {
+    if (!media || !media.url) {
       throw new Error("Failed to generate story image.");
     }
     

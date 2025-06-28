@@ -78,7 +78,7 @@ function WeaponTrainingContent() {
             {!isLoading && modules.length === 0 && (
                 <div className="text-center text-muted-foreground mt-12 max-w-md mx-auto p-6 bg-muted/50 rounded-lg">
                     <p className='font-headline text-lg text-card-foreground'>The Training Grounds are Quiet</p>
-                    <p className="mt-2">A Royal Wizard must first forge new Knowledge Dragons in the King's Court and have them approved before knights can begin their training.</p>
+                    <p className="mt-2">A Royal Wizard must first forge new Knowledge Dragons in the King&apos;s Court and have them approved before knights can begin their training.</p>
                 </div>
             )}
 

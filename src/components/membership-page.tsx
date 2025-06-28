@@ -64,7 +64,7 @@ const tiers: Tier[] = [
     features: [
       "Everything in Dragon Knight",
       "Access to exclusive live sessions",
-      "Direct line to the King's Council",
+      "Direct line to the King&#39;s Council",
       "Vote on new platform features",
     ],
     buttonText: "Ascend to Grand Master",
@@ -227,8 +227,8 @@ export function MembershipPageContent() {
                     Please deposit the fee for your chosen tier to the following bank account. Use your name or email as the reference.
                 </p>
                 <div className="mt-2 p-3 bg-muted rounded-md text-sm">
-                    <p><strong>Bank:</strong> People's Bank</p>
-                    <p><strong>Account Name:</strong> The King's Treasury</p>
+                    <p><strong>Bank:</strong> People&#39;s Bank</p>
+                    <p><strong>Account Name:</strong> The King&#39;s Treasury</p>
                     <p><strong>Account Number:</strong> 123-456-7890</p>
                     <p><strong>Branch:</strong> Royal Capital Branch</p>
                 </div>

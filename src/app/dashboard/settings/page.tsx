@@ -174,7 +174,7 @@ function SettingsForm() {
                                     The kingdom is already dark, knight.
                                 </p>
                             </div>
-                            <Switch id="dark-mode" defaultChecked disabled />
+                            <Switch id="dark-mode" defaultChecked />
                         </div>
                     </CardContent>
                 </Card>

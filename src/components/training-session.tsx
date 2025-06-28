@@ -163,7 +163,7 @@ export function TrainingSession({ module, submissionId }: TrainingSessionProps) 
     <div className="space-y-8 w-full max-w-4xl mx-auto animate-fade-in-up">
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-2xl flex items-center gap-2"><Target /> Dragon's Anatomy (Lesson)</CardTitle>
+          <CardTitle className="font-headline text-2xl flex items-center gap-2"><Target /> Dragon&#39;s Anatomy (Lesson)</CardTitle>
           <CardDescription>Study this knowledge before your trial.</CardDescription>
         </CardHeader>
         <CardContent>

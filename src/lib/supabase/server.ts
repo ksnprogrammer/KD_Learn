@@ -3,8 +3,8 @@ import { cookies } from 'next/headers'
 
 // NOTE: This is a server-only file.
 
-export const createSupabaseServerClient = () => {
-  const cookieStore = cookies()
+export const createSupabaseServerClient = async () => {
+  const cookieStore = await cookies()
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

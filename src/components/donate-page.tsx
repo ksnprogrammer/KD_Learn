@@ -159,7 +159,7 @@ export function DonatePageContent() {
       <Card className="w-full max-w-2xl">
         <CardHeader>
             <CardTitle>Complete Your Donation</CardTitle>
-            <CardDescription>Follow these steps to send your contribution to the kingdom's treasury.</CardDescription>
+            <CardDescription>Follow these steps to send your contribution to the kingdom&#39;s treasury.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
             <div>
@@ -168,8 +168,8 @@ export function DonatePageContent() {
                     Please deposit your chosen amount to the following bank account. Use your name or email as the reference.
                 </p>
                 <div className="mt-2 p-3 bg-muted rounded-md text-sm">
-                    <p><strong>Bank:</strong> People's Bank</p>
-                    <p><strong>Account Name:</strong> The King's Treasury</p>
+                    <p><strong>Bank:</strong> People&#39;s Bank</p>
+                    <p><strong>Account Name:</strong> The King&#39;s Treasury</p>
                     <p><strong>Account Number:</strong> 123-456-7890</p>
                     <p><strong>Branch:</strong> Royal Capital Branch</p>
                 </div>

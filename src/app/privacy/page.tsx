@@ -32,7 +32,7 @@ export default function PrivacyPage() {
                     <p>We do not sell or rent your personal information to third parties. Your information is a sacred trust. We may only share data with trusted Wizards (service providers) who help us operate the Kingdom, and only under strict confidentiality agreements.</p>
 
                     <h3>5. Securing the Realm</h3>
-                    <p>We employ strong magical barriers (security measures) to protect your information from unauthorized access. However, no system is impenetrable, but we are committed to safeguarding the Kingdom's data.</p>
+                    <p>We employ strong magical barriers (security measures) to protect your information from unauthorized access. However, no system is impenetrable, but we are committed to safeguarding the Kingdom&apos;s data.</p>
                 </CardContent>
             </Card>
         </LegalLayout>

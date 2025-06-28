@@ -11,7 +11,7 @@ export default async function DonatePage() {
     let user = null;
 
     if (isSupabaseConfigured) {
-      const supabase = createSupabaseServerClient();
+      const supabase = await createSupabaseServerClient();
       const { data } = await supabase.auth.getUser();
       user = data.user;
     }

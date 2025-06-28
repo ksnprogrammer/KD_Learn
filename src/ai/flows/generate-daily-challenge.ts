@@ -5,7 +5,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import { DailyChallengeOutputSchema, type DailyChallengeOutput } from '@/ai/schemas';
+import { DailyChallengeOutputSchema, DailyChallengeOutput } from '@/ai/schemas/daily-challenge';
 
 export async function generateDailyChallenge(): Promise<DailyChallengeOutput> {
   return generateDailyChallengeFlow();

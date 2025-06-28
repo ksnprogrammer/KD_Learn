@@ -62,7 +62,7 @@ function KnightRegistrationForm() {
             </div>
              <div className="space-y-2">
                 <Label htmlFor="nic">National Identity Card (NIC)</Label>
-                <Input id="nic" name="nic" placeholder="Your or your parent's NIC" required />
+                <Input id="nic" name="nic" placeholder="Your or your parent&apos;s NIC" required />
             </div>
              <div className="space-y-2">
                 <Label htmlFor="password">Secret Word (Password)</Label>
@@ -125,7 +125,7 @@ function KnightRegistrationForm() {
             <div className="flex flex-row items-start space-x-3 space-y-0 pt-2">
                 <Checkbox id="terms" name="terms" required />
                 <div className="space-y-1 leading-none">
-                    <Label htmlFor="terms">I accept the Kingdom's rules.</Label>
+                    <Label htmlFor="terms">I accept the Kingdom&apos;s rules.</Label>
                     <p className="text-sm text-muted-foreground">
                     By signing up, you agree to our{' '}
                     <Link href="/terms" className="underline hover:text-primary" target="_blank">

@@ -12,7 +12,7 @@ export default async function AdminLayout({
     redirect('/login?message=Database is not configured by the administrator.');
   }
 
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {

@@ -191,7 +191,7 @@ function AiDragonCreator() {
         <div className="mt-8 space-y-8 animate-fade-in-up">
           <Card>
             <CardHeader>
-              <CardTitle className="font-headline text-2xl">Dragon's Anatomy (Lesson Outline)</CardTitle>
+              <CardTitle className="font-headline text-2xl">Dragon&#39;s Anatomy (Lesson Outline)</CardTitle>
               <CardDescription>The core knowledge forged from the essence you provided.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -286,7 +286,7 @@ function AssetManager() {
     <Card>
       <CardHeader>
         <CardTitle>Asset Management</CardTitle>
-        <CardDescription>Manage the Kingdom's visual assets.</CardDescription>
+        <CardDescription>Manage the Kingdom&apos;s visual assets.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-6">
@@ -596,7 +596,7 @@ function AnalyticsReports() {
             Kingdom Intelligence
           </CardTitle>
           <CardDescription>
-            Request a new report from the Royal Scribe to understand the state of the kingdom's content pipeline.
+            Request a new report from the Royal Scribe to understand the state of the kingdom&#39;s content pipeline.
           </CardDescription>
         </CardHeader>
         <CardFooter>
@@ -618,7 +618,7 @@ function AnalyticsReports() {
         <div className="space-y-6 animate-fade-in-up">
           <Card>
             <CardHeader>
-              <CardTitle>Scribe's Summary</CardTitle>
+              <CardTitle>Scribe&#39;s Summary</CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none text-muted-foreground">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{report.narrativeSummary}</ReactMarkdown>
