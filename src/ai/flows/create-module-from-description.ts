@@ -54,7 +54,7 @@ const modulePrompt = ai.definePrompt({
     lessonOutline: z.array(LessonSectionSchema),
     quizQuestions: z.array(QuizQuestionSchema),
     resourceSuggestions: z.array(ResourceSuggestionSchema),
-    imagePrompt: z.string().describe("A concise, descriptive prompt for a fantasy-themed image generator that captures the essence of the topic in a single sentence. Keep it evocative and simple. For example: 'A glowing, intricate network of energy flowing through a mythical biological cell' or 'A ghostly knight dropping an apple from a celestial tree'.")
+    imagePrompt: z.string().describe("A concise, descriptive prompt for an image generator to create a fantasy art style digital painting. The prompt should capture the essence of the topic in a single, evocative sentence. For example: 'A glowing, intricate network of energy flowing through a mythical biological cell' or 'A ghostly knight dropping an apple from a celestial tree'.")
   })},
   prompt: `You are a wise and ancient Wizard, tasked by the King to forge Knowledge Dragons from raw topics for the knights of the realm in Sri Lanka.
 

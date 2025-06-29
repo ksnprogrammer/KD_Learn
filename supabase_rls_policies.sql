@@ -38,7 +38,7 @@ CREATE POLICY "Allow authenticated users to update own posts" ON public.posts
   FOR UPDATE USING (auth.uid() = (SELECT id FROM public.profiles WHERE author_name = auth.jwt() ->> 'name')); -- This might need adjustment based on how author_name is linked to user_id
 -- Allow authenticated users to delete their own posts
 CREATE POLICY "Allow authenticated users to delete own posts" ON public.posts
-  FOR DELETE USING (auth.uid() = (SELECT id FROM public.profiles WHERE author_name = auth.jwt() ->> 'name'));
+  FOR DELETE USING (auth.uid() = user_id);
 
 -- Policies for public.payments
 -- Allow authenticated users to insert payments (e.g., for submitting payment proof)

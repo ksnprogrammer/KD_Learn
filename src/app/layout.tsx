@@ -1,8 +1,12 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { cn } from '@/lib/utils';
+
 
 const inter = Inter({
   subsets: ['latin'],
@@ -29,6 +33,8 @@ export default function RootLayout({
       <body className={cn("font-body antialiased", inter.variable, spaceGrotesk.variable)}>
         {children}
         <Toaster />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

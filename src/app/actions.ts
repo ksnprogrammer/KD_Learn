@@ -90,7 +90,8 @@ export async function signup(formData: FormData) {
     return redirect(`/register?message=${error.message}`);
   }
 
-  return redirect('/dashboard');
+  revalidatePath('/', 'layout');
+  return redirect('/login?message=Check your email for the confirmation link.');
 }
 
 export async function logout() {
@@ -169,6 +170,7 @@ export async function submitModuleForReview(moduleData: CreateModuleOutput, topi
       console.error('Supabase error:', error);
       throw new Error(error.message);
     };
+    revalidatePath('/admin');
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -218,6 +220,7 @@ export async function updateSubmissionStatus(id: number, status: 'Approved' | 'R
       console.error('Supabase error:', error);
       throw new Error(error.message);
     }
+    revalidatePath('/admin');
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -247,6 +250,7 @@ export async function saveStory(storyData: CreateStoryOutput): Promise<{
       console.error('Supabase error:', error);
       throw new Error(error.message);
     };
+    revalidatePath('/dashboard/hall-of-legends');
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -331,6 +335,7 @@ export async function createPost(content: string): Promise<{
       .from('posts')
       .insert([
         { 
+          user_id: user.id,
           content,
           author_name,
           author_avatar,
@@ -473,6 +478,7 @@ export async function submitPaymentForReview(
       console.error('Supabase error:', error);
       throw new Error(error.message);
     };
+    revalidatePath('/admin');
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -522,6 +528,7 @@ export async function updatePaymentStatus(id: number, status: 'Approved' | 'Reje
       console.error('Supabase error:', error);
       throw new Error(error.message);
     }
+    revalidatePath('/admin');
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -638,7 +645,7 @@ export async function getTeamWarData(): Promise<{
   }
 }
 
-export async function updateUserPublicProfile(name: string): Promise<{
+export async function updateUserPublicProfile(name: string, avatarUrl: string, avatarHint: string): Promise<{
   success: boolean;
   error?: string;
 }> {
@@ -655,7 +662,7 @@ export async function updateUserPublicProfile(name: string): Promise<{
   }
 
   const { error } = await supabase.auth.updateUser({
-    data: { name: name.trim() }
+    data: { name: name.trim(), avatar_url: avatarUrl, avatar_hint: avatarHint }
   });
 
   if (error) {

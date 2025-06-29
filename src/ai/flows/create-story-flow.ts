@@ -32,7 +32,7 @@ const storyPrompt = ai.definePrompt({
   output: {schema: z.object({
     title: z.string().describe("The title of the generated story."),
     story: z.string().describe("The full text of the generated story, written in Markdown format."),
-    imagePrompt: z.string().describe("A concise, descriptive prompt for an image generator that captures the essence of the story in a single sentence. For example: 'A lone knight standing on a cliff overlooking a kingdom with two moons'.")
+    imagePrompt: z.string().describe("A concise, descriptive prompt for an image generator to create a fantasy art style digital painting. The prompt should capture the essence of the story in a single, evocative sentence. For example: 'A lone knight standing on a cliff overlooking a kingdom with two moons'.")
   })},
   prompt: `You are the Royal Storyteller of the Kingdom of KingDragons. Your task is to weave epic tales of bravery, knowledge, and adventure to inspire the knights of the realm.
 

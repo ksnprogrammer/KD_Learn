@@ -1,0 +1,13 @@
+﻿
+[2025-06-29 09:32:44Z] ✅ setup-gemini.ps1 run completed.
+
+[2025-06-29 09:32:53Z] ✅ setup-gemini.ps1 run completed.
+[2025-06-29 09:33:37Z] ✅ setup-gemini completed
+2025-06-29 09:41:56 - Running as Administrator...
+2025-06-29 09:44:11 - Full access granted to C:\Users\pcworld\KD
+2025-06-29 09:44:11 - Gemini CLI whitelisted in Windows Firewall
+2025-06-29 09:44:12 - Gemini CLI path added to PATH
+2025-06-29 09:44:12 - âŒ Failed to set ExecutionPolicy: Windows PowerShell updated your execution policy successfully, but the setting is overridden by a policy defined at a more specific scope.  Due to the override, your shell will retain its current effective execution policy of Bypass. Type "Get-ExecutionPolicy -List" to view your execution policy settings. For more information please see "Get-Help Set-ExecutionPolicy".
+2025-06-29 09:44:12 - Gemini non-interactive mode configured
+2025-06-29 09:44:24 - Development cycle executed
+2025-06-29 09:44:24 - âœ… Setup complete!

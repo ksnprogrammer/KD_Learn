@@ -18,6 +18,8 @@ import { updateUserPublicProfile } from "@/app/actions";
 
 const profileFormSchema = z.object({
   knightName: z.string().min(3, "Name must be at least 3 characters.").max(50, "Name cannot exceed 50 characters."),
+  avatarUrl: z.string().url("Please enter a valid URL.").optional().or(z.literal("")),
+  avatarHint: z.string().max(100, "Hint cannot exceed 100 characters.").optional().or(z.literal("")),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -28,6 +30,8 @@ function SettingsForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     
     const userName = user?.user_metadata?.name || 'Knight';
+    const userAvatarUrl = user?.user_metadata?.avatar_url || '';
+    const userAvatarHint = user?.user_metadata?.avatar_hint || '';
     const examLevel = user?.user_metadata?.exam_level || 'A/L';
     const userTitle = `Dragon Knight - ${examLevel} Path`;
 
@@ -35,13 +39,15 @@ function SettingsForm() {
         resolver: zodResolver(profileFormSchema),
         defaultValues: {
             knightName: userName,
+            avatarUrl: userAvatarUrl,
+            avatarHint: userAvatarHint,
         },
         mode: 'onChange',
     });
 
     async function onSubmit(values: ProfileFormValues) {
         setIsSubmitting(true);
-        const { success, error } = await updateUserPublicProfile(values.knightName);
+        const { success, error } = await updateUserPublicProfile(values.knightName, values.avatarUrl || '', values.avatarHint || '');
         setIsSubmitting(false);
 
         if (success) {
@@ -50,7 +56,7 @@ function SettingsForm() {
                 description: "Your Knight Name has been successfully changed.",
             });
             // Reset form dirty state so the button becomes disabled again
-            form.reset({ knightName: values.knightName });
+            form.reset({ knightName: values.knightName, avatarUrl: values.avatarUrl, avatarHint: values.avatarHint });
         } else {
             toast({
                 variant: "destructive",
@@ -85,6 +91,32 @@ function SettingsForm() {
                                             <FormLabel>Knight Name</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="Your knightly name" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="avatarUrl"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Avatar URL</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="https://example.com/avatar.png" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="avatarHint"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Avatar Hint</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="A brief description of your avatar" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
