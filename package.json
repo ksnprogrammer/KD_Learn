@@ -12,7 +12,7 @@
     "test": "jest --maxWorkers=2",
     "log-errors": "node scripts/log-errors.js",
     "autofix": "eslint src --fix",
-    "cycle": "npm run lint && npm run test || npm run log-errors && npm run autofix && git add -A && git commit --no-verify --quiet -m 'chore: automated cycle' && git push",
+    "cycle": "npm run lint && npm run test || npm run log-errors && npm run autofix",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
