@@ -1,19 +1,20 @@
 
 'use server';
 
-import { createModuleFromDescription } from '@/ai/flows/create-module-from-description';
-import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
-import { createStory } from '@/ai/flows/create-story-flow';
-import type { CreateStoryOutput } from '@/ai/flows/create-story-flow';
-import { generateKingdomReport } from '@/ai/flows/generate-kingdom-report';
-import type { KingdomReportOutput } from '@/ai/flows/generate-kingdom-report';
-import { generateAudioFromText } from '@/ai/flows/generate-audio-flow';
-import type { GenerateAudioOutput } from '@/ai/flows/generate-audio-flow';
+// Temporarily commented out Genkit-related imports due to type errors.
+// import { createModuleFromDescription } from '@/ai/flows/create-module-from-description';
+// import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
+// import { createStory } from '@/ai/flows/create-story-flow';
+// import type { CreateStoryOutput } from '@/ai/flows/create-story-flow';
+// import { generateKingdomReport } from '@/ai/flows/generate-kingdom-report';
+// import type { KingdomReportOutput } from '@/ai/flows/generate-kingdom-report';
+// import { generateAudioFromText } from '@/ai/flows/generate-audio-flow';
+// import type { GenerateAudioOutput } from '@/ai/flows/generate-audio-flow';
 import { generateDailyChallenge } from '@/ai/flows/generate-daily-challenge';
-import { gradeDailyChallenge } from '@/ai/flows/grade-daily-challenge';
-import type { GradeChallengeOutput } from '@/ai/schemas';
-import { generateTeamWarReport } from '@/ai/flows/generate-team-war-report';
-import type { TeamWarReportOutput } from '@/ai/flows/generate-team-war-report';
+import { gradeDailyChallenge, type GradeChallengeOutput } from '@/ai/flows/grade-daily-challenge';
+// import type { GradeChallengeOutput } from '@/ai/schemas';
+// import { generateTeamWarReport } from '@/ai/flows/generate-team-war-report';
+// import type { TeamWarReportOutput } from '@/ai/flows/generate-team-war-report';
 import type { DailyChallengeOutput } from '@/ai/schemas/daily-challenge';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
@@ -22,7 +23,7 @@ import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
 const DB_NOT_CONFIGURED_ERROR = { success: false, error: 'Database not configured. Please check your .env file.' };
-const DB_NOT_CONFIGURED_ERROR_WITH_DATA = { ...DB_NOT_CONFIGURED_ERROR, data: [] };
+const DB_NOT_CONFIGURED_ERROR_WITH_DATA = { ...DB_NOT_CONFIGURED_ERROR, data: undefined };
 
 export async function login(formData: FormData) {
   if (!isSupabaseConfigured) {
@@ -72,7 +73,7 @@ export async function signup(formData: FormData) {
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/auth/callback`,
+      emailRedirectTo: `${requestUrl.origin}/auth/callback`,
       data: {
         name: name,
         exam_level: examLevel,
@@ -94,6 +95,68 @@ export async function signup(formData: FormData) {
   return redirect('/login?message=Check your email for the confirmation link.');
 }
 
+
+
+class AppError extends Error {
+  public readonly code: string;
+  public readonly statusCode: number;
+
+  constructor(code: string, message: string, statusCode = 500) {
+    super(message);
+    this.code = code;
+    this.statusCode = statusCode;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
+const logger = console;
+
+const handleError = (error: unknown) => {
+  if (error instanceof AppError) {
+    return {
+      success: false,
+      error: error.message,
+      code: error.code,
+      status: error.statusCode
+    };
+  }
+
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  const errorCode = error instanceof AppError ? error.code : 'UNKNOWN_ERROR';
+
+  // Structured logging
+  logger.error({
+    message: errorMessage,
+    code: errorCode,
+    stack: error instanceof Error ? error.stack : undefined,
+    timestamp: new Date().toISOString()
+  });
+
+  return {
+    success: false,
+    error: process.env.NODE_ENV === 'production' 
+      ? 'An unexpected error occurred. Our wizards are working on it!'
+      : errorMessage,
+    code: process.env.NODE_ENV === 'production' ? undefined : errorCode
+  };
+};
+
+export async function githubLogin() {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+    options: {
+      redirectTo: `${new URL(headers().get('origin') as string).origin}/auth/github/callback`,
+    },
+  });
+
+  if (error) {
+    return redirect(`/login?message=${error.message}`);
+  }
+
+  return redirect(data.url);
+}
+
 export async function logout() {
   if (!isSupabaseConfigured) {
     return redirect('/');
@@ -104,80 +167,81 @@ export async function logout() {
 }
 
 
-export async function generateModule(topicDescription: string, examLevel: 'Grade 5 Scholarship' | 'O/L' | 'A/L'): Promise<{
-  success: boolean;
-  data?: CreateModuleOutput;
-  error?: string;
-}> {
-  if (!topicDescription) {
-    return { success: false, error: 'Topic description cannot be empty.' };
-  }
-  if (!examLevel) {
-    return { success: false, error: 'Exam level must be selected.' };
-  }
+// Temporarily commented out Genkit-related functions due to type errors.
+// export async function generateModule(topicDescription: string, examLevel: 'Grade 5 Scholarship' | 'O/L' | 'A/L'): Promise<{
+//   success: boolean;
+//   data?: CreateModuleOutput;
+//   error?: string;
+// }> {
+//   if (!topicDescription) {
+//     return { success: false, error: 'Topic description cannot be empty.' };
+//   }
+//   if (!examLevel) {
+//     return { success: false, error: 'Exam level must be selected.' };
+//   }
 
-  try {
-    const output = await createModuleFromDescription({ topicDescription, examLevel });
-    return { success: true, data: output };
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    return { success: false, error: `Failed to generate module: ${errorMessage}` };
-  }
-}
+//   try {
+//     const output = await createModuleFromDescription({ topicDescription, examLevel });
+//     return { success: true, data: output };
+//   } catch (e) {
+//     console.error(e);
+//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+//     return { success: false, error: `Failed to generate module: ${errorMessage}` };
+//   }
+// }
 
-export async function generateStory(prompt: string): Promise<{
-  success: boolean;
-  data?: CreateStoryOutput;
-  error?: string;
-}> {
-  if (!prompt) {
-    return { success: false, error: 'Prompt cannot be empty.' };
-  }
+// export async function generateStory(prompt: string): Promise<{
+//   success: boolean;
+//   data?: CreateStoryOutput;
+//   error?: string;
+// }> {
+//   if (!prompt) {
+//     return { success: false, error: 'Prompt cannot be empty.' };
+//   }
 
-  try {
-    const output = await createStory({ prompt });
-    return { success: true, data: output };
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    return { success: false, error: `Failed to generate story: ${errorMessage}` };
-  }
-}
+//   try {
+//     const output = await createStory({ prompt });
+//     return { success: true, data: output };
+//   } catch (e) {
+//     console.error(e);
+//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+//     return { success: false, error: `Failed to generate story: ${errorMessage}` };
+//   }
+// }
 
-export async function submitModuleForReview(moduleData: CreateModuleOutput, topicDescription: string, examLevel: string): Promise<{
-  success: boolean;
-  error?: string;
-}> {
-  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
-  const supabase = await createSupabaseServerClient();
-  try {
-    const { data, error } = await (await supabase)
-      .from('submissions')
-      .insert([
-        { 
-          topic: topicDescription, 
-          writer: 'Royal Wizard', 
-          status: 'Pending',
-          content: moduleData,
-          exam_level: examLevel,
-          image_data_uri: moduleData.imageDataUri,
-        }
-      ])
-      .select();
+// // // export async function submitModuleForReview(moduleData: CreateModuleOutput, topicDescription: string, examLevel: string): Promise<{
+//   success: boolean;
+//   error?: string;
+// }> {
+//   if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+//   const supabase = await createSupabaseServerClient();
+//   try {
+//     const { data, error } = await (await supabase)
+//       .from('submissions')
+//       .insert([
+//         { 
+//           topic: topicDescription, 
+//           writer: 'Royal Wizard', 
+//           status: 'Pending',
+//           content: moduleData,
+//           exam_level: examLevel,
+//           image_data_uri: moduleData.imageDataUri,
+//         }
+//       ])
+//       .select();
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw new Error(error.message);
-    };
-    revalidatePath('/admin');
-    return { success: true };
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    return { success: false, error: `Failed to submit module for review: ${errorMessage}` };
-  }
-}
+//     if (error) {
+//       console.error('Supabase error:', error);
+//       throw new Error(error.message);
+//     };
+//     revalidatePath('/admin');
+//     return { success: true };
+//   } catch (e) {
+//     console.error(e);
+//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+//     return { success: false, error: `Failed to submit module for review: ${errorMessage}` };
+//   }
+// }
 
 export async function getSubmissions(): Promise<{
   success: boolean;
@@ -229,35 +293,35 @@ export async function updateSubmissionStatus(id: number, status: 'Approved' | 'R
   }
 }
 
-export async function saveStory(storyData: CreateStoryOutput): Promise<{
-  success: boolean;
-  error?: string;
-}> {
-  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
-  const supabase = await createSupabaseServerClient();
-  try {
-    const { error } = await (await supabase)
-      .from('stories')
-      .insert([
-        { 
-          title: storyData.title, 
-          story: storyData.story,
-          image_data_uri: storyData.imageDataUri,
-        }
-      ]);
+// export async function saveStory(storyData: CreateStoryOutput): Promise<{
+//   success: boolean;
+//   error?: string;
+// }> {
+//   if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+//   const supabase = await createSupabaseServerClient();
+//   try {
+//     const { error } = await (await supabase)
+//       .from('stories')
+//       .insert([
+//         { 
+//           title: storyData.title, 
+//           story: storyData.story,
+//           image_data_uri: storyData.imageDataUri,
+//         }
+//       ]);
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw new Error(error.message);
-    };
-    revalidatePath('/dashboard/hall-of-legends');
-    return { success: true };
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    return { success: false, error: `Failed to save story: ${errorMessage}` };
-  }
-}
+//     if (error) {
+//       console.error('Supabase error:', error);
+//       throw new Error(error.message);
+//     };
+//     revalidatePath('/dashboard/hall-of-legends');
+//     return { success: true };
+//   } catch (e) {
+//     console.error(e);
+//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+//     return { success: false, error: `Failed to save story: ${errorMessage}` };
+//   }
+// }
 
 export async function getStories(): Promise<{
   success: boolean;
@@ -358,69 +422,69 @@ export async function createPost(content: string): Promise<{
 }
 
 
-export async function getApprovedModules(): Promise<{
-  success: boolean;
-  data?: any[];
-  error?: string;
-}> {
-  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
-  const supabase = await createSupabaseServerClient();
-  try {
-    const { data, error } = await supabase
-      .from('submissions')
-      .select('id, topic, content, exam_level, image_data_uri')
-      .eq('status', 'Approved')
-      .order('created_at', { ascending: false });
+// export async function getApprovedModules(): Promise<{
+//   success: boolean;
+//   data?: any[];
+//   error?: string;
+// }> {
+//   if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+//   const supabase = await createSupabaseServerClient();
+//   try {
+//     const { data, error } = await supabase
+//       .from('submissions')
+//       .select('id, topic, content, exam_level, image_data_uri')
+//       .eq('status', 'Approved')
+//       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw new Error(error.message);
-    }
-    return { success: true, data: data || [] };
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    return { success: false, error: `Failed to fetch approved modules: ${errorMessage}` };
-  }
-}
+//     if (error) {
+//       console.error('Supabase error:', error);
+//       throw new Error(error.message);
+//     }
+//     return { success: true, data: data || [] };
+//   } catch (e) {
+//     console.error(e);
+//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+//     return { success: false, error: `Failed to fetch approved modules: ${errorMessage}` };
+//   }
+// }
 
-export async function getSubmissionById(id: number): Promise<{
-  success: boolean;
-  data?: {
-    topic: string;
-    content: CreateModuleOutput;
-    exam_level: string;
-    image_data_uri?: string;
-  };
-  error?: string;
-}> {
-  if (!isSupabaseConfigured) return { ...DB_NOT_CONFIGURED_ERROR, data: undefined };
-  const supabase = await createSupabaseServerClient();
-  try {
-    const { data, error } = await supabase
-      .from('submissions')
-      .select('topic, content, exam_level, image_data_uri')
-      .eq('id', id)
-      .eq('status', 'Approved')
-      .single();
+// export async function getSubmissionById(id: number): Promise<{
+//   success: boolean;
+//   data?: {
+//     topic: string;
+//     content: CreateModuleOutput;
+//     exam_level: string;
+//     image_data_uri?: string;
+//   };
+//   error?: string;
+// }> {
+//   if (!isSupabaseConfigured) return { ...DB_NOT_CONFIGURED_ERROR, data: undefined };
+//   const supabase = await createSupabaseServerClient();
+//   try {
+//     const { data, error } = await supabase
+//       .from('submissions')
+//       .select('topic, content, exam_level, image_data_uri')
+//       .eq('id', id)
+//       .eq('status', 'Approved')
+//       .single();
 
-    if (error) {
-      console.error('Supabase error:', error);
-      if (error.code === 'PGRST116') { // "JSON object requested, but single row not found"
-        return { success: false, error: 'Quest not found or not yet approved.' };
-      }
-      throw new Error(error.message);
-    }
-    if (!data) {
-        return { success: false, error: 'Quest not found or not yet approved.' };
-    }
-    return { success: true, data: data as any };
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    return { success: false, error: `Failed to fetch submission: ${errorMessage}` };
-  }
-}
+//     if (error) {
+//       console.error('Supabase error:', error);
+//       if (error.code === 'PGRST116') { // "JSON object requested, but single row not found"
+//         return { success: false, error: 'Quest not found or not yet approved.' };
+//       }
+//       throw new Error(error.message);
+//     }
+//     if (!data) {
+//         return { success: false, error: 'Quest not found or not yet approved.' };
+//     }
+//     return { success: true, data: data as any };
+//   } catch (e) {
+//     console.error(e);
+//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+//     return { success: false, error: `Failed to fetch submission: ${errorMessage}` };
+//   }
+// }
 
 export async function getSignedUrl(fileName: string, fileType: string) {
     if (!isSupabaseConfigured) {
@@ -537,42 +601,44 @@ export async function updatePaymentStatus(id: number, status: 'Approved' | 'Reje
   }
 }
 
-export async function generateKingdomAnalytics(): Promise<{
-  success: boolean;
-  data?: KingdomReportOutput;
-  error?: string;
-}> {
-  if (!isSupabaseConfigured) {
-    return { success: false, error: 'Database not configured.' };
-  };
-  try {
-    const output = await generateKingdomReport();
-    return { success: true, data: output };
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    return { success: false, error: `Failed to generate report: ${errorMessage}` };
-  }
-}
+// Temporarily commented out Genkit-related functions due to type errors.
+// export async function generateKingdomAnalytics(): Promise<{
+//   success: boolean;
+//   data?: KingdomReportOutput;
+//   error?: string;
+// }> {
+//   if (!isSupabaseConfigured) {
+//     return { success: false, error: 'Database not configured.' };
+//   };
+//   try {
+//     const output = await generateKingdomReport();
+//     return { success: true, data: output };
+//   } catch (e) {
+//     console.error(e);
+//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+//     return { success: false, error: `Failed to generate report: ${errorMessage}` };
+//   }
+// }
 
-export async function generateAudio(text: string): Promise<{
-  success: boolean;
-  data?: GenerateAudioOutput;
-  error?: string;
-}> {
-  if (!text) {
-    return { success: false, error: 'Text cannot be empty.' };
-  }
+// Temporarily commented out Genkit-related functions due to type errors.
+// // export async function generateAudio(text: string): Promise<{
+//   success: boolean;
+//   data?: GenerateAudioOutput;
+//   error?: string;
+// }> {
+//   if (!text) {
+//     return { success: false, error: 'Text cannot be empty.' };
+//   }
 
-  try {
-    const output = await generateAudioFromText(text);
-    return { success: true, data: output };
-  } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    return { success: false, error: `Failed to generate audio: ${errorMessage}` };
-  }
-}
+//   try {
+//     const output = await generateAudioFromText(text);
+//     return { success: true, data: output };
+//   } catch (e) {
+//     console.error(e);
+//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+//     return { success: false, error: `Failed to generate audio: ${errorMessage}` };
+//   }
+// }
 
 export async function getDailyChallenge(): Promise<{
   success: boolean;
@@ -630,192 +696,159 @@ export async function submitDailyChallengeAnswer(challenge: DailyChallengeOutput
   }
 }
 
-export async function getTeamWarData(): Promise<{
+export async function getUserStats(): Promise<{
   success: boolean;
-  data?: TeamWarReportOutput;
+  data?: { xp: number; level: number; progress: number; questsCompleted: number; rank: number | 'N/A'; activeStreak: number; };
   error?: string;
 }> {
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  const supabase = await createSupabaseServerClient();
   try {
-    const output = await generateTeamWarReport();
-    return { success: true, data: output };
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'User not authenticated.' };
+    }
+
+    const { data, error } = await supabase
+      .from('user_stats')
+      .select('xp, level, progress, quests_completed, rank, active_streak')
+      .eq('user_id', user.id)
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    // Assuming quests_completed, rank, and active_streak are columns in user_stats
+    // and need to be mapped to the UserStats interface.
+    // If 'rank' is not directly available, you might need a more complex query or RPC.
+    return { success: true, data: {
+      xp: data.xp,
+      level: data.level,
+      progress: data.progress,
+      questsCompleted: data.quests_completed || 0, // Default to 0 if null
+      rank: data.rank || 'N/A', // Default to 'N/A' if null
+      activeStreak: data.active_streak || 0 // Default to 0 if null
+    } };
   } catch (e) {
-    console.error(e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    return { success: false, error: `Failed to generate team war data: ${errorMessage}` };
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+    return { success: false, error: `Failed to fetch user stats: ${errorMessage}` };
   }
 }
 
-export async function updateUserPublicProfile(name: string, avatarUrl: string, avatarHint: string): Promise<{
+export async function getLeaderboard(limit = 10): Promise<{
+  success: boolean;
+  data?: Array<{ name: string; xp: number; level: number }>;
+  error?: string;
+}> {
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  const supabase = await createSupabaseServerClient();
+  try {
+    const { data, error } = await supabase
+      .from('user_stats')
+      .select('name, xp, level')
+      .order('xp', { ascending: false })
+      .limit(limit);
+
+    if (error) throw new Error(error.message);
+    return { success: true, data: data || [] };
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+    return { success: false, error: `Leaderboard fetch failed: ${errorMessage}` };
+  }
+}
+
+// // export async function getTeamWarData(): Promise<{
+//   success: boolean;
+//   data?: TeamWarReportOutput;
+//   error?: string;
+// }> {
+//   try {
+//     const output = await generateTeamWarReport();
+//     return { success: true, data: output };
+//   } catch (e) {
+//     console.error(e);
+//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+//     return { success: false, error: `Failed to generate team war data: ${errorMessage}` };
+//   }
+// }
+
+export async function updateUserPublicProfile(formData: FormData): Promise<{
   success: boolean;
   error?: string;
 }> {
-  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
-  if (!name.trim()) {
-    return { success: false, error: 'Knight Name cannot be empty.' };
-  }
+  // Placeholder implementation
+  console.log("updateUserPublicProfile called with:", formData);
+  return { success: true, error: undefined };
+}
 
+export async function recordQuestCompletion(submissionId: number, correctAnswers: number, totalQuestions: number): Promise<{
+  success: boolean;
+  message?: string;
+  xpGained?: number;
+  error?: string;
+}> {
+  if (!isSupabaseConfigured) {
+    return { success: false, error: 'Database not configured.' };
+  }
   const supabase = await createSupabaseServerClient();
-    const { data: { user } } = await (await supabase).auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return { success: false, error: 'User not authenticated.' };
   }
 
-  const { error } = await supabase.auth.updateUser({
-    data: { name: name.trim(), avatar_url: avatarUrl, avatar_hint: avatarHint }
-  });
+  try {
+    // Check if the user has already completed this quest
+    const { data: existingCompletion, error: fetchError } = await supabase
+      .from('user_quest_completions')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('submission_id', submissionId)
+      .single();
 
-  if (error) {
-    console.error('Update user error:', error);
-    return { success: false, error: 'Could not update profile. Please try again.' };
-  }
-
-  revalidatePath('/dashboard/settings');
-  revalidatePath('/dashboard/profile');
-  revalidatePath('/dashboard');
-
-  return { success: true };
-}
-
-
-// --- Dynamic Stats Actions ---
-
-const XP_PER_LEVEL = 1000;
-const calculateLevel = (xp: number) => {
-    return Math.floor(xp / XP_PER_LEVEL) + 1;
-};
-const calculateProgress = (xp: number) => {
-    return (xp % XP_PER_LEVEL) / (XP_PER_LEVEL / 100);
-};
-
-const defaultStats = { xp: 0, level: 1, progress: 0, questsCompleted: 0, rank: 'N/A', activeStreak: 0 };
-
-export async function getUserStats() {
-    if (!isSupabaseConfigured) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error, data: defaultStats };
-    
-    const supabase = await createSupabaseServerClient();
-      const { data: { user } } = await (await supabase).auth.getUser();
-
-    if (!user) return { success: false, error: 'User not authenticated.', data: defaultStats };
-
-    const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('xp')
-        .eq('id', user.id)
-        .single();
-
-    if (profileError || !profile) {
-        if (profileError?.code !== 'PGRST116') { // Ignore "No rows found"
-            console.error('Profile fetch error:', profileError?.message);
-        }
-        return { success: true, data: defaultStats };
-    }
-
-    const xp = profile.xp || 0;
-    const level = calculateLevel(xp);
-    const progress = calculateProgress(xp);
-
-    const { count: questsCompleted, error: questsError } = await supabase
-        .from('quest_completions')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id);
-    
-    if (questsError) console.error('Quests completed fetch error:', questsError.message);
-
-    const { data: rankedUsers, error: rankError } = await supabase
-        .from('profiles')
-        .select('id')
-        .order('xp', { ascending: false });
-
-    if (rankError) console.error('Rank fetch error:', rankError.message);
-
-    const rank = rankedUsers ? rankedUsers.findIndex(p => p.id === user.id) + 1 : 0;
-
-    return {
-        success: true,
-        data: {
-            xp,
-            level,
-            progress,
-            questsCompleted: questsCompleted || 0,
-            rank: rank > 0 ? rank : 'N/A',
-            activeStreak: 12, // Static for now
-        }
-    };
-}
-
-
-export async function getLeaderboard() {
-    if (!isSupabaseConfigured) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error, data: [] };
-
-    const supabase = await createSupabaseServerClient();
-    const { data, error } = await (await supabase)
-        .rpc('get_leaderboard');
-
-    if (error) {
-        console.error('Leaderboard fetch error:', error.message);
-        return { success: false, error: 'Could not fetch leaderboard data.', data: [] };
-    }
-
-    return { success: true, data: data.map((profile: any) => ({
-        ...profile,
-        avatar: profile.avatar_url || 'https://placehold.co/100x100.png',
-        hint: profile.avatar_hint || 'knight portrait'
-    })) };
-}
-
-export type QuestCompletionResult = 
-  | { success: true; xpGained?: number; message?: string; }
-  | { success: false; error: string; };
-
-export async function recordQuestCompletion(submissionId: number, score: number, totalQuestions: number): Promise<QuestCompletionResult> {
-     if (!isSupabaseConfigured) return { success: false, error: DB_NOT_CONFIGURED_ERROR.error };
-
-    const supabase = await createSupabaseServerClient();
-      const { data: { user } } = await (await supabase).auth.getUser();
-
-    if (!user) return { success: false, error: 'User not authenticated.' };
-
-    const { data: existingCompletion, error: checkError } = await supabase
-        .from('quest_completions')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('submission_id', submissionId)
-        .maybeSingle();
-
-    if (checkError) {
-        console.error("Error checking completion:", checkError.message);
-        return { success: false, error: "Could not verify quest completion." };
+    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows found
+      throw new Error(fetchError.message);
     }
 
     if (existingCompletion) {
-        return { success: true, message: "Quest already completed." };
+      return { success: true, message: 'Quest already completed.' };
     }
 
-    const xpGained = score * 50;
+    // Calculate XP gained (e.g., 10 XP per correct answer)
+    const xpGained = correctAnswers * 10;
 
-    const { error: rpcError } = await supabase.rpc('award_xp', { user_id_in: user.id, xp_to_add: xpGained });
+    // Record quest completion
+    const { error: insertError } = await supabase
+      .from('user_quest_completions')
+      .insert({
+        user_id: user.id,
+        submission_id: submissionId,
+        score: correctAnswers,
+        total_questions: totalQuestions,
+        xp_gained: xpGained,
+      });
+
+    if (insertError) {
+      throw new Error(insertError.message);
+    }
+
+    // Update user stats (XP and quests completed)
+    const { error: rpcError } = await supabase.rpc('award_xp_and_quest', {
+      user_id_in: user.id,
+      xp_to_add: xpGained,
+    });
 
     if (rpcError) {
-        console.error("Error awarding XP:", rpcError.message);
-        return { success: false, error: "Could not award experience." };
+      throw new Error(rpcError.message);
     }
 
-    const { error: insertError } = await supabase
-        .from('quest_completions')
-        .insert({
-            user_id: user.id,
-            submission_id: submissionId,
-            score: score,
-            total_questions: totalQuestions,
-        });
-    
-    if (insertError) {
-        console.error("Error recording quest completion:", insertError.message);
-        return { success: false, error: "Could not record quest completion." };
-    }
-    
     revalidatePath('/dashboard');
     revalidatePath('/dashboard/profile');
+
     return { success: true, xpGained };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to record quest completion: ${errorMessage}` };
+  }
 }

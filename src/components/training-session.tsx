@@ -58,7 +58,7 @@ export function TrainingSession({ module, submissionId }: TrainingSessionProps) 
       if (result.message) { // Already completed
          toast({
             title: "Already Completed",
-            description: `You have already earned credit for this quest.`,
+            description: result.message,
         });
       } else {
         toast({

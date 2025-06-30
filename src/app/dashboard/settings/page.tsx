@@ -47,7 +47,12 @@ function SettingsForm() {
 
     async function onSubmit(values: ProfileFormValues) {
         setIsSubmitting(true);
-        const { success, error } = await updateUserPublicProfile(values.knightName, values.avatarUrl || '', values.avatarHint || '');
+        const formData = new FormData();
+        formData.append('knightName', values.knightName);
+        formData.append('avatarUrl', values.avatarUrl || '');
+        formData.append('avatarHint', values.avatarHint || '');
+
+        const { success, error } = await updateUserPublicProfile(formData);
         setIsSubmitting(false);
 
         if (success) {

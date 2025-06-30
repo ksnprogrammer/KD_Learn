@@ -13,7 +13,9 @@
     "log-errors": "node scripts/log-errors.js",
     "autofix": "eslint src --fix",
     "cycle": "npm run lint && npm run test || npm run log-errors && npm run autofix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "kd:start": "npm run dev",
+    "kd:stop-supabase": "cd supabase && supabase stop"
   },
   "dependencies": {
     "@genkit-ai/firebase": "^1.14.0",
@@ -53,7 +55,7 @@
     "embla-carousel-react": "^8.1.5",
     "genkit": "^1.13.0",
     "lucide-react": "^0.481.0",
-    "next": "15.3.3",
+    "next": "^15.3.4",
     "patch-package": "^8.0.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
@@ -79,8 +81,8 @@
     "genkit-cli": "^1.13.0",
     "jest": "^30.0.3",
     "postcss": "^8",
+    "supabase": "^2.26.9",
     "tailwindcss": "^3.4.4",
     "typescript": "^5"
   }
 }
-

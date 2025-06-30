@@ -1,0 +1,238 @@
+vercel never expriew token DrIkEIFso9mfHflRGcvlZcDJ
+
+https://afkzfrzkzpimwgtypoit.supabase.co
+anonpublic
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFma3pmcnprenBpbXdndHlwb2l0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTExMjMwMjAsImV4cCI6MjA2NjY5OTAyMH0.kHhFHZpaHTFnLWFghayUhkYRqKBzRAvijML03zIOW_s
+
+Copy
+This key is safe to use in a browser if you have enabled Row Level Security for your tables and configured policies. Prefer using Secret API keys instead.
+Last request was 10 hours ago.
+service_rolesecret
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFma3pmcnprenBpbXdndHlwb2l0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MTEyMzAyMCwiZXhwIjoyMDY2Njk5MDIwfQ.IcXU_tcoGScUKOWvd6iMMDAZKjCvSySxbDlgqiz744M
+
+Copy
+
+This key has the ability to bypass Row Level Security. Never share it publicly. If leaked, generate a new JWT secret immediately. Prefer using Publishable API keys instead.
+
+
+Skip to content
+Navigation Menu
+Settings
+Developer Settings
+
+Type / to search
+New fine-grained personal access token
+Create a fine-grained, repository-scoped token suitable for personal API use and for using Git over HTTPS.
+
+Token name *
+KD
+'KD' is available.
+A unique name for this token. May be visible to resource owners or users with possession of the token.
+Description
+Resource owner
+The token will only be able to make changes to resources owned by the selected resource owner. Tokens can always read all public repositories.
+
+Expiration
+GitHub strongly recommends that you set an expiration date for your token to help keep your information secure. 
+Learn more
+Repository access
+
+
+Public repositories
+Read-only access to public repositories.
+
+All repositories
+This applies to all current and future repositories you own. Also includes public repositories (read-only).
+
+Only select repositories
+Select at least one repository. Max 50 repositories. Also includes public repositories (read-only).
+Permissions
+Choose the minimal permissions necessary for your needs. Learn more about permissions.
+
+Repository permissions
+19 selected 1 mandatory
+Repository permissions permit access to repositories and related resources.
+
+Actions
+Selected
+Workflows, workflow runs and artifacts. Learn more.
+Administration
+Selected
+Repository creation, deletion, settings, teams, and collaborators. Learn more.
+Attestations
+Selected
+Create and retrieve attestations for a repository. Learn more.
+Code scanning alerts
+Selected
+View and manage code scanning alerts. Learn more.
+Codespaces
+Selected
+Create, edit, delete and list Codespaces. Learn more.
+Codespaces lifecycle admin
+Selected
+Manage the lifecycle of Codespaces, including starting and stopping. Learn more.
+Codespaces metadata
+Selected
+Access Codespaces metadata including the devcontainers and machine type. Learn more.
+Codespaces secrets
+Selected
+Restrict Codespaces user secrets modifications to specific repositories. Learn more.
+Commit statuses
+Selected
+Commit statuses. Learn more.
+Contents
+Selected
+Repository contents, commits, branches, downloads, releases, and merges. Learn more.
+Custom properties
+Selected
+View and set values for a repository's custom properties, when allowed by the property. Learn more.
+Dependabot alerts
+Retrieve Dependabot alerts. Learn more.
+Dependabot secrets
+Manage Dependabot repository secrets. Learn more.
+Deployments
+Deployments and deployment statuses. Learn more.
+Discussions
+Discussions and related comments and labels. Learn more.
+Environments
+Manage repository environments. Learn more.
+Issues
+Issues and related comments, assignees, labels, and milestones. Learn more.
+Merge queues
+Manage a repository's merge queues Learn more.
+Metadata
+Mandatory
+Search repositories, list collaborators, and access repository metadata. Learn more.
+This is a mandatory permission and cannot be changed
+Pages
+Selected
+Retrieve Pages statuses, configuration, and builds, as well as create new builds. Learn more.
+Pull requests
+Selected
+Pull requests and related comments, assignees, labels, milestones, and merges. Learn more.
+Repository security advisories
+Selected
+View and manage repository security advisories. Learn more.
+Secret scanning alerts
+Selected
+View and manage secret scanning alerts. Learn more.
+Secrets
+Selected
+Manage Actions repository secrets. Learn more.
+Variables
+Selected
+Manage Actions repository variables. Learn more.
+Webhooks
+Selected
+Manage the post-receive hooks for a repository. Learn more.
+Workflows
+Selected
+Update GitHub Action workflow files. Learn more.
+Account permissions
+19 selected
+User permissions permit access to resources under your personal GitHub account.
+
+Block another user
+Selected
+View and manage users blocked by the user. Learn more.
+Codespaces user secrets
+Selected
+Manage Codespaces user secrets. Learn more.
+Copilot Chat
+Selected
+This application will receive your GitHub ID, your GitHub Copilot Chat session messages (not including messages sent to another application), and timestamps of provided GitHub Copilot Chat session messages. This permission must be enabled for Copilot Extensions. Learn more.
+Copilot Editor Context
+Selected
+This application will receive bits of Editor Context (e.g. currently opened file) whenever you send it a message through Copilot Chat. Learn more.
+Email addresses
+Selected
+Manage a user's email addresses. Learn more.
+Events
+Selected
+View events triggered by a user's activity. Learn more.
+Followers
+Selected
+A user's followers Learn more.
+GPG keys
+Selected
+View and manage a user's GPG keys. Learn more.
+Gists
+Selected
+Create and modify a user's gists and comments. Learn more.
+Git SSH keys
+Selected
+Git SSH keys Learn more.
+Interaction limits
+Selected
+Interaction limits on repositories Learn more.
+Knowledge bases
+Selected
+View knowledge bases for a user. Learn more.
+Models
+Selected
+Allows access to GitHub Models. Learn more.
+Plan
+Selected
+View a user's plan. Learn more.
+Private repository invitations
+Selected
+View a user's invitations to private repositories Learn more.
+Profile
+Selected
+Manage a user's profile settings. Learn more.
+SSH signing keys
+Selected
+View and manage a user's SSH signing keys. Learn more.
+Starring
+Selected
+List and manage repositories a user is starring. Learn more.
+Watching
+Selected
+List and change repositories a user is subscribed to. Learn more.
+This token will be ready for use immediately.
+
+Footer
+© 2025 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+New Fine-grained Personal Access Token
+
+
+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
+
+
+
+
+mongosh "mongodb+srv://kd.qkx3kfm.mongodb.net/" --apiVersion 1 --username sitharanimsara181221
+
+
+
+vOrekcUHWCDXDo6z     pass
+
+Database Access
+Database Users
+Custom Roles
+
+User
+Description
+Authentication Method
+MongoDB Roles
+Resources
+Actions
+sitharanimsara181221
+SCRAM
+readWriteAnyDatabase@admin
+All Resources
+
+
+System StatusAll Good 
+
+
+mongosh installed
