@@ -44,15 +44,12 @@ function StoryWeaverPanel() {
     // const { success, data, error } = await generateStory(values.prompt);
     setIsLoading(false);
 
-    if (success && data) {
-      setResult(data);
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Error Weaving Story',
-        description: error || 'The Royal Storyteller is busy. Please try again later.',
-      });
-    }
+    setResult({ title: "Placeholder Story", story: "This is a placeholder story because Genkit features are temporarily disabled.", imageDataUri: "https://placehold.co/600x400.png" });
+    toast({
+      variant: 'default',
+      title: 'Story Weaver Disabled',
+      description: 'The Royal Storyteller is currently resting. Story weaving features are temporarily disabled.',
+    });
   }
 
   // async function handleSaveStory() {
@@ -144,12 +141,12 @@ function StoryWeaverPanel() {
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.story}</ReactMarkdown>
             </div>
           </CardContent>
-          <CardFooter>
+          {/* <CardFooter>
             <Button onClick={handleSaveStory} disabled={isSaving || isSaved}>
               {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" />}
               {isSaved ? 'Saved to Hall' : 'Save to Hall of Legends'}
             </Button>
-          </CardFooter>
+          </CardFooter> */}
         </Card>
       )}
     </div>

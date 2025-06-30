@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import Script from 'next/script';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { cn } from '@/lib/utils';
 
@@ -32,6 +33,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={cn("font-body antialiased", inter.variable, spaceGrotesk.variable)}>
         {children}
+        <Script src="https://js.puter.com/v2/" strategy="lazyOnload" />
         <Toaster />
         <Analytics />
         <SpeedInsights />

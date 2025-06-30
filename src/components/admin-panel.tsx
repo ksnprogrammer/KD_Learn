@@ -28,6 +28,9 @@ import {
   updateSubmissionStatus,
   getPayments,
   updatePaymentStatus,
+  generateModule,
+  submitModuleForReview,
+  generateKingdomAnalytics,
 } from '@/app/actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -72,7 +75,7 @@ function AiDragonCreator() {
     setIsLoading(true);
     setResult(null);
     setCurrentTopic(values.topicDescription);
-    // const { success, data, error } = await generateModule(values.topicDescription, values.examLevel);
+    const { success, data, error } = await generateModule(values.topicDescription, values.examLevel);
     setIsLoading(false);
 
     if (success && data) {
@@ -100,7 +103,7 @@ function AiDragonCreator() {
     }
 
     setIsSubmitting(true);
-    // const { success, error } = await submitModuleForReview(result, currentTopic, examLevel);
+    const { success, error } = await submitModuleForReview(result, currentTopic, examLevel);
     setIsSubmitting(false);
 
     if (success) {
@@ -566,7 +569,7 @@ function AnalyticsReports() {
   const handleGenerateReport = async () => {
     setIsLoading(true);
     setReport(null);
-    // const { success, data, error } = await generateKingdomAnalytics();
+    const { success, data, error } = await generateKingdomAnalytics();
     setIsLoading(false);
 
     if (success && data) {

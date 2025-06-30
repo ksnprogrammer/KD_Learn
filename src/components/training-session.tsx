@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { CreateModuleOutput, QuizQuestion } from '@/ai/flows/create-module-from-description';
-import { recordQuestCompletion } from '@/app/actions';
+import { recordQuestCompletion, generateAudio } from '@/app/actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,7 +91,7 @@ export function TrainingSession({ module, submissionId }: TrainingSessionProps) 
 
     setAudioStates(prev => ({ ...prev, [index]: { isLoading: true, audioData: null } }));
 
-    // const { success, data, error } = await generateAudio(text);
+        const { success, data, error } = await generateAudio(text);
 
     if (success && data) {
       setAudioStates(prev => ({ ...prev, [index]: { isLoading: false, audioData: data.media } }));

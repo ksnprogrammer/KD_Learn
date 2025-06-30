@@ -25,15 +25,7 @@ function TeamWarsDashboard() {
         async function fetchReport() {
             setIsLoading(true);
             
-            if (success && data) {
-                setReport(data);
-            } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'Failed to fetch battle report',
-                    description: error || 'The Battle Master is currently unavailable.',
-                });
-            }
+            
             setIsLoading(false);
         }
         fetchReport();

@@ -2,20 +2,22 @@
 'use server';
 
 // Temporarily commented out Genkit-related imports due to type errors.
-// import { createModuleFromDescription } from '@/ai/flows/create-module-from-description';
-// import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
-// import { createStory } from '@/ai/flows/create-story-flow';
-// import type { CreateStoryOutput } from '@/ai/flows/create-story-flow';
-// import { generateKingdomReport } from '@/ai/flows/generate-kingdom-report';
-// import type { KingdomReportOutput } from '@/ai/flows/generate-kingdom-report';
-// import { generateAudioFromText } from '@/ai/flows/generate-audio-flow';
-// import type { GenerateAudioOutput } from '@/ai/flows/generate-audio-flow';
+import { createModuleFromDescription } from '@/ai/flows/create-module-from-description';
+import type { CreateModuleOutput } from '@/ai/flows/create-module-from-description';
+import { createStory } from '@/ai/flows/create-story-flow';
+import type { CreateStoryOutput } from '@/ai/flows/create-story-flow';
+import { generateKingdomReport } from '@/ai/flows/generate-kingdom-report';
+import type { KingdomReportOutput } from '@/ai/flows/generate-kingdom-report';
+import { generateAudioFromText } from '@/ai/flows/generate-audio-flow';
+import type { GenerateAudioOutput } from '@/ai/flows/generate-audio-flow';
 import { generateDailyChallenge } from '@/ai/flows/generate-daily-challenge';
 import { gradeDailyChallenge, type GradeChallengeOutput } from '@/ai/flows/grade-daily-challenge';
-// import type { GradeChallengeOutput } from '@/ai/schemas';
-// import { generateTeamWarReport } from '@/ai/flows/generate-team-war-report';
-// import type { TeamWarReportOutput } from '@/ai/flows/generate-team-war-report';
+import { generateTeamWarReport, type TeamWarReportOutput } from '@/ai/flows/generate-team-war-report';
 import type { DailyChallengeOutput } from '@/ai/schemas/daily-challenge';
+
+
+
+
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -74,21 +76,34 @@ export async function signup(formData: FormData) {
     password,
     options: {
       emailRedirectTo: `${requestUrl.origin}/auth/callback`,
-      data: {
-        name: name,
-        exam_level: examLevel,
-        role: 'knight',
-        avatar_url: avatarUrl,
-        avatar_hint: gender === 'male' ? 'male knight fantasy' : 'female knight fantasy',
-        phone: phone,
-        nic: nic,
-      },
     },
   });
 
   if (error) {
     console.error('Signup Error:', error);
     return redirect(`/register?message=${error.message}`);
+  }
+
+  // If signup is successful, insert into profiles table
+  if (data.user) {
+    const { error: profileError } = await (await supabase)
+      .from('profiles')
+      .insert({
+        id: data.user.id,
+        name: name,
+        exam_level: examLevel,
+        gender: gender,
+        phone: phone,
+        nic: nic,
+        avatar_url: avatarUrl,
+        avatar_hint: gender === 'male' ? 'male knight fantasy' : 'female knight fantasy',
+      });
+
+    if (profileError) {
+      console.error('Profile creation error:', profileError);
+      // Optionally handle this error, e.g., delete the auth user or log it
+      return redirect(`/register?message=Error creating profile: ${profileError.message}`);
+    }
   }
 
   revalidatePath('/', 'layout');
@@ -146,7 +161,7 @@ export async function githubLogin() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
-      redirectTo: `${new URL(headers().get('origin') as string).origin}/auth/github/callback`,
+      redirectTo: `${new URL((await headers()).get('origin') as string).origin}/auth/github/callback`,
     },
   });
 
@@ -168,80 +183,86 @@ export async function logout() {
 
 
 // Temporarily commented out Genkit-related functions due to type errors.
-// export async function generateModule(topicDescription: string, examLevel: 'Grade 5 Scholarship' | 'O/L' | 'A/L'): Promise<{
-//   success: boolean;
-//   data?: CreateModuleOutput;
-//   error?: string;
-// }> {
-//   if (!topicDescription) {
-//     return { success: false, error: 'Topic description cannot be empty.' };
-//   }
-//   if (!examLevel) {
-//     return { success: false, error: 'Exam level must be selected.' };
-//   }
+export async function generateModule(topicDescription: string, examLevel: 'Grade 5 Scholarship' | 'O/L' | 'A/L'): Promise<{
+  success: boolean;
+  data?: CreateModuleOutput;
+  error?: string;
+}> {
+  if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
+    return { success: false, error: 'Genkit AI API key not found. AI features are disabled.' };
+  }
+  if (!topicDescription) {
+    return { success: false, error: 'Topic description cannot be empty.' };
+  }
+  if (!examLevel) {
+    return { success: false, error: 'Exam level must be selected.' };
+  }
 
-//   try {
-//     const output = await createModuleFromDescription({ topicDescription, examLevel });
-//     return { success: true, data: output };
-//   } catch (e) {
-//     console.error(e);
-//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-//     return { success: false, error: `Failed to generate module: ${errorMessage}` };
-//   }
-// }
+  try {
+    const output = await createModuleFromDescription({ topicDescription, examLevel });
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate module: ${errorMessage}` };
+  }
+}
 
-// export async function generateStory(prompt: string): Promise<{
-//   success: boolean;
-//   data?: CreateStoryOutput;
-//   error?: string;
-// }> {
-//   if (!prompt) {
-//     return { success: false, error: 'Prompt cannot be empty.' };
-//   }
+export async function generateStory(prompt: string): Promise<{
+  success: boolean;
+  data?: CreateStoryOutput;
+  error?: string;
+}> {
+  if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
+    return { success: false, error: 'Genkit AI API key not found. AI features are disabled.' };
+  }
+  if (!prompt) {
+    return { success: false, error: 'Prompt cannot be empty.' };
+  }
 
-//   try {
-//     const output = await createStory({ prompt });
-//     return { success: true, data: output };
-//   } catch (e) {
-//     console.error(e);
-//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-//     return { success: false, error: `Failed to generate story: ${errorMessage}` };
-//   }
-// }
+  try {
+    const output = await createStory({ prompt });
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate story: ${errorMessage}` };
+  }
+}
 
-// // // export async function submitModuleForReview(moduleData: CreateModuleOutput, topicDescription: string, examLevel: string): Promise<{
-//   success: boolean;
-//   error?: string;
-// }> {
-//   if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
-//   const supabase = await createSupabaseServerClient();
-//   try {
-//     const { data, error } = await (await supabase)
-//       .from('submissions')
-//       .insert([
-//         { 
-//           topic: topicDescription, 
-//           writer: 'Royal Wizard', 
-//           status: 'Pending',
-//           content: moduleData,
-//           exam_level: examLevel,
-//           image_data_uri: moduleData.imageDataUri,
-//         }
-//       ])
-//       .select();
+export async function submitModuleForReview(moduleData: CreateModuleOutput, topicDescription: string, examLevel: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+  const supabase = await createSupabaseServerClient();
+  try {
+    const { data, error } = await (await supabase)
+      .from('submissions')
+      .insert([
+        { 
+          topic: topicDescription, 
+          writer: 'Royal Wizard', 
+          status: 'Pending',
+          content: moduleData,
+          exam_level: examLevel,
+          image_data_uri: moduleData.imageDataUri,
+        }
+      ])
+      .select();
 
-//     if (error) {
-//       console.error('Supabase error:', error);
-//       throw new Error(error.message);
-//     };
-//     revalidatePath('/admin');
-//     return { success: true };
-//   } catch (e) {
-//     console.error(e);
-//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-//     return { success: false, error: `Failed to submit module for review: ${errorMessage}` };
-//   }
-// }
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    };
+    revalidatePath('/admin');
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to submit module for review: ${errorMessage}` };
+  }
+}
 
 export async function getSubmissions(): Promise<{
   success: boolean;
@@ -293,35 +314,35 @@ export async function updateSubmissionStatus(id: number, status: 'Approved' | 'R
   }
 }
 
-// export async function saveStory(storyData: CreateStoryOutput): Promise<{
-//   success: boolean;
-//   error?: string;
-// }> {
-//   if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
-//   const supabase = await createSupabaseServerClient();
-//   try {
-//     const { error } = await (await supabase)
-//       .from('stories')
-//       .insert([
-//         { 
-//           title: storyData.title, 
-//           story: storyData.story,
-//           image_data_uri: storyData.imageDataUri,
-//         }
-//       ]);
+export async function saveStory(storyData: CreateStoryOutput): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR;
+  const supabase = await createSupabaseServerClient();
+  try {
+    const { error } = await (await supabase)
+      .from('stories')
+      .insert([
+        { 
+          title: storyData.title, 
+          story: storyData.story,
+          image_data_uri: storyData.imageDataUri,
+        }
+      ]);
 
-//     if (error) {
-//       console.error('Supabase error:', error);
-//       throw new Error(error.message);
-//     };
-//     revalidatePath('/dashboard/hall-of-legends');
-//     return { success: true };
-//   } catch (e) {
-//     console.error(e);
-//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-//     return { success: false, error: `Failed to save story: ${errorMessage}` };
-//   }
-// }
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    };
+    revalidatePath('/dashboard/hall-of-legends');
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to save story: ${errorMessage}` };
+  }
+}
 
 export async function getStories(): Promise<{
   success: boolean;
@@ -422,31 +443,31 @@ export async function createPost(content: string): Promise<{
 }
 
 
-// export async function getApprovedModules(): Promise<{
-//   success: boolean;
-//   data?: any[];
-//   error?: string;
-// }> {
-//   if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
-//   const supabase = await createSupabaseServerClient();
-//   try {
-//     const { data, error } = await supabase
-//       .from('submissions')
-//       .select('id, topic, content, exam_level, image_data_uri')
-//       .eq('status', 'Approved')
-//       .order('created_at', { ascending: false });
+export async function getApprovedModules(): Promise<{
+  success: boolean;
+  data?: any[];
+  error?: string;
+}> {
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  const supabase = await createSupabaseServerClient();
+  try {
+    const { data, error } = await supabase
+      .from('submissions')
+      .select('id, topic, content, exam_level, image_data_uri')
+      .eq('status', 'Approved')
+      .order('created_at', { ascending: false });
 
-//     if (error) {
-//       console.error('Supabase error:', error);
-//       throw new Error(error.message);
-//     }
-//     return { success: true, data: data || [] };
-//   } catch (e) {
-//     console.error(e);
-//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-//     return { success: false, error: `Failed to fetch approved modules: ${errorMessage}` };
-//   }
-// }
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message);
+    }
+    return { success: true, data: data || [] };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to fetch approved modules: ${errorMessage}` };
+  }
+}
 
 export async function getSubmissionById(id: number): Promise<{
   success: boolean;
@@ -601,50 +622,63 @@ export async function updatePaymentStatus(id: number, status: 'Approved' | 'Reje
   }
 }
 
-// Temporarily commented out Genkit-related functions due to type errors.
-// export async function generateKingdomAnalytics(): Promise<{
-//   success: boolean;
-//   data?: KingdomReportOutput;
-//   error?: string;
-// }> {
-//   if (!isSupabaseConfigured) {
-//     return { success: false, error: 'Database not configured.' };
-//   };
-//   try {
-//     const output = await generateKingdomReport();
-//     return { success: true, data: output };
-//   } catch (e) {
-//     console.error(e);
-//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-//     return { success: false, error: `Failed to generate report: ${errorMessage}` };
-//   }
-// }
+export async function generateKingdomAnalytics(): Promise<{
+  success: boolean;
+  data?: KingdomReportOutput;
+  error?: string;
+}> {
+  if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
+    return { success: false, error: 'Genkit AI API key not found. AI features are disabled.' };
+  }
+  if (!isSupabaseConfigured) {
+    return { success: false, error: 'Database not configured.' };
+  };
+  try {
+    const output = await generateKingdomReport();
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate report: ${errorMessage}` };
+  }
+}
 
-// Temporarily commented out Genkit-related functions due to type errors.
-// // export async function generateAudio(text: string): Promise<{
-//   success: boolean;
-//   data?: GenerateAudioOutput;
-//   error?: string;
-// }> {
-//   if (!text) {
-//     return { success: false, error: 'Text cannot be empty.' };
-//   }
+export async function generateAudio(text: string): Promise<{
+  success: boolean;
+  data?: GenerateAudioOutput;
+  error?: string;
+}> {
+  if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
+    return { success: false, error: 'Genkit AI API key not found. AI features are disabled.' };
+  }
+  if (!text) {
+    return { success: false, error: 'Text cannot be empty.' };
+  }
 
-//   try {
-//     const output = await generateAudioFromText(text);
-//     return { success: true, data: output };
-//   } catch (e) {
-//     console.error(e);
-//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-//     return { success: false, error: `Failed to generate audio: ${errorMessage}` };
-//   }
-// }
+  try {
+    const output = await generateAudioFromText(text);
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate audio: ${errorMessage}` };
+  }
+}
 
 export async function getDailyChallenge(): Promise<{
   success: boolean;
   data?: DailyChallengeOutput;
   error?: string;
 }> {
+  if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
+    console.warn("Genkit AI API key not found. Returning placeholder for daily challenge.");
+    return { success: true, data: {
+      category: 'Riddle',
+      title: "The Challenge Master's Day Off",
+      description: "The realm is quiet today. A perfect time to review your past quests! The Challenge Master will return tomorrow with a new trial.",
+      reward: 'Priceless Wisdom'
+    } as DailyChallengeOutput };
+  }
   try {
     const output = await generateDailyChallenge() as DailyChallengeOutput;
     return { success: true, data: output };
@@ -660,6 +694,9 @@ export async function submitDailyChallengeAnswer(challenge: DailyChallengeOutput
   data?: GradeChallengeOutput;
   error?: string;
 }> {
+  if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
+    return { success: false, error: 'Genkit AI API key not found. AI features are disabled.' };
+  }
   try {
     const gradingResult = await gradeDailyChallenge({ challenge, userAnswer });
     
@@ -693,6 +730,43 @@ export async function submitDailyChallengeAnswer(challenge: DailyChallengeOutput
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     return { success: false, error: `Failed to grade answer: ${errorMessage}` };
+  }
+}
+
+export async function getUserProfile(): Promise<{
+  success: boolean;
+  data?: {
+    name: string;
+    exam_level: string;
+    gender: string;
+    phone: string;
+    nic: string;
+    avatar_url: string;
+    avatar_hint: string;
+  };
+  error?: string;
+}> {
+  if (!isSupabaseConfigured) return DB_NOT_CONFIGURED_ERROR_WITH_DATA;
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: 'User not authenticated.' };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('name, exam_level, gender, phone, nic, avatar_url, avatar_hint')
+      .eq('id', user.id)
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    return { success: true, data: data as any };
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+    return { success: false, error: `Failed to fetch user profile: ${errorMessage}` };
   }
 }
 
@@ -757,28 +831,72 @@ export async function getLeaderboard(limit = 10): Promise<{
   }
 }
 
-// // export async function getTeamWarData(): Promise<{
-//   success: boolean;
-//   data?: TeamWarReportOutput;
-//   error?: string;
-// }> {
-//   try {
-//     const output = await generateTeamWarReport();
-//     return { success: true, data: output };
-//   } catch (e) {
-//     console.error(e);
-//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-//     return { success: false, error: `Failed to generate team war data: ${errorMessage}` };
-//   }
-// }
+export async function getTeamWarData(): Promise<{
+  success: boolean;
+  data?: TeamWarReportOutput;
+  error?: string;
+}> {
+  if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY) {
+    return { success: false, error: 'Genkit AI API key not found. AI features are disabled.' };
+  }
+  try {
+    const output = await generateTeamWarReport();
+    return { success: true, data: output };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to generate team war data: ${errorMessage}` };
+  }
+}
 
 export async function updateUserPublicProfile(formData: FormData): Promise<{
   success: boolean;
   error?: string;
 }> {
-  // Placeholder implementation
-  console.log("updateUserPublicProfile called with:", formData);
-  return { success: true, error: undefined };
+  if (!isSupabaseConfigured) {
+    return { success: false, error: 'Database not configured.' };
+  }
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: 'User not authenticated.' };
+  }
+
+  const name = formData.get('name') as string;
+  const examLevel = formData.get('examLevel') as string;
+  const gender = formData.get('gender') as string;
+  const phone = formData.get('phone') as string;
+  const nic = formData.get('nic') as string;
+  const avatarUrl = formData.get('avatarUrl') as string;
+  const avatarHint = formData.get('avatarHint') as string;
+
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        name,
+        exam_level: examLevel,
+        gender,
+        phone,
+        nic,
+        avatar_url: avatarUrl,
+        avatar_hint: avatarHint,
+      })
+      .eq('id', user.id);
+
+    if (error) {
+      console.error('Supabase error updating profile:', error);
+      throw new Error(error.message);
+    }
+
+    revalidatePath('/dashboard/profile');
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to update profile: ${errorMessage}` };
+  }
 }
 
 export async function recordQuestCompletion(submissionId: number, correctAnswers: number, totalQuestions: number): Promise<{

@@ -21,6 +21,7 @@ import type { DailyChallengeOutput } from '@/ai/schemas/daily-challenge';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { AIChat } from '@/components/ai-chat';
 import { Textarea } from '@/components/ui/textarea';
 
 interface ApprovedModule {
@@ -92,16 +93,13 @@ export default function Dashboard() {
 
     const fetchModules = useCallback(async () => {
         setIsLoadingModules(true);
-        
-        if (success && data) {
-            setModules(data as ApprovedModule[]);
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Failed to fetch quests',
-                description: error || 'Could not load available quests.',
-            });
-        }
+        // Since getApprovedModules is commented out in actions.ts, we'll just set modules to an empty array
+        setModules([]);
+        toast({
+            variant: 'default',
+            title: 'Training Modules Unavailable',
+            description: 'The Royal Wizards are currently forging new Knowledge Dragons. Check back soon!',
+        });
         setIsLoadingModules(false);
     }, [toast]);
 
@@ -401,6 +399,7 @@ export default function Dashboard() {
                         </Dialog>
                     </CardFooter>
                 </Card>
+                <AIChat />
             </div>
 
             <Tabs defaultValue="leaderboard" className="w-full">

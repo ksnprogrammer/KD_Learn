@@ -38,15 +38,13 @@ function WeaponTrainingContent() {
         const fetchModules = async () => {
             setIsLoading(true);
             
-            if (success && data) {
-                setModules(data as ApprovedModule[]);
-            } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'Failed to fetch training modules',
-                    description: error || 'Could not load available quests.',
-                });
-            }
+            // Placeholder for when getApprovedModules is enabled
+            setModules([]);
+            toast({
+                variant: 'default',
+                title: 'Training Modules Unavailable',
+                description: 'The Royal Wizards are currently forging new Knowledge Dragons. Check back soon!',
+            });
             setIsLoading(false);
         };
 

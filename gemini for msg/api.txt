@@ -1,0 +1,256 @@
+API key created
+Use this key in your application by passing it with the key=API_KEY parameter.
+
+Your API key
+AQ.Ab8RN6KPvcQWpLP14GI5zP9S2QaYLyvqEDlzsTS2QSwqrngMlw
+
+AIzaSyAa0UXL7c6YAku1WRgib3dwNRdHDHk0CeU
+
+
+
+Puter.js Docs
+33.6K
+Open playground
+Download AI Prompt
+Getting Started
+Introduction
+
+Getting Started
+
+Examples
+
+Security and Permissions
+
+User Pays Model
+
+AI
+chat()
+
+txt2img()
+
+img2txt()
+
+txt2speech()
+
+Apps
+create()
+
+list()
+
+delete()
+
+update()
+
+get()
+
+Auth
+signIn()
+
+signOut()
+
+isSignedIn()
+
+getUser()
+
+Cloud Storage
+write()
+
+read()
+
+mkdir()
+
+readdir()
+
+rename()
+
+copy()
+
+move()
+
+stat()
+
+delete()
+
+upload()
+
+Hosting
+create()
+
+list()
+
+delete()
+
+update()
+
+get()
+
+Key-Value Store
+set()
+
+get()
+
+incr()
+
+decr()
+
+del()
+
+list()
+
+flush()
+
+Networking
+Socket
+
+TLSSocket
+
+fetch()
+
+UI
+authenticateWithPuter()
+
+alert()GUI
+
+prompt()GUI
+
+createWindow()GUI
+
+exit()GUI
+
+launchApp()GUI
+
+parentApp()GUI
+
+setMenubar()GUI
+
+on()GUI
+
+onLaunchedWithItems()GUI
+
+wasLaunchedWithItems()GUI
+
+onWindowClose()GUI
+
+setWindowHeight()GUI
+
+setWindowPosition()GUI
+
+setWindowSize()GUI
+
+setWindowTitle()GUI
+
+setWindowWidth()GUI
+
+setWindowX()GUI
+
+setWindowY()GUI
+
+showOpenFilePicker()
+
+showSaveFilePicker()
+
+showDirectoryPicker()
+
+showColorPicker()GUI
+
+showFontPicker()GUI
+
+socialShare()GUI
+
+Drivers
+call
+
+Utilities
+appID
+
+env
+
+print()
+
+randName()
+
+Objects
+AppConnection
+
+App
+
+FSItem
+
+Subdomain
+
+Puter.js
+Puter.js brings serverless auth, cloud, and AI services directly to your browser-side JavaScript with no backend code or configuration required. Just include a single <script> tag and you can instantly use file storage, databases, Claude, GPT, DALL-E, and more right from your frontend code.
+
+https://super-magical-website.com
+OpenAI API
+Cloud Storage
+Claude API
+DALL·E 3
+NoSQL
+<script src="https://js.puter.com/v2/"></script>
+
+Publish Web Pages
+Auth
+OCR
+Networking
+Text to Speech
+Additionally, Puter.js works in a way that every user of your app will cover their own costs, so whether you have 1 user or 1 million users, your app won't cost you anything to run. In other words, Puter.js gives your app infinitely scalable Cloud and AI for free.
+
+Puter.js is powered by Puter, the open-source cloud operating system with a heavy focus on privacy. Puter does not use tracking technologies and does not monetize or even collect personal information.
+
+Examples
+Chat with GPT-4.1 nano
+<html>
+<body>
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+        // Chat with GPT-4.1 nano
+        puter.ai.chat(`What is life?`).then(puter.print);
+    </script>
+</body>
+</html>
+GPT-4 Vision
+
+<html>
+<body>
+    <script src="https://js.puter.com/v2/"></script>
+    <img src="https://assets.puter.site/doge.jpeg" style="display:block;">
+    <script>
+        puter.ai.chat(
+            `What do you see?`, 
+            `https://assets.puter.site/doge.jpeg`)
+        .then(puter.print);
+    </script>
+</body>
+</html>
+Generate an image of a cat using DALL·E 3
+
+<html>
+<body>
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+        // Generate an image of a cat using DALL·E 3. Please note that testMode is set to true so that you can test this code without using up API credits.
+        puter.ai.txt2img('A picture of a cat.', true).then((image)=>{
+            document.body.appendChild(image);
+        });
+    </script>
+</body>
+</html>
+Stream the response
+
+<html>
+<body>
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+    (async () => {
+        const resp = await puter.ai.chat('Tell me in detail what Rick and Morty is all about.', {model: 'claude', stream: true });
+        for await ( const part of resp ) puter.print(part?.text?.replaceAll('\n', '<br>'));
+    })();
+    </script>
+</body>
+</html>
+NEXT
+
+Getting Started
+
+Puter.com•hey@puter.com•Discord•X (Twitter)•GitHub•Reddit© 2025 Puter Technologies Inc.	
