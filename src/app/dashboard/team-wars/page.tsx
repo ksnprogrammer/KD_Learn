@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getTeamWarData } from '@/app/actions';
+
 import type { TeamWarReportOutput } from '@/ai/flows/generate-team-war-report';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +24,7 @@ function TeamWarsDashboard() {
     useEffect(() => {
         async function fetchReport() {
             setIsLoading(true);
-            const { success, data, error } = await getTeamWarData();
+            
             if (success && data) {
                 setReport(data);
             } else {

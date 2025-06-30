@@ -448,43 +448,43 @@ export async function createPost(content: string): Promise<{
 //   }
 // }
 
-// export async function getSubmissionById(id: number): Promise<{
-//   success: boolean;
-//   data?: {
-//     topic: string;
-//     content: CreateModuleOutput;
-//     exam_level: string;
-//     image_data_uri?: string;
-//   };
-//   error?: string;
-// }> {
-//   if (!isSupabaseConfigured) return { ...DB_NOT_CONFIGURED_ERROR, data: undefined };
-//   const supabase = await createSupabaseServerClient();
-//   try {
-//     const { data, error } = await supabase
-//       .from('submissions')
-//       .select('topic, content, exam_level, image_data_uri')
-//       .eq('id', id)
-//       .eq('status', 'Approved')
-//       .single();
+export async function getSubmissionById(id: number): Promise<{
+  success: boolean;
+  data?: {
+    topic: string;
+    content: any;
+    exam_level: string;
+    image_data_uri?: string;
+  };
+  error?: string;
+}> {
+  if (!isSupabaseConfigured) return { ...DB_NOT_CONFIGURED_ERROR, data: undefined };
+  const supabase = await createSupabaseServerClient();
+  try {
+    const { data, error } = await supabase
+      .from('submissions')
+      .select('topic, content, exam_level, image_data_uri')
+      .eq('id', id)
+      .eq('status', 'Approved')
+      .single();
 
-//     if (error) {
-//       console.error('Supabase error:', error);
-//       if (error.code === 'PGRST116') { // "JSON object requested, but single row not found"
-//         return { success: false, error: 'Quest not found or not yet approved.' };
-//       }
-//       throw new Error(error.message);
-//     }
-//     if (!data) {
-//         return { success: false, error: 'Quest not found or not yet approved.' };
-//     }
-//     return { success: true, data: data as any };
-//   } catch (e) {
-//     console.error(e);
-//     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-//     return { success: false, error: `Failed to fetch submission: ${errorMessage}` };
-//   }
-// }
+    if (error) {
+      console.error('Supabase error:', error);
+      if (error.code === 'PGRST116') { // "JSON object requested, but single row not found"
+        return { success: false, error: 'Quest not found or not yet approved.' };
+      }
+      throw new Error(error.message);
+    }
+    if (!data) {
+        return { success: false, error: 'Quest not found or not yet approved.' };
+    }
+    return { success: true, data: data as any };
+  } catch (e) {
+    console.error(e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    return { success: false, error: `Failed to fetch submission: ${errorMessage}` };
+  }
+}
 
 export async function getSignedUrl(fileName: string, fileType: string) {
     if (!isSupabaseConfigured) {

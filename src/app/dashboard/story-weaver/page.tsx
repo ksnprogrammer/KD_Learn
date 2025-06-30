@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
-import { generateStory, saveStory } from "@/app/actions";
+
 import type { CreateStoryOutput } from "@/ai/flows/create-story-flow";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Feather, Sparkles, Save } from "lucide-react";
@@ -41,7 +41,7 @@ function StoryWeaverPanel() {
     setResult(null);
     setIsSaved(false);
 
-    const { success, data, error } = await generateStory(values.prompt);
+    // const { success, data, error } = await generateStory(values.prompt);
     setIsLoading(false);
 
     if (success && data) {
@@ -55,26 +55,26 @@ function StoryWeaverPanel() {
     }
   }
 
-  async function handleSaveStory() {
-    if (!result) return;
-    setIsSaving(true);
-    const { success, error } = await saveStory(result);
-    setIsSaving(false);
-
-    if (success) {
-      setIsSaved(true);
-      toast({
-        title: 'Story Saved!',
-        description: 'Your legend has been inscribed in the Hall of Legends.',
-      });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Error Saving Story',
-        description: error || 'Could not save your story. Please try again.',
-      });
-    }
-  }
+  // async function handleSaveStory() {
+//     setIsSaving(true);
+//     if (result) {
+//       const { success, error } = await saveStory(result);
+//       if (success) {
+//         toast({
+//           title: "Story Saved!",
+//           description: "Your story has been successfully saved to the Hall of Legends.",
+//         });
+//         setIsSaved(true);
+//       } else {
+//         toast({
+//           title: "Error Saving Story",
+//           description: error || "An unknown error occurred while saving your story.",
+//           variant: "destructive",
+//         });
+//       }
+//     }
+//     setIsSaving(false);
+//   }
 
   return (
     <div className="container mx-auto py-8">

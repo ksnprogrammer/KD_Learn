@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Swords, Zap, FlaskConical, Leaf, BookOpen, Sigma } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getApprovedModules } from "@/app/actions";
+
 import Link from "next/link";
 import type { CreateModuleOutput } from "@/ai/flows/create-module-from-description";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +37,7 @@ function WeaponTrainingContent() {
     useEffect(() => {
         const fetchModules = async () => {
             setIsLoading(true);
-            const { success, data, error } = await getApprovedModules();
+            
             if (success && data) {
                 setModules(data as ApprovedModule[]);
             } else {

@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { getPosts, createPost, getApprovedModules, getDailyChallenge, getUserStats, getLeaderboard, submitDailyChallengeAnswer } from '@/app/actions';
+import { getPosts, createPost, getDailyChallenge, getUserStats, getLeaderboard, submitDailyChallengeAnswer } from '@/app/actions';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/hooks/use-user';
@@ -92,7 +92,7 @@ export default function Dashboard() {
 
     const fetchModules = useCallback(async () => {
         setIsLoadingModules(true);
-        const { success, data, error } = await getApprovedModules();
+        
         if (success && data) {
             setModules(data as ApprovedModule[]);
         } else {

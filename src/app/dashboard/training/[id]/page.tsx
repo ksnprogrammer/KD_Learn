@@ -1,5 +1,5 @@
 
-import { getSubmissionById } from '@/app/actions';
+
 import { TrainingSession } from '@/components/training-session';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,8 @@ interface TrainingPageProps {
   params: { id: string };
   searchParams?: { [key: string]: string | string[] | undefined };
 }
+
+import { getSubmissionById } from '@/app/actions';
 
 async function getModule(id: number) {
     const { success, data, error } = await getSubmissionById(id);
